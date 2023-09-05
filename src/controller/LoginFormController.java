@@ -8,6 +8,7 @@ public class LoginFormController {
     public TextField userNameTxt;
     public PasswordField passwordTxt;
 
-    public void lognBtnOnActon(ActionEvent actionEvent) {
+    public void loginBtnOnActon(ActionEvent actionEvent) {
+
     }
 }

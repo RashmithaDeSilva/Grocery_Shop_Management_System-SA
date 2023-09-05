@@ -27,7 +27,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Button layoutX="665.0" layoutY="329.0" mnemonicParsing="false" onAction="#lognBtnOnActon" prefHeight="38.0" prefWidth="107.0" style="-fx-background-color: #48dbfb;" text="Login">
+      <Button layoutX="665.0" layoutY="329.0" mnemonicParsing="false" onAction="#loginBtnOnActon" prefHeight="38.0" prefWidth="107.0" style="-fx-background-color: #48dbfb;" text="Login">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -40,12 +40,12 @@
       </Button>
       <TextField fx:id="userNameTxt" layoutX="529.0" layoutY="162.0" prefHeight="27.0" prefWidth="244.0">
          <font>
-            <Font size="14.0" />
+            <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
       <PasswordField fx:id="passwordTxt" layoutX="529.0" layoutY="253.0" prefHeight="27.0" prefWidth="244.0">
          <font>
-            <Font name="System Bold" size="14.0" />
+            <Font name="System Bold" size="16.0" />
          </font>
       </PasswordField>
    </children>
