@@ -7,7 +7,21 @@ public class DBConnection {
     private static String url = "jdbc:mysql://localhost/upeksha_communication";
     private static String userName = "root";
     private static String password = "";
+    private static DBConnection instance;
+    private static Statement stm;
 
+    private DBConnection() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            Connection connection = DriverManager.getConnection(url, userName, password);
+
+            stm = connection.createStatement();
+
+        } catch (Exception e) {
+            System.out.println("JDBC Class not found ...!");
+        }
+    }
 
     public static void main(String[] args) {
 
@@ -20,21 +34,32 @@ public class DBConnection {
 
             ResultSet reset = stm.executeQuery("SELECT * FROM items");
 
-//            while (reset.next()) {
-//                System.out.println("ID: " + reset.getInt(1) +
-//                        "\nItem name: " + reset.getString(2) +
-//                        "\nItem price: " + reset.getDouble(3) +
-//                        "\nItem selling price: " + reset.getDouble(4));
-//            }
-
             connection.close();
-
-
 
         } catch (Exception e) {
             System.out.println("JDBC Class not found ...!");
         }
     }
+
+
+    public static DBConnection getInstance() {
+        if (instance == null) {
+            instance = new DBConnection();
+        }
+        return instance;
+    }
+
+
+    public boolean checkUserLogin(String userName, String password) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT password FROM users WHERE user_name = '" + userName + "';");
+
+        if (reset.next()) {
+            return reset.getString(1).equals(password);
+        }
+
+        return false;
+    }
+
 
 
     // Getters

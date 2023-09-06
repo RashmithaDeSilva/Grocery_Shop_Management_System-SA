@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginFormController">
+<AnchorPane fx:id="contextLoginForm" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginFormController">
    <children>
       <ImageView fitHeight="400.0" fitWidth="439.0" layoutY="68.0" pickOnBounds="true" preserveRatio="true">
          <image>
@@ -27,7 +27,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Button layoutX="665.0" layoutY="329.0" mnemonicParsing="false" onAction="#loginBtnOnActon" prefHeight="38.0" prefWidth="107.0" style="-fx-background-color: #48dbfb;" text="Login">
+      <Button layoutX="665.0" layoutY="329.0" mnemonicParsing="false" onAction="#loginOnActonBtn" prefHeight="38.0" prefWidth="107.0" style="-fx-background-color: #48dbfb;" text="Login">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
