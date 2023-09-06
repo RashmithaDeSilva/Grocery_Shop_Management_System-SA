@@ -29,17 +29,17 @@ public class DashboardFormController {
         stage.centerOnScreen();
     }
 
-    public void sellOnActionBtn(ActionEvent actionEvent) throws IOException {
+    public void sellOnAction(ActionEvent actionEvent) throws IOException {
         setUI("SellForm");
     }
 
-    public void itemOnActionBtn(ActionEvent actionEvent) {
+    public void itemOnAction(ActionEvent actionEvent) {
     }
 
-    public void stockOnActionBtn(ActionEvent actionEvent) {
+    public void stockOnAction(ActionEvent actionEvent) {
     }
 
-    public void incomeOnActionBtn(ActionEvent actionEvent) {
+    public void incomeOnAction(ActionEvent actionEvent) {
     }
 
     public void userAccOnAction(MouseEvent mouseEvent) {
@@ -47,5 +47,9 @@ public class DashboardFormController {
 
     public void setUserName(String userName) {
         DashboardFormController.userName = userName;
+    }
+
+    public void logoutOnAction(ActionEvent actionEvent) {
+        System.exit(0);
     }
 }

@@ -35,7 +35,7 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Button layoutX="150.0" layoutY="144.0" mnemonicParsing="false" onAction="#sellOnActionBtn" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #48dbfb;" text="Sell">
+      <Button layoutX="150.0" layoutY="144.0" mnemonicParsing="false" onAction="#sellOnAction" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #48dbfb;" text="Sell">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
@@ -43,7 +43,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Button>
-      <Button layoutX="150.0" layoutY="283.0" mnemonicParsing="false" onAction="#itemOnActionBtn" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #48dbfb;" text="Items">
+      <Button layoutX="150.0" layoutY="283.0" mnemonicParsing="false" onAction="#itemOnAction" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #48dbfb;" text="Items">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
@@ -51,7 +51,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Button>
-      <Button layoutX="456.0" layoutY="150.0" mnemonicParsing="false" onAction="#stockOnActionBtn" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #48dbfb;" text="Stock">
+      <Button layoutX="456.0" layoutY="150.0" mnemonicParsing="false" onAction="#stockOnAction" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #48dbfb;" text="Stock">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
@@ -59,7 +59,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Button>
-      <Button layoutX="456.0" layoutY="283.0" mnemonicParsing="false" onAction="#incomeOnActionBtn" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #48dbfb;" text="Income">
+      <Button layoutX="456.0" layoutY="283.0" mnemonicParsing="false" onAction="#incomeOnAction" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #48dbfb;" text="Income">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
@@ -67,7 +67,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Button>
-      <Button layoutX="664.0" layoutY="428.0" mnemonicParsing="false" style="-fx-background-color: #ee5253;" text="Logout">
+      <Button layoutX="664.0" layoutY="428.0" mnemonicParsing="false" onAction="#logoutOnAction" style="-fx-background-color: #ee5253;" text="Logout">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
