@@ -16,7 +16,7 @@ public class DashboardFormController {
     public AnchorPane contextDashboardForm;
     public Label userNameTxt;
     public Label incomeTxt;
-    private static String userName;
+    private static String userName = "Admin";
 
     public void initialize() {
         userNameTxt.setText(userName);
