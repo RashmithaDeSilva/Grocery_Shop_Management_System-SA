@@ -19,7 +19,7 @@ public class DBConnection {
             stm = connection.createStatement();
 
         } catch (Exception e) {
-            System.out.println("JDBC Class not found ...!");
+            System.out.println("JDBC Class not found ...!\n" + e.getMessage());
         }
     }
 
