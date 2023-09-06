@@ -27,12 +27,12 @@
             <TableColumn fx:id="deleteCol" prefWidth="92.0" text="Delete" />
         </columns>
       </TableView>
-      <TextField fx:id="idTxt" layoutX="691.0" layoutY="193.0" prefHeight="27.0" prefWidth="113.0" promptText="Item ID" />
-      <TextField fx:id="nameTxt" layoutX="690.0" layoutY="244.0" prefHeight="27.0" prefWidth="228.0" promptText="Item Name" />
-      <TextField fx:id="discountTxt" layoutX="690.0" layoutY="344.0" prefHeight="27.0" prefWidth="114.0" promptText="Discount" />
-      <TextField fx:id="quantityTxt" layoutX="690.0" layoutY="293.0" prefHeight="27.0" prefWidth="114.0" promptText="Quantity " />
-      <TextField fx:id="priceTxt" layoutX="690.0" layoutY="395.0" prefHeight="27.0" prefWidth="114.0" promptText="Price" />
-      <Label fx:id="totalLbl" layoutX="691.0" layoutY="444.0" prefHeight="27.0" prefWidth="228.0" text="Total : ">
+      <TextField fx:id="idTxt" layoutX="691.0" layoutY="152.0" prefHeight="27.0" prefWidth="113.0" promptText="Item ID" />
+      <TextField fx:id="nameTxt" layoutX="690.0" layoutY="203.0" prefHeight="27.0" prefWidth="228.0" promptText="Item Name" />
+      <TextField fx:id="discountTxt" layoutX="690.0" layoutY="303.0" prefHeight="27.0" prefWidth="114.0" promptText="Discount" />
+      <TextField fx:id="quantityTxt" layoutX="690.0" layoutY="252.0" prefHeight="27.0" prefWidth="114.0" promptText="Quantity " />
+      <TextField fx:id="priceTxt" layoutX="690.0" layoutY="354.0" prefHeight="27.0" prefWidth="114.0" promptText="Price" />
+      <Label fx:id="totalLbl" layoutX="691.0" layoutY="429.0" prefHeight="27.0" prefWidth="228.0" text="Total : ">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
