@@ -34,8 +34,8 @@
       <TextField fx:id="idTxt" layoutX="691.0" layoutY="203.0" prefHeight="27.0" prefWidth="113.0" promptText="Item ID" />
       <TextField fx:id="nameTxt" layoutX="690.0" layoutY="254.0" prefHeight="27.0" prefWidth="228.0" promptText="Item Name" />
       <TextField fx:id="discountTxt" layoutX="690.0" layoutY="354.0" prefHeight="27.0" prefWidth="114.0" promptText="Discount" />
-      <TextField fx:id="quantityTxt" layoutX="690.0" layoutY="303.0" prefHeight="27.0" prefWidth="114.0" promptText="Quantity " />
-      <TextField fx:id="priceTxt" layoutX="690.0" layoutY="405.0" prefHeight="27.0" prefWidth="114.0" promptText="Price" />
+      <TextField fx:id="quantityTxt" layoutX="690.0" layoutY="303.0" prefHeight="27.0" prefWidth="102.0" promptText="Quantity " />
+      <TextField fx:id="priceTxt" editable="false" layoutX="690.0" layoutY="405.0" prefHeight="27.0" prefWidth="114.0" promptText="Price" />
       <Label fx:id="totalLbl" layoutX="690.0" layoutY="115.0" prefHeight="27.0" prefWidth="164.0" text="Total : ">
          <font>
             <Font name="System Bold" size="18.0" />
@@ -98,5 +98,6 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
+      <TextField fx:id="availableQuantityTxt" layoutX="815.0" layoutY="303.0" prefHeight="27.0" prefWidth="102.0" promptText="Available" />
    </children>
 </AnchorPane>

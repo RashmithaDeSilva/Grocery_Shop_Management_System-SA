@@ -17,6 +17,7 @@ import model.tableRows.SellItems;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class SellFormController {
@@ -37,8 +38,11 @@ public class SellFormController {
     public TableView<SellItems> itemTbl;
     public TableColumn<Object, String> idCol2;
     public TableColumn<Object, String> nameCol2;
-    private String searchText = "";
-    private DBConnection dbConnection = DBConnection.getInstance();
+    public TextField availableQuantityTxt;
+    private String searchTextId = "";
+    private String searchTextName = "";
+    private ArrayList<Item> items;
+    private final DBConnection dbConnection = DBConnection.getInstance();
 
 
     public void initialize() {
@@ -47,13 +51,17 @@ public class SellFormController {
         nameCol2.setCellValueFactory(new PropertyValueFactory<>("itemName"));
 
         try{
-            setTable2Data();
+            items = dbConnection.getItemTable();
+            if(items != null) {
+                setTable2Data();
+            }
+
         } catch (SQLException e) {
-            alertError(Alert.AlertType.ERROR, "Error", "Data Load Error", e.getMessage());
+            alertError(Alert.AlertType.ERROR, "Error", "Item Table Data Load Error", e.getMessage());
         }
 
         idTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            searchText = newValue.toLowerCase();
+            searchTextId = newValue.toLowerCase();
             try {
                 fillOtherInputs(SellFillterTypes.ID);
 
@@ -63,23 +71,59 @@ public class SellFormController {
         });
 
         nameTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            searchText = newValue.toLowerCase();
+            searchTextName = newValue.toLowerCase();
             try {
                 fillOtherInputs(SellFillterTypes.NAME);
 
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+
+//            ObservableList<StudentTM> obList = FXCollections.observableArrayList();
+//
+//            for (Student st : dbcon.getStudentTable()) {
+//
+//                if (st.getFullName().toLowerCase().contains(searchText)) {
+//                    Button btn = new Button("Delete");
+//
+//                    obList.add(new StudentTM(st.getId(), st.getFullName(),
+//                            String.valueOf(st.getDateOfBirth()), st.getAddress(), btn));
+//
+//                    btn.setOnAction(e->{
+//                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure?",
+//                                ButtonType.YES, ButtonType.NO);
+//                        Optional<ButtonType> buttonType = alert.showAndWait();
+//                        if (buttonType.isPresent() && buttonType.get().equals(ButtonType.YES)) {
+//                            dbcon.deleteStudent(st);
+//                            setTableData(searchText);
+//                            new Alert(Alert.AlertType.INFORMATION, "Student Delete Successfully").show();
+//                        }
+//                    });
+//                }
+//            }
+//            tblStudent.setItems(obList);
+
+
+
+
+
         });
     }
 
     private void fillOtherInputs(SellFillterTypes sellFillterTypes) throws SQLException {
         switch(sellFillterTypes) {
             case ID:
-                nameTxt.setText(dbConnection.getItemName(searchText));
+                for (Item i : items) {
+                    if(searchTextId.equals(Integer.toString(i.getItemId()))) {
+                        nameTxt.setText(i.getItemName()); // dbConnection.getItemName(searchTextId)
+                        availableQuantityTxt.setText(i.get);
+                        priceTxt.setText("Rs: " + i.getSellingPrice());
+                    }
+                }
                 break;
+
             case NAME:
-                System.out.println(searchText);
+                System.out.println(searchTextName);
                 break;
         }
     }
@@ -107,7 +151,7 @@ public class SellFormController {
     private void setTable2Data() throws SQLException {
         ObservableList<SellItems> obList = FXCollections.observableArrayList();
 
-        for (Item i : dbConnection.getItemTable()) {
+        for (Item i : items) {
             obList.add(new SellItems(i.getItemId(), i.getItemName()));
         }
         itemTbl.setItems(obList);
