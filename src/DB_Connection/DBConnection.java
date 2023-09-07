@@ -1,8 +1,10 @@
 package DB_Connection;
 
 import javafx.scene.control.Alert;
+import model.Item;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class DBConnection {
 
@@ -10,13 +12,14 @@ public class DBConnection {
     private static String userName = "root";
     private static String password = "";
     private static DBConnection instance;
+    private static Connection connection;
     private static Statement stm;
 
     private DBConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            Connection connection = DriverManager.getConnection(url, userName, password);
+            connection = DriverManager.getConnection(url, userName, password);
 
             stm = connection.createStatement();
 
@@ -71,6 +74,23 @@ public class DBConnection {
         }
 
         return "";
+    }
+
+    public ArrayList<Item> getItemTable() throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT * FROM items");
+
+        ArrayList<Item> items = new ArrayList<>();
+
+        while(reset.next()) {
+            items.add(new Item(reset.getInt("item_id"), reset.getString("item_name"),
+                    reset.getDouble("item_price"), reset.getDouble("item_selling_price")));
+        }
+
+        return items;
+    }
+
+    public void closeConnection() throws SQLException {
+        connection.close();
     }
 
 

@@ -1,5 +1,6 @@
 package controller;
 
+import DB_Connection.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,6 +11,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class DashboardFormController {
@@ -49,7 +51,8 @@ public class DashboardFormController {
         DashboardFormController.userName = userName;
     }
 
-    public void logoutOnAction(ActionEvent actionEvent) {
+    public void logoutOnAction(ActionEvent actionEvent) throws SQLException {
+        DBConnection.getInstance().closeConnection();
         System.exit(0);
     }
 }

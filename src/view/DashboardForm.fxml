@@ -19,7 +19,7 @@
       </Label>
       <ImageView fitHeight="24.0" fitWidth="25.0" layoutX="577.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../img/1177568.png" />
+            <Image url="@../assets/imagers/1177568.png" />
          </image>
       </ImageView>
       <Label fx:id="userNameTxt" layoutX="614.0" layoutY="21.0" onDragDetected="#userAccOnAction" prefHeight="19.0" prefWidth="156.0" text="User name">
