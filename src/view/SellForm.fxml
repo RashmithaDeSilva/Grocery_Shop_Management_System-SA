@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contextSellForm" prefHeight="550.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SellFormController">
+<AnchorPane fx:id="contextSellForm" prefHeight="550.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SellFormController">
    <children>
       <Label layoutX="30.0" layoutY="25.0" text="Sell">
          <font>
@@ -19,12 +19,12 @@
       <Separator layoutX="30.0" layoutY="88.0" prefHeight="4.0" prefWidth="709.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" />
       <TableView fx:id="quotationTbl" layoutX="30.0" layoutY="115.0" prefHeight="410.0" prefWidth="640.0">
         <columns>
-          <TableColumn fx:id="idCol" prefWidth="64.00000381469727" text="Item ID" />
-          <TableColumn fx:id="nameCol" prefWidth="178.4000244140625" text="Item Name" />
-            <TableColumn fx:id="quantityCol" prefWidth="96.79998779296875" text="Quantity " />
-            <TableColumn fx:id="discountCol" prefWidth="91.20001220703125" text="Discount" />
-            <TableColumn fx:id="priceCol" prefWidth="117.5999755859375" text="Price" />
-            <TableColumn fx:id="deleteCol" prefWidth="92.0" text="Delete" />
+          <TableColumn fx:id="idCol" prefWidth="64.00000381469727" resizable="false" text="Item ID" />
+          <TableColumn fx:id="nameCol" prefWidth="178.4000244140625" resizable="false" text="Item Name" />
+            <TableColumn fx:id="quantityCol" prefWidth="96.79998779296875" resizable="false" text="Quantity " />
+            <TableColumn fx:id="discountCol" prefWidth="91.20001220703125" resizable="false" text="Discount" />
+            <TableColumn fx:id="priceCol" prefWidth="117.5999755859375" resizable="false" text="Price" />
+            <TableColumn fx:id="deleteCol" prefWidth="92.0" resizable="false" text="Delete" />
         </columns>
       </TableView>
       <TextField fx:id="idTxt" layoutX="691.0" layoutY="152.0" prefHeight="27.0" prefWidth="113.0" promptText="Item ID" />
@@ -42,15 +42,26 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </Button>
-      <Button layoutX="748.0" layoutY="38.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
+      <Button layoutX="1075.0" layoutY="38.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Button>
-      <Button layoutX="844.0" layoutY="38.0" mnemonicParsing="false" onAction="#sellOnAction" style="-fx-background-color: #1dd1a1;" text="Sell">
+      <Button layoutX="1171.0" layoutY="38.0" mnemonicParsing="false" onAction="#sellOnAction" style="-fx-background-color: #1dd1a1;" text="Sell">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Button>
+      <Button layoutX="700.0" layoutY="488.0" mnemonicParsing="false" onAction="#printInvoiceOnAction" style="-fx-background-color: #1dd1a1;" text="Print Invoice ">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Button>
+      <TableView fx:id="itemTbl" layoutX="933.0" layoutY="117.0" prefHeight="410.0" prefWidth="287.0">
+        <columns>
+          <TableColumn fx:id="idCol2" prefWidth="68.800048828125" resizable="false" text="Item ID" />
+          <TableColumn fx:id="nameCol2" prefWidth="217.5999755859375" resizable="false" text="Item Name" />
+        </columns>
+      </TableView>
    </children>
 </AnchorPane>

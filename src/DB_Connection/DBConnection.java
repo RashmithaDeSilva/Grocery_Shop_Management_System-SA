@@ -1,5 +1,7 @@
 package DB_Connection;
 
+import javafx.scene.control.Alert;
+
 import java.sql.*;
 
 public class DBConnection {
@@ -19,7 +21,8 @@ public class DBConnection {
             stm = connection.createStatement();
 
         } catch (Exception e) {
-            System.out.println("JDBC Class not found ...!\n" + e.getMessage());
+            new Alert(Alert.AlertType.ERROR, "Database Connection Error !\n(" + e.getMessage() + ")" ).show();
+//            System.out.println("JDBC Class not found ...!\n" + e.getMessage());
         }
     }
 
@@ -60,6 +63,15 @@ public class DBConnection {
         return false;
     }
 
+    public String getItemName(String itemID) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT item_name FROM items WHERE item_id = '" + itemID + "';");
+
+        if (reset.next()) {
+            return reset.getString(1);
+        }
+
+        return "";
+    }
 
 
     // Getters
