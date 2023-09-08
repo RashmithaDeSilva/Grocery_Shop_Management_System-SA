@@ -220,7 +220,7 @@ public class SellFormController {
                                 nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
                                 Double.parseDouble("0.00"), Double.parseDouble(totalPriceTxt.getText()), btn));
                         resetAllInputs();
-                        searchTxt.setText("");
+                        searchTxt.clear();
 
                     } else if(Double.parseDouble(discountTxt.getText()) > 0 &&
                             Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
@@ -228,7 +228,7 @@ public class SellFormController {
                                 nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
                                 Double.parseDouble(discountTxt.getText()), Double.parseDouble(totalPriceTxt.getText()), btn));
                         resetAllInputs();
-                        searchTxt.setText("");
+                        searchTxt.clear();
 
                     } else {
                         alert(Alert.AlertType.ERROR, "Invalid Input",
@@ -263,6 +263,7 @@ public class SellFormController {
     }
 
     public void resetInvoiceOnAction(ActionEvent actionEvent) {
+        quotationTbl.getItems().clear();
     }
 
     public void resetInputOnAction(ActionEvent actionEvent) {
@@ -272,6 +273,7 @@ public class SellFormController {
     public void resetAllOnActon(ActionEvent actionEvent) {
         resetAllInputs();
         searchTxt.clear();
+        quotationTbl.getItems().clear();
     }
 
     private void setTable2Data() throws SQLException {
