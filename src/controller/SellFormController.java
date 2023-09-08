@@ -178,11 +178,18 @@ public class SellFormController {
         });
 
         itemTbl.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (null != newValue) {
-                    setDataIntoInputs(newValue);
-                }
-            });
+                (observable, oldValue, newValue) -> {
+            if (null != newValue) {
+                setDataIntoInputs(newValue);
+            }
+        });
+
+//        quotationTbl.getSelectionModel().selectedItemProperty().addListener(
+//                (observable, oldValue, newValue) -> {
+//            if (null != newValue) {
+//                setDataIntoInputs(newValue);
+//            }
+//        });
     }
 
     private void setDataIntoInputs(SellItems newValue) {
