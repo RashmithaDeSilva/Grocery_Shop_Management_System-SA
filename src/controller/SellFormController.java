@@ -51,6 +51,12 @@ public class SellFormController {
     public void initialize() {
         idCol2.setCellValueFactory(new PropertyValueFactory<>("itemId"));
         nameCol2.setCellValueFactory(new PropertyValueFactory<>("itemName"));
+        idCol.setCellValueFactory(new PropertyValueFactory<>("itemId"));
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("itemName"));
+        quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        discountCol.setCellValueFactory(new PropertyValueFactory<>("discount"));
+        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+        deleteCol.setCellValueFactory(new PropertyValueFactory<>("delete"));
 
         try{
             items = dbConnection.getItemTable();
@@ -77,16 +83,25 @@ public class SellFormController {
             if(newValue != null && !newValue.isEmpty()) {
                 try{
                     int quantity = Integer.parseInt(newValue);
+
                     if(!idTxt.getText().isEmpty()) {
                         double price = 0;
+                        int availableQuantity = Integer.parseInt(availableQuantityTxt.getText());
+
                         for (Item i : items) {
                             if(i.getItemId() == Integer.parseInt(idTxt.getText())) {
                                 price = i.getSellingPrice();
                             }
                         }
 
-                        if(quantity >= 0 && price != 0) {
+                        if(quantity >= 0 && quantity <= availableQuantity) {
                             priceTxt.setText(String.valueOf(quantity * price));
+
+                        } else {
+                            alert(Alert.AlertType.ERROR, "Invalid Input",
+                                    "Select Correct Quantity",
+                                    "Quantity must be in less than available quantity");
+                            quantityTxt.setText(oldValue);
                         }
 
                     } else {
@@ -137,6 +152,12 @@ public class SellFormController {
 
                         if(price >= discount) {
                             totalPriceTxt.setText(decimalFormat.format(price - discount));
+
+                        } else {
+                            alert(Alert.AlertType.ERROR, "Invalid Input",
+                                    "Discount Is Greathearted Price",
+                                    "Discount must be less than  price so set discount again");
+                            discountTxt.setText(oldValue);
                         }
 
                     } else {
@@ -184,15 +205,36 @@ public class SellFormController {
         availableQuantityTxt.clear();
         discountTxt.clear();
         priceTxt.clear();
+        totalPriceTxt.clear();
     }
 
     public void addOnAction(ActionEvent actionEvent) {
+        Button btn = new Button();
+
         try {
             if(Integer.parseInt(quantityTxt.getText()) > 0 && Integer.parseInt(quantityTxt.getText())
                     <= Integer.parseInt(availableQuantityTxt.getText())){
                 try{
-//                    quotationTbl.getItems().add(new InvoiceItems(idTxt.getText(), nameTxt.getText(),
-//                            quantityTxt.getText(), Integer.parseInt(discountTxt.getText()),));
+                    if(discountTxt.getText().isEmpty()) {
+                        quotationTbl.getItems().add(new InvoiceItems(Integer.parseInt(idTxt.getText()),
+                                nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
+                                Double.parseDouble("0.00"), Double.parseDouble(totalPriceTxt.getText()), btn));
+                        resetAllInputs();
+                        searchTxt.setText("");
+
+                    } else if(Double.parseDouble(discountTxt.getText()) > 0 &&
+                            Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
+                        quotationTbl.getItems().add(new InvoiceItems(Integer.parseInt(idTxt.getText()),
+                                nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
+                                Double.parseDouble(discountTxt.getText()), Double.parseDouble(totalPriceTxt.getText()), btn));
+                        resetAllInputs();
+                        searchTxt.setText("");
+
+                    } else {
+                        alert(Alert.AlertType.ERROR, "Invalid Input",
+                                "Set Discount Correctly",
+                                "Sorry this discount is incorrect");
+                    }
 
                 } catch (NumberFormatException e) {
                     alert(Alert.AlertType.ERROR, "Invalid Input",
@@ -223,7 +265,7 @@ public class SellFormController {
     public void resetInvoiceOnAction(ActionEvent actionEvent) {
     }
 
-    public void resetItemOnAction(ActionEvent actionEvent) {
+    public void resetInputOnAction(ActionEvent actionEvent) {
         resetAllInputs();
     }
 
@@ -234,7 +276,6 @@ public class SellFormController {
 
     private void setTable2Data() throws SQLException {
         ObservableList<SellItems> obList = FXCollections.observableArrayList();
-
         for (Item i : items) {
             obList.add(new SellItems(i.getItemId(), i.getItemName()));
         }
