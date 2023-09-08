@@ -13,40 +13,42 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Item;
 import model.staticType.SellFillterTypes;
+import model.tableRows.InvoiceItems;
 import model.tableRows.SellItems;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class SellFormController {
     public AnchorPane contextSellForm;
-    public TableView quotationTbl;
-    public TableColumn idCol;
-    public TableColumn nameCol;
-    public TableColumn quantityCol;
-    public TableColumn discountCol;
-    public TableColumn priceCol;
-    public TableColumn deleteCol;
+    public TableView<InvoiceItems> quotationTbl;
+    public TableColumn<Object, String> idCol;
+    public TableColumn<Object, String> nameCol;
+    public TableColumn<Object, String> quantityCol;
+    public TableColumn<Object, String> discountCol;
+    public TableColumn<Object, String> priceCol;
+    public TableColumn<Object, String> deleteCol;
     public TextField idTxt;
     public TextField nameTxt;
     public TextField discountTxt;
     public TextField quantityTxt;
     public TextField priceTxt;
-    public Label totalLbl;
     public TableView<SellItems> itemTbl;
     public TableColumn<Object, String> idCol2;
     public TableColumn<Object, String> nameCol2;
     public TextField availableQuantityTxt;
-    private String searchTextId = "";
-    private String searchTextName = "";
+    public TextField searchTxt;
+    public TextField totalPriceTxt;
+    public Label totalBill;
     private ArrayList<Item> items;
     private final DBConnection dbConnection = DBConnection.getInstance();
+    DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
 
     public void initialize() {
-
         idCol2.setCellValueFactory(new PropertyValueFactory<>("itemId"));
         nameCol2.setCellValueFactory(new PropertyValueFactory<>("itemName"));
 
@@ -57,79 +59,155 @@ public class SellFormController {
             }
 
         } catch (SQLException e) {
-            alertError(Alert.AlertType.ERROR, "Error", "Item Table Data Load Error", e.getMessage());
+            alert(Alert.AlertType.ERROR, "Error", "Item Table Data Load Error", e.getMessage());
         }
 
-        idTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            searchTextId = newValue.toLowerCase();
-            try {
-                fillOtherInputs(SellFillterTypes.ID);
+        searchTxt.textProperty().addListener((observable, oldValue, newValue) -> {
+            ObservableList<SellItems> obList = FXCollections.observableArrayList();
+            for (Item i : items) {
+                if (i.getItemName().toLowerCase().contains(searchTxt.getText().toLowerCase()) ||
+                        Integer.toString(i.getItemId()).contains(searchTxt.getText())) {
+                    obList.add(new SellItems(i.getItemId(), i.getItemName()));
+                }
+            }
+            itemTbl.setItems(obList);
+        });
 
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+        quantityTxt.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null && !newValue.isEmpty()) {
+                try{
+                    int quantity = Integer.parseInt(newValue);
+                    if(!idTxt.getText().isEmpty()) {
+                        double price = 0;
+                        for (Item i : items) {
+                            if(i.getItemId() == Integer.parseInt(idTxt.getText())) {
+                                price = i.getSellingPrice();
+                            }
+                        }
+
+                        if(quantity >= 0 && price != 0) {
+                            priceTxt.setText(String.valueOf(quantity * price));
+                        }
+
+                    } else {
+                        alert(Alert.AlertType.ERROR, "Invalid Input",
+                                "Select Item Before Set Quantity",
+                                "You did not select item so select item before set the quantity");
+                    }
+
+                } catch (NumberFormatException e) {
+                    alert(Alert.AlertType.ERROR, "Invalid Input",
+                            "Set Integer Value Into Quantity", e.getMessage());
+                }
+
+            } else {
+                assert newValue != null;
+                priceTxt.setText("0.00");
             }
         });
 
-        nameTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            searchTextName = newValue.toLowerCase();
-            try {
-                fillOtherInputs(SellFillterTypes.NAME);
+        priceTxt.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null && !newValue.isEmpty()) {
+                try{
+                    double price = Double.parseDouble(newValue);
+                    double discount = discountTxt.getText().isEmpty() ?
+                            0 : Double.parseDouble(discountTxt.getText());
 
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+                    if(price >= discount) {
+                        totalPriceTxt.setText(decimalFormat.format(price - discount));
+
+                    }
+
+                } catch (NumberFormatException e) {
+                    alert(Alert.AlertType.ERROR, "Invalid Input",
+                            "Set Integer Value Into Price", e.getMessage());
+                }
+            } else {
+                assert newValue != null;
+                totalPriceTxt.setText("0.00");
             }
-
-//            ObservableList<StudentTM> obList = FXCollections.observableArrayList();
-//
-//            for (Student st : dbcon.getStudentTable()) {
-//
-//                if (st.getFullName().toLowerCase().contains(searchText)) {
-//                    Button btn = new Button("Delete");
-//
-//                    obList.add(new StudentTM(st.getId(), st.getFullName(),
-//                            String.valueOf(st.getDateOfBirth()), st.getAddress(), btn));
-//
-//                    btn.setOnAction(e->{
-//                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure?",
-//                                ButtonType.YES, ButtonType.NO);
-//                        Optional<ButtonType> buttonType = alert.showAndWait();
-//                        if (buttonType.isPresent() && buttonType.get().equals(ButtonType.YES)) {
-//                            dbcon.deleteStudent(st);
-//                            setTableData(searchText);
-//                            new Alert(Alert.AlertType.INFORMATION, "Student Delete Successfully").show();
-//                        }
-//                    });
-//                }
-//            }
-//            tblStudent.setItems(obList);
-
-
-
-
-
         });
+
+        discountTxt.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null && !newValue.isEmpty()) {
+                try{
+                    if(!idTxt.getText().isEmpty()) {
+                        double price = Double.parseDouble(priceTxt.getText());
+                        double discount = Double.parseDouble(newValue);
+
+                        if(price >= discount) {
+                            totalPriceTxt.setText(decimalFormat.format(price - discount));
+                        }
+
+                    } else {
+                        alert(Alert.AlertType.ERROR, "Invalid Input",
+                                "Select Item Before Set Discount",
+                                "You did not select item so select item before set the discount");
+                    }
+
+                } catch (NumberFormatException e) {
+                    alert(Alert.AlertType.ERROR, "Invalid Input",
+                            "Set Integer Value Into Discount", e.getMessage());
+                }
+            } else {
+                assert newValue != null;
+                    totalPriceTxt.setText(decimalFormat.format(Double.parseDouble(
+                            priceTxt.getText().isEmpty() ? "0.00" : priceTxt.getText())));
+            }
+        });
+
+        itemTbl.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, newValue) -> {
+                if (null != newValue) {
+                    setDataIntoInputs(newValue);
+                }
+            });
     }
 
-    private void fillOtherInputs(SellFillterTypes sellFillterTypes) throws SQLException {
-        switch(sellFillterTypes) {
-            case ID:
-                for (Item i : items) {
-                    if(searchTextId.equals(Integer.toString(i.getItemId()))) {
-                        nameTxt.setText(i.getItemName()); // dbConnection.getItemName(searchTextId)
-                        availableQuantityTxt.setText(i.get);
-                        priceTxt.setText("Rs: " + i.getSellingPrice());
-                    }
-                }
+    private void setDataIntoInputs(SellItems newValue) {
+        for (Item i : items) {
+            if(i.getItemId() == newValue.getItemId()) {
+                idTxt.setText(Integer.toString(i.getItemId()));
+                nameTxt.setText(i.getItemName());
+                availableQuantityTxt.setText(Integer.toString(i.getQuantity()));
+                quantityTxt.setText("1");
+                priceTxt.setText(Double.toString(i.getSellingPrice()));
                 break;
-
-            case NAME:
-                System.out.println(searchTextName);
-                break;
+            }
         }
+    }
+
+    private void resetAllInputs() {
+        idTxt.clear();
+        nameTxt.clear();
+        quantityTxt.clear();
+        availableQuantityTxt.clear();
+        discountTxt.clear();
+        priceTxt.clear();
     }
 
     public void addOnAction(ActionEvent actionEvent) {
+        try {
+            if(Integer.parseInt(quantityTxt.getText()) > 0 && Integer.parseInt(quantityTxt.getText())
+                    <= Integer.parseInt(availableQuantityTxt.getText())){
+                try{
+//                    quotationTbl.getItems().add(new InvoiceItems(idTxt.getText(), nameTxt.getText(),
+//                            quantityTxt.getText(), Integer.parseInt(discountTxt.getText()),));
 
+                } catch (NumberFormatException e) {
+                    alert(Alert.AlertType.ERROR, "Invalid Input",
+                            "Set Integer or Float Value Into Discount", e.getMessage());
+                }
+
+            } else {
+                alert(Alert.AlertType.ERROR, "Invalid Input",
+                        "Set Quantity Correctly", "Sorry this quantity is not available");
+            }
+
+        } catch (NumberFormatException e) {
+            alert(Alert.AlertType.ERROR, "Invalid Input",
+                    "Set Integer Value Into Quantity", e.getMessage());
+        }
     }
 
     public void backOnAction(ActionEvent actionEvent) throws IOException {
@@ -146,6 +224,12 @@ public class SellFormController {
     }
 
     public void resetItemOnAction(ActionEvent actionEvent) {
+        resetAllInputs();
+    }
+
+    public void resetAllOnActon(ActionEvent actionEvent) {
+        resetAllInputs();
+        searchTxt.clear();
     }
 
     private void setTable2Data() throws SQLException {
@@ -164,7 +248,7 @@ public class SellFormController {
         stage.centerOnScreen();
     }
 
-    private void alertError(Alert.AlertType type, String title, String headerText, String contentText) {
+    private void alert(Alert.AlertType type, String title, String headerText, String contentText) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(headerText);

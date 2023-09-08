@@ -10,7 +10,7 @@ public class DBConnection {
 
     private static String url = "jdbc:mysql://localhost/upeksha_communication";
     private static String userName = "root";
-    private static String password = "";
+    private static String password = "1234";
     private static DBConnection instance;
     private static Connection connection;
     private static Statement stm;
@@ -38,12 +38,12 @@ public class DBConnection {
 
             Statement stm = connection.createStatement();
 
-            ResultSet reset = stm.executeQuery("SELECT * FROM items");
+            ResultSet reset = stm.executeQuery("SELECT * FROM items;");
 
             connection.close();
 
         } catch (Exception e) {
-            System.out.println("JDBC Class not found ...!");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -77,15 +77,17 @@ public class DBConnection {
     }
 
     public ArrayList<Item> getItemTable() throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT * FROM items");
+        ResultSet reset = stm.executeQuery("SELECT * FROM items;");
 
         ArrayList<Item> items = new ArrayList<>();
 
         while(reset.next()) {
             items.add(new Item(reset.getInt("item_id"), reset.getString("item_name"),
-                    reset.getDouble("item_price"), reset.getDouble("item_selling_price")));
+                    10, reset.getDouble("price"),
+                    reset.getDouble("selling_price")));
         }
 
+        // reset = stm.executeQuery("SELECT quantity FROM stock WHERE item_id;");
         return items;
     }
 

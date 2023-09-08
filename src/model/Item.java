@@ -3,6 +3,7 @@ package model;
 public class Item {
     private int itemId;
     private String itemName;
+    private int quantity;
     private double price;
     private double sellingPrice;
 
@@ -10,9 +11,10 @@ public class Item {
     public Item() {
     }
 
-    public Item(int itemId, String itemName, double price, double sellingPrice) {
+    public Item(int itemId, String itemName, int quantity, double price, double sellingPrice) {
         this.itemId = itemId;
         this.itemName = itemName;
+        this.quantity = quantity;
         this.price = price;
         this.sellingPrice = sellingPrice;
     }
@@ -49,4 +51,7 @@ public class Item {
     public void setSellingPrice(double sellingPrice) {
         this.sellingPrice = sellingPrice;
     }
+    public int getQuantity() { return quantity; }
+
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 }
