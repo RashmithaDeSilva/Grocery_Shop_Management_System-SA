@@ -237,94 +237,108 @@ public class SellFormController {
 
     public void addOnAction(ActionEvent actionEvent) {
         if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
-            Button btn = new Button("Delete");
-
-            try {
-                if(Integer.parseInt(quantityTxt.getText()) > 0 && Integer.parseInt(quantityTxt.getText())
-                        <= Integer.parseInt(availableQuantityTxt.getText())){
-                    try{
-                        if(discountTxt.getText().isEmpty() || Double.parseDouble(discountTxt.getText()) == 0) {
-                            quotationTbl.getItems().add(new InvoiceItems(Integer.parseInt(idTxt.getText()),
-                                    nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
-                                    Double.parseDouble("0.00"), Double.parseDouble(totalPriceTxt.getText()), btn));
-                            resetAllInputs();
-                            searchTxt.clear();
-
-                        } else if(Double.parseDouble(discountTxt.getText()) > 0 &&
-                                Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
-                            quotationTbl.getItems().add(new InvoiceItems(Integer.parseInt(idTxt.getText()),
-                                    nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
-                                    Double.parseDouble(discountTxt.getText()), Double.parseDouble(totalPriceTxt.getText()), btn));
-                            resetAllInputs();
-                            searchTxt.clear();
-
-                        } else {
-                            alert(Alert.AlertType.ERROR, "Invalid Input",
-                                    "Set Discount Correctly",
-                                    "Sorry this discount is incorrect");
-                        }
-
-                    } catch (NumberFormatException e) {
-                        alert(Alert.AlertType.ERROR, "Invalid Input",
-                                "Set Integer or Float Value Into Discount", e.getMessage());
+            boolean notAddedToInvoice = true;
+            if(quotationTbl != null) {
+                for (InvoiceItems i : quotationTbl.getItems()) {
+                    if(Integer.parseInt(idTxt.getText()) == i.getItemId()) {
+                        notAddedToInvoice = false;
+                        break;
                     }
-
-                } else {
-                    alert(Alert.AlertType.ERROR, "Invalid Input",
-                            "Set Quantity Correctly", "Sorry this quantity is not available");
                 }
-
-            } catch (NumberFormatException e) {
-                alert(Alert.AlertType.ERROR, "Invalid Input",
-                        "Set Integer Value Into Quantity", e.getMessage());
             }
 
-        } else if(addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
-            for (InvoiceItems i : quotationTbl.getItems()) {
-                try{
-                    if(i.getItemId() == Integer.parseInt(idTxt.getText())) {
-                        try {
-                            if(Integer.parseInt(quantityTxt.getText()) > 0 && Integer.parseInt(quantityTxt.getText())
-                                    <= Integer.parseInt(availableQuantityTxt.getText())){
-                                try{
-                                    if(discountTxt.getText().isEmpty() || Double.parseDouble(discountTxt.getText()) == 0) {
+            if(notAddedToInvoice) {
+                Button btn = new Button("Delete");
 
-                                        i.setDiscount(Double.parseDouble("0.00"));
+                try {
+                    if(Integer.parseInt(quantityTxt.getText()) > 0 && Integer.parseInt(quantityTxt.getText())
+                            <= Integer.parseInt(availableQuantityTxt.getText())){
+                        try{
+                            if(discountTxt.getText().isEmpty() || Double.parseDouble(discountTxt.getText()) == 0) {
+                                quotationTbl.getItems().add(new InvoiceItems(Integer.parseInt(idTxt.getText()),
+                                        nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
+                                        0, Double.parseDouble(totalPriceTxt.getText()), btn));
+                                resetAllInputs();
+                                searchTxt.clear();
 
-                                    } else if(Double.parseDouble(discountTxt.getText()) > 0 &&
-                                            Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
-
-                                        i.setDiscount(Double.parseDouble(discountTxt.getText()));
-
-                                    } else {
-                                        alert(Alert.AlertType.ERROR, "Invalid Input",
-                                                "Set Discount Correctly",
-                                                "Sorry this discount is incorrect");
-                                    }
-
-                                    i.setQuantity(Integer.parseInt(quantityTxt.getText()));
-                                    i.setPrice(Double.parseDouble(totalPriceTxt.getText()));
-                                    quotationTbl.refresh();
-                                    resetAllInputs();
-                                    searchTxt.clear();
-                                    addOrUpdateBtn.setText("Add");
-
-                                } catch (NumberFormatException e) {
-                                    alert(Alert.AlertType.ERROR, "Invalid Input",
-                                            "Set Integer or Float Value Into Discount", e.getMessage());
-                                }
+                            } else if(Double.parseDouble(discountTxt.getText()) > 0 &&
+                                    Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
+                                quotationTbl.getItems().add(new InvoiceItems(Integer.parseInt(idTxt.getText()),
+                                        nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
+                                        Double.parseDouble(discountTxt.getText()), Double.parseDouble(totalPriceTxt.getText()), btn));
+                                resetAllInputs();
+                                searchTxt.clear();
 
                             } else {
                                 alert(Alert.AlertType.ERROR, "Invalid Input",
-                                        "Set Quantity Correctly", "Sorry this quantity is not available");
+                                        "Set Discount Correctly",
+                                        "Sorry this discount is incorrect");
                             }
 
                         } catch (NumberFormatException e) {
                             alert(Alert.AlertType.ERROR, "Invalid Input",
-                                    "Set Integer Value Into Quantity", e.getMessage());
+                                    "Set Integer or Float Value Into Discount", e.getMessage());
                         }
+
+                    } else {
+                        alert(Alert.AlertType.ERROR, "Invalid Input",
+                                "Set Quantity Correctly", "Sorry this quantity is not available");
                     }
-                } catch (Exception e){
+
+                } catch (NumberFormatException e) {
+                    alert(Alert.AlertType.ERROR, "Invalid Input",
+                            "Set Integer Value Into Quantity", e.getMessage());
+                }
+
+            } else {
+                alert(Alert.AlertType.INFORMATION, "Check Invoice",
+                        "This Item Is Already Added",
+                        "This item is already added into invoice if you want to update it try to update");
+            }
+
+        } else if(addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
+            for (InvoiceItems i : quotationTbl.getItems()) {
+                if(i.getItemId() == Integer.parseInt(idTxt.getText())) {
+                    try {
+                        if(Integer.parseInt(quantityTxt.getText()) > 0 && Integer.parseInt(quantityTxt.getText())
+                                <= Integer.parseInt(availableQuantityTxt.getText())){
+                            try{
+                                if(discountTxt.getText().isEmpty() || Double.parseDouble(discountTxt.getText()) == 0) {
+
+                                    i.setDiscount(Double.parseDouble("0.00"));
+
+                                } else if(Double.parseDouble(discountTxt.getText()) > 0 &&
+                                        Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
+
+                                    i.setDiscount(Double.parseDouble(discountTxt.getText()));
+
+                                } else {
+                                    alert(Alert.AlertType.ERROR, "Invalid Input",
+                                            "Set Discount Correctly",
+                                            "Sorry this discount is incorrect");
+                                }
+
+                                i.setQuantity(Integer.parseInt(quantityTxt.getText()));
+                                i.setPrice(Double.parseDouble(totalPriceTxt.getText()));
+                                quotationTbl.refresh();
+                                resetAllInputs();
+                                searchTxt.clear();
+                                addOrUpdateBtn.setText("Add");
+
+                            } catch (NumberFormatException e) {
+                                alert(Alert.AlertType.ERROR, "Invalid Input",
+                                        "Set Integer or Float Value Into Discount", e.getMessage());
+                            }
+
+                        } else {
+                            alert(Alert.AlertType.ERROR, "Invalid Input",
+                                    "Set Quantity Correctly", "Sorry this quantity is not available");
+                        }
+
+                    } catch (NumberFormatException e) {
+                        alert(Alert.AlertType.ERROR, "Invalid Input",
+                                "Set Integer Value Into Quantity", e.getMessage());
+                    }
                     break;
                 }
             }
