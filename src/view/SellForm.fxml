@@ -56,7 +56,7 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Button layoutX="854.0" layoutY="488.0" mnemonicParsing="false" onAction="#addOnAction" style="-fx-background-color: #1dd1a1;" text="Add">
+      <Button fx:id="addOrUpdateBtn" layoutX="819.0" layoutY="488.0" mnemonicParsing="false" onAction="#addOnAction" prefHeight="38.0" prefWidth="94.0" style="-fx-background-color: #1dd1a1;" text="Add">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
