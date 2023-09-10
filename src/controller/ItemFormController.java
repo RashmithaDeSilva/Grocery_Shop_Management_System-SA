@@ -52,6 +52,8 @@ public class ItemFormController {
             alert(Alert.AlertType.ERROR, "Error", "Item Table Data Load Error", e.getMessage());
         }
 
+        idTxt.setText(items != null ? String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
+
         searchTxt.textProperty().addListener((observable, oldValue, newValue) -> {
             ObservableList<model.tableRows.Item> obList = FXCollections.observableArrayList();
             for (Item i : items) {
@@ -109,6 +111,10 @@ public class ItemFormController {
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "Error", "Item Table Data Load Error", e.getMessage());
         }
+
+        if(addOrUpdateTxt.getText().equalsIgnoreCase("add")) {
+            idTxt.setText(items != null ? String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
+        }
     }
 
     public void addOrUpdateOnAction(ActionEvent actionEvent) {
@@ -130,6 +136,9 @@ public class ItemFormController {
                             sellingPrice = Double.parseDouble(sellingPriceTxt.getText());
 
                             if (dbConnection.addItem(new Item(0, name, 0, price, sellingPrice))) {
+
+                                refreshOnAction(actionEvent);
+                                resetOnAction(actionEvent);
                                 alert(Alert.AlertType.INFORMATION, "Successful", "Successfully Added Item",
                                         "Successfully added item " + name);
 
@@ -160,12 +169,61 @@ public class ItemFormController {
             }
 
         } else if (addOrUpdateTxt.getText().equalsIgnoreCase("update")) {
+            String name;
+            double price;
+            double sellingPrice;
 
+            if(!nameTxt.getText().isEmpty()) {
+                name = nameTxt.getText().toLowerCase().trim();
+
+                try {
+                    if(Double.parseDouble(priceTxt.getText()) > 0) {
+                        if(Double.parseDouble(sellingPriceTxt.getText()) > 0 &&
+                                Double.parseDouble(sellingPriceTxt.getText()) >=
+                                        Double.parseDouble(priceTxt.getText())) {
+
+                            price = Double.parseDouble(priceTxt.getText());
+                            sellingPrice = Double.parseDouble(sellingPriceTxt.getText());
+
+                            if (dbConnection.updateItem(new Item(Integer.parseInt(idTxt.getText()),
+                                    name, 0, price, sellingPrice))) {
+
+                                refreshOnAction(actionEvent);
+                                resetOnAction(actionEvent);
+                                alert(Alert.AlertType.INFORMATION, "Successful", "Successfully Update Item",
+                                        "Successfully update item " + name);
+
+                            } else {
+                                // alert(Alert.AlertType type, String title, String headerText, String contentText)
+                                alert(Alert.AlertType.ERROR, "Error", "Try again",
+                                        "DB Connection error try again");
+                            }
+
+                        } else {
+                            alert(Alert.AlertType.WARNING, "Warning", "Incorrect Input",
+                                    "Set selling price grater than 0 and the price");
+                        }
+
+                    } else {
+                        alert(Alert.AlertType.WARNING, "Warning", "Incorrect Input",
+                                "Set price grater than");
+                    }
+
+                } catch (Exception e) {
+                    alert(Alert.AlertType.WARNING, "Error", "Incorrect Input",
+                            "Set integer or float value into price and selling price");
+                }
+
+            } else {
+                alert(Alert.AlertType.WARNING, "Warning", "Incorrect Input",
+                        "Set item name correctly");
+            }
         }
     }
 
     public void resetOnAction(ActionEvent actionEvent) {
-        idTxt.clear();
+        refreshOnAction(actionEvent);
+        idTxt.setText(items != null ? String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
         nameTxt.clear();
         priceTxt.clear();
         sellingPriceTxt.clear();

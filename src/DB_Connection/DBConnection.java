@@ -98,18 +98,33 @@ public class DBConnection {
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             // Set the values for the placeholders
             preparedStatement.setString(1, item.getItemName());
-            preparedStatement.setBigDecimal(2, BigDecimal.valueOf(item.getPrice()));
-            preparedStatement.setBigDecimal(3, BigDecimal.valueOf(item.getSellingPrice()));
+            preparedStatement.setDouble(2, item.getPrice());
+            preparedStatement.setDouble(3, item.getSellingPrice());
 
             // Execute the query
-            preparedStatement.executeUpdate();
-
-            return true;
+            return preparedStatement.executeUpdate() > 0;
 
         } catch (SQLException e) {
             return false;
         }
+    }
 
+    public boolean updateItem(Item item) {
+        String sql = "UPDATE items SET item_name = ?, price = ?, selling_price = ? WHERE item_id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+            // Set the values for the placeholders
+            preparedStatement.setString(1, item.getItemName());
+            preparedStatement.setDouble(2, item.getPrice());
+            preparedStatement.setDouble(3, item.getSellingPrice());
+            preparedStatement.setInt(4, item.getItemId());
+
+            // Execute the query
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     public void closeConnection() throws SQLException {
