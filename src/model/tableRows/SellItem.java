@@ -1,12 +1,12 @@
 package model.tableRows;
 
-public class SellItems {
+public class SellItem {
     private int itemId;
     private String itemName;
 
-    public SellItems() {}
+    public SellItem() {}
 
-    public SellItems(int itemId, String itemName) {
+    public SellItem(int itemId, String itemName) {
         this.itemId = itemId;
         this.itemName = itemName;
     }

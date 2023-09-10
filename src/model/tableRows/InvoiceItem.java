@@ -2,7 +2,7 @@ package model.tableRows;
 
 import javafx.scene.control.Button;
 
-public class InvoiceItems {
+public class InvoiceItem {
     private int itemId;
     private String itemName;
     private int quantity;
@@ -10,9 +10,9 @@ public class InvoiceItems {
     private double price;
     private Button delete;
 
-    public InvoiceItems() {}
+    public InvoiceItem() {}
 
-    public InvoiceItems(int itemId, String itemName, int quantity, double discount, double price, Button delete) {
+    public InvoiceItem(int itemId, String itemName, int quantity, double discount, double price, Button delete) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.quantity = quantity;

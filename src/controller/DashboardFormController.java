@@ -35,13 +35,16 @@ public class DashboardFormController {
         setUI("SellForm");
     }
 
-    public void itemOnAction(ActionEvent actionEvent) {
+    public void itemOnAction(ActionEvent actionEvent) throws IOException {
+        setUI("ItemForm");
     }
 
-    public void stockOnAction(ActionEvent actionEvent) {
+    public void stockOnAction(ActionEvent actionEvent) throws IOException {
+        setUI("StockForm");
     }
 
-    public void incomeOnAction(ActionEvent actionEvent) {
+    public void lockerOnAction(ActionEvent actionEvent) throws IOException {
+        setUI("LockerForm");
     }
 
     public void userAccOnAction(MouseEvent mouseEvent) {

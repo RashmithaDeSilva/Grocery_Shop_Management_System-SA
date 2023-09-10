@@ -12,8 +12,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Item;
-import model.tableRows.InvoiceItems;
-import model.tableRows.SellItems;
+import model.tableRows.InvoiceItem;
+import model.tableRows.SellItem;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -25,7 +25,7 @@ import java.util.Date;
 
 public class SellFormController {
     public AnchorPane contextSellForm;
-    public TableView<InvoiceItems> quotationTbl;
+    public TableView<InvoiceItem> quotationTbl;
     public TableColumn<Object, String> idCol;
     public TableColumn<Object, String> nameCol;
     public TableColumn<Object, String> quantityCol;
@@ -37,7 +37,7 @@ public class SellFormController {
     public TextField discountTxt;
     public TextField quantityTxt;
     public TextField priceTxt;
-    public TableView<SellItems> itemTbl;
+    public TableView<SellItem> itemTbl;
     public TableColumn<Object, String> idCol2;
     public TableColumn<Object, String> nameCol2;
     public TextField availableQuantityTxt;
@@ -71,11 +71,11 @@ public class SellFormController {
         }
 
         searchTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            ObservableList<SellItems> obList = FXCollections.observableArrayList();
+            ObservableList<SellItem> obList = FXCollections.observableArrayList();
             for (Item i : items) {
                 if (i.getItemName().toLowerCase().contains(searchTxt.getText().toLowerCase()) ||
                         Integer.toString(i.getItemId()).contains(searchTxt.getText())) {
-                    obList.add(new SellItems(i.getItemId(), i.getItemName()));
+                    obList.add(new SellItem(i.getItemId(), i.getItemName()));
                 }
             }
             itemTbl.setItems(obList);
@@ -194,7 +194,7 @@ public class SellFormController {
         });
     }
 
-    private void setDataIntoInputs(InvoiceItems newValue) {
+    private void setDataIntoInputs(InvoiceItem newValue) {
         resetAllInputs();
         idTxt.setText(Integer.toString(newValue.getItemId()));
         nameTxt.setText(newValue.getItemName());
@@ -211,7 +211,7 @@ public class SellFormController {
         addOrUpdateBtn.setText("Update");
     }
 
-    private void setDataIntoInputs(SellItems newValue) {
+    private void setDataIntoInputs(SellItem newValue) {
         for (Item i : items) {
             if(i.getItemId() == newValue.getItemId()) {
                 resetAllInputs();
@@ -240,7 +240,7 @@ public class SellFormController {
         if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
             boolean notAddedToInvoice = true;
             if(quotationTbl != null) {
-                for (InvoiceItems i : quotationTbl.getItems()) {
+                for (InvoiceItem i : quotationTbl.getItems()) {
                     if(Integer.parseInt(idTxt.getText()) == i.getItemId()) {
                         notAddedToInvoice = false;
                         break;
@@ -256,7 +256,7 @@ public class SellFormController {
                             <= Integer.parseInt(availableQuantityTxt.getText())){
                         try{
                             if(discountTxt.getText().isEmpty() || Double.parseDouble(discountTxt.getText()) == 0) {
-                                quotationTbl.getItems().add(new InvoiceItems(Integer.parseInt(idTxt.getText()),
+                                quotationTbl.getItems().add(new InvoiceItem(Integer.parseInt(idTxt.getText()),
                                         nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
                                         0, Double.parseDouble(totalPriceTxt.getText()), btn));
                                 resetAllInputs();
@@ -264,7 +264,7 @@ public class SellFormController {
 
                             } else if(Double.parseDouble(discountTxt.getText()) > 0 &&
                                     Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
-                                quotationTbl.getItems().add(new InvoiceItems(Integer.parseInt(idTxt.getText()),
+                                quotationTbl.getItems().add(new InvoiceItem(Integer.parseInt(idTxt.getText()),
                                         nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
                                         Double.parseDouble(discountTxt.getText()), Double.parseDouble(totalPriceTxt.getText()), btn));
                                 resetAllInputs();
@@ -298,7 +298,7 @@ public class SellFormController {
             }
 
         } else if(addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
-            for (InvoiceItems i : quotationTbl.getItems()) {
+            for (InvoiceItem i : quotationTbl.getItems()) {
                 if(i.getItemId() == Integer.parseInt(idTxt.getText())) {
                     try {
                         if(Integer.parseInt(quantityTxt.getText()) > 0 && Integer.parseInt(quantityTxt.getText())
@@ -350,7 +350,7 @@ public class SellFormController {
     private void setTotal() {
         double total = 0;
         if(quotationTbl != null) {
-            for (InvoiceItems i : quotationTbl.getItems()) {
+            for (InvoiceItem i : quotationTbl.getItems()) {
                 total += i.getPrice();
             }
         }
@@ -415,7 +415,7 @@ public class SellFormController {
                         "Item name", "Quantity", "Price", "Discount", "Total");
                 writer.write(formattedTital);
 
-                for (InvoiceItems i : quotationTbl.getItems()) {
+                for (InvoiceItem i : quotationTbl.getItems()) {
                     // Use String.format to format each field with the specified width
                     String formattedLine = String.format("%-30s %10d %10.2f %10s) %10.2f%n",
                             i.getItemName(), i.getQuantity(), (i.getPrice() + i.getDiscount()),
@@ -458,9 +458,9 @@ public class SellFormController {
     }
 
     private void setTable2Data() throws SQLException {
-        ObservableList<SellItems> obList = FXCollections.observableArrayList();
+        ObservableList<SellItem> obList = FXCollections.observableArrayList();
         for (Item i : items) {
-            obList.add(new SellItems(i.getItemId(), i.getItemName()));
+            obList.add(new SellItem(i.getItemId(), i.getItemName()));
         }
         itemTbl.setItems(obList);
     }
