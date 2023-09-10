@@ -12,15 +12,16 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Item;
-import model.staticType.SellFillterTypes;
 import model.tableRows.InvoiceItems;
 import model.tableRows.SellItems;
 
-import java.io.IOException;
+import java.io.*;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SellFormController {
     public AnchorPane contextSellForm;
@@ -99,14 +100,14 @@ public class SellFormController {
                             priceTxt.setText(String.valueOf(quantity * price));
 
                         } else {
-                            alert(Alert.AlertType.ERROR, "Invalid Input",
+                            alert(Alert.AlertType.WARNING, "Invalid Input",
                                     "Select Correct Quantity",
                                     "Quantity must be in less than available quantity");
                             quantityTxt.setText(oldValue);
                         }
 
                     } else {
-                        alert(Alert.AlertType.ERROR, "Invalid Input",
+                        alert(Alert.AlertType.WARNING, "Invalid Input",
                                 "Select Item Before Set Quantity",
                                 "You did not select item so select item before set the quantity");
                     }
@@ -155,14 +156,14 @@ public class SellFormController {
                             totalPriceTxt.setText(decimalFormat.format(price - discount));
 
                         } else {
-                            alert(Alert.AlertType.ERROR, "Invalid Input",
+                            alert(Alert.AlertType.WARNING, "Invalid Input",
                                     "Discount Is Greathearted Price",
                                     "Discount must be less than  price so set discount again");
                             discountTxt.setText(oldValue);
                         }
 
                     } else {
-                        alert(Alert.AlertType.ERROR, "Invalid Input",
+                        alert(Alert.AlertType.WARNING, "Invalid Input",
                                 "Select Item Before Set Discount",
                                 "You did not select item so select item before set the discount");
                     }
@@ -270,7 +271,7 @@ public class SellFormController {
                                 searchTxt.clear();
 
                             } else {
-                                alert(Alert.AlertType.ERROR, "Invalid Input",
+                                alert(Alert.AlertType.WARNING, "Invalid Input",
                                         "Set Discount Correctly",
                                         "Sorry this discount is incorrect");
                             }
@@ -281,7 +282,7 @@ public class SellFormController {
                         }
 
                     } else {
-                        alert(Alert.AlertType.ERROR, "Invalid Input",
+                        alert(Alert.AlertType.WARNING, "Invalid Input",
                                 "Set Quantity Correctly", "Sorry this quantity is not available");
                     }
 
@@ -291,7 +292,7 @@ public class SellFormController {
                 }
 
             } else {
-                alert(Alert.AlertType.INFORMATION, "Check Invoice",
+                alert(Alert.AlertType.WARNING, "Check Invoice",
                         "This Item Is Already Added",
                         "This item is already added into invoice if you want to update it try to update");
             }
@@ -313,7 +314,7 @@ public class SellFormController {
                                     i.setDiscount(Double.parseDouble(discountTxt.getText()));
 
                                 } else {
-                                    alert(Alert.AlertType.ERROR, "Invalid Input",
+                                    alert(Alert.AlertType.WARNING, "Invalid Input",
                                             "Set Discount Correctly",
                                             "Sorry this discount is incorrect");
                                 }
@@ -331,7 +332,7 @@ public class SellFormController {
                             }
 
                         } else {
-                            alert(Alert.AlertType.ERROR, "Invalid Input",
+                            alert(Alert.AlertType.WARNING, "Invalid Input",
                                     "Set Quantity Correctly", "Sorry this quantity is not available");
                         }
 
@@ -364,6 +365,79 @@ public class SellFormController {
     }
 
     public void printInvoiceOnAction(ActionEvent actionEvent) {
+        if(!quotationTbl.getItems().isEmpty()) {
+            // Get the user's home directory
+            String userHome = System.getProperty("user.home");
+
+            // Determine the "Downloads" folder path based on the operating system
+            String downloadsFolder;
+            String os = System.getProperty("os.name").toLowerCase();
+            if (os.contains("win")) {
+                downloadsFolder = userHome + "\\Downloads";
+
+            } else if (os.contains("mac")) {
+                downloadsFolder = userHome + "/Downloads";
+
+            } else {
+                downloadsFolder = userHome + "/Downloads";
+            }
+
+            // Create an "Invoice" folder inside the "Downloads" folder
+            String invoiceFolderPath = downloadsFolder + "/Invoice";
+            File invoiceFolder = new File(invoiceFolderPath);
+            if (!invoiceFolder.exists()) {
+                if (invoiceFolder.mkdirs()) {
+//                    System.out.println("Invoice folder created successfully at: " + invoiceFolderPath);
+
+                } else {
+                    alert(Alert.AlertType.ERROR, "Folder Error",
+                            "Folder Error",
+                            "Failed to create the Invoice folder");
+//                    System.err.println("Failed to create the Invoice folder");
+                    return;
+                }
+            }
+
+            // Generate a timestamp for the file name
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
+            String timestamp = dateFormat.format(new Date());
+
+            // Create the "Invoice.txt" file with a timestamp within the "Invoice" folder
+            String fileName = "Invoice_" + timestamp + ".txt";
+            File file = new File(invoiceFolderPath, fileName);
+
+            try (FileWriter writer = new FileWriter(file)) {
+                // Write content to the file
+                String formattedTital = String.format("%-30s %10s %10s %10s %10s%n",
+                        "Item name", "Quantity", "Price", "Discount", "Total");
+                writer.write(formattedTital);
+
+                for (InvoiceItems i : quotationTbl.getItems()) {
+                    // Use String.format to format each field with the specified width
+                    String formattedLine = String.format("%-30s %10d %10.2f %10s) %10.2f%n",
+                            i.getItemName(), i.getQuantity(), (i.getPrice() + i.getDiscount()),
+                            "(" + i.getDiscount(), i.getPrice());
+                    writer.write(formattedLine);
+                }
+
+                writer.write("\nTotal Bill " + totalBill.getText());
+
+                alert(Alert.AlertType.CONFIRMATION, "Successful",
+                        "Successfully Print Invoice",
+                        "Check: " + invoiceFolder.getPath() + "\n" + "File name: " + fileName);
+//                System.out.println("File created successfully at: " + file.getAbsolutePath());
+
+            } catch (IOException e) {
+                alert(Alert.AlertType.ERROR, "An Error Occurred",
+                        "Folder Error", e.getMessage());
+//                System.err.println("An error occurred: " + e.getMessage());
+            }
+
+        } else {
+            alert(Alert.AlertType.WARNING, "Can Not Try",
+                    "There Have No Items To Print",
+                    "Sorry their have no items to print so add items");
+        }
     }
 
     public void resetInvoiceOnAction(ActionEvent actionEvent) {

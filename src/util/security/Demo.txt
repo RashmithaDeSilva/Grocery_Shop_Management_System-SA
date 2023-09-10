@@ -1,0 +1,25 @@
+ try {
+                Process process = Runtime.getRuntime().exec("wmic baseboard get product");
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    System.out.println("Motherboard Product: " + line.trim());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Process process = Runtime.getRuntime().exec("wmic csproduct get uuid");
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    if (!line.trim().isEmpty()) {
+                        System.out.println("Motherboard UUID: " + line.trim());
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
