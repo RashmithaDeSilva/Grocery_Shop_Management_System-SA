@@ -387,6 +387,9 @@ public class SellFormController {
             File invoiceFolder = new File(invoiceFolderPath);
             if (!invoiceFolder.exists()) {
                 if (invoiceFolder.mkdirs()) {
+                    alert(Alert.AlertType.CONFIRMATION, "Successful",
+                            "Invoice folder created successfully",
+                            invoiceFolderPath);
 //                    System.out.println("Invoice folder created successfully at: " + invoiceFolderPath);
 
                 } else {
