@@ -3,6 +3,7 @@ package DB_Connection;
 import javafx.scene.control.Alert;
 import model.Item;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -89,6 +90,26 @@ public class DBConnection {
 
         // reset = stm.executeQuery("SELECT quantity FROM stock WHERE item_id;");
         return items;
+    }
+
+    public boolean addItem(Item item) {
+        String sql = "INSERT INTO items (item_name, price, selling_price) VALUES (?, ?, ?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // Set the values for the placeholders
+            preparedStatement.setString(1, item.getItemName());
+            preparedStatement.setBigDecimal(2, BigDecimal.valueOf(item.getPrice()));
+            preparedStatement.setBigDecimal(3, BigDecimal.valueOf(item.getSellingPrice()));
+
+            // Execute the query
+            preparedStatement.executeUpdate();
+
+            return true;
+
+        } catch (SQLException e) {
+            return false;
+        }
+
     }
 
     public void closeConnection() throws SQLException {

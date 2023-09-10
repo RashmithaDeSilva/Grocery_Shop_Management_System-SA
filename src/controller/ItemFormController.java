@@ -112,6 +112,56 @@ public class ItemFormController {
     }
 
     public void addOrUpdateOnAction(ActionEvent actionEvent) {
+        if(addOrUpdateTxt.getText().equalsIgnoreCase("add")) {
+            String name;
+            double price;
+            double sellingPrice;
+
+            if(!nameTxt.getText().isEmpty()) {
+                name = nameTxt.getText().toLowerCase().trim();
+
+                try {
+                    if(Double.parseDouble(priceTxt.getText()) > 0) {
+                        if(Double.parseDouble(sellingPriceTxt.getText()) > 0 &&
+                                Double.parseDouble(sellingPriceTxt.getText()) >=
+                                        Double.parseDouble(priceTxt.getText())) {
+
+                            price = Double.parseDouble(priceTxt.getText());
+                            sellingPrice = Double.parseDouble(sellingPriceTxt.getText());
+
+                            if (dbConnection.addItem(new Item(0, name, 0, price, sellingPrice))) {
+                                alert(Alert.AlertType.INFORMATION, "Successful", "Successfully Added Item",
+                                        "Successfully added item " + name);
+
+                            } else {
+                               // alert(Alert.AlertType type, String title, String headerText, String contentText)
+                                alert(Alert.AlertType.ERROR, "Error", "Try again",
+                                        "DB Connection error try again");
+                            }
+
+                        } else {
+                            alert(Alert.AlertType.WARNING, "Warning", "Incorrect Input",
+                                    "Set selling price grater than 0 and the price");
+                        }
+
+                    } else {
+                        alert(Alert.AlertType.WARNING, "Warning", "Incorrect Input",
+                                "Set price grater than");
+                    }
+
+                } catch (Exception e) {
+                    alert(Alert.AlertType.WARNING, "Error", "Incorrect Input",
+                            "Set integer or float value into price and selling price");
+                }
+
+            } else {
+                alert(Alert.AlertType.WARNING, "Warning", "Incorrect Input",
+                        "Set item name correctly");
+            }
+
+        } else if (addOrUpdateTxt.getText().equalsIgnoreCase("update")) {
+
+        }
     }
 
     public void resetOnAction(ActionEvent actionEvent) {
