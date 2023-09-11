@@ -64,6 +64,12 @@ public class SellFormController {
         try{
             items = dbConnection.getItemTable();
             if(items != null) {
+                for (int i=0; i<items.size(); i++) {
+                    if(items.get(i).getStocks() == null) {
+                        items.remove(i);
+                        i--;
+                    }
+                }
                 setTable2Data();
             }
 
@@ -471,9 +477,7 @@ public class SellFormController {
     private void setTable2Data() throws SQLException {
         ObservableList<SellItem> obList = FXCollections.observableArrayList();
         for (Item i : items) {
-            if(i.getStocks() != null) {
-                obList.add(new SellItem(i.getItemId(), i.getItemName()));
-            }
+            obList.add(new SellItem(i.getItemId(), i.getItemName()));
         }
         itemTbl.setItems(obList);
     }
