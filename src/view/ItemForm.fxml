@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contextItemForm" prefHeight="550.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ItemFormController">
+<AnchorPane fx:id="contextItemForm" prefHeight="550.0" prefWidth="688.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ItemFormController">
    <children>
       <Label layoutX="40.0" layoutY="35.0" text="Items">
          <font>
@@ -18,7 +18,7 @@
          </font>
       </Label>
       <Separator layoutX="40.0" layoutY="98.0" prefHeight="4.0" prefWidth="709.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" />
-      <Button layoutX="796.0" layoutY="43.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
+      <Button layoutX="587.0" layoutY="43.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -26,36 +26,24 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <TextField fx:id="searchTxt" layoutX="30.0" layoutY="120.0" prefHeight="38.0" prefWidth="433.0" promptText="Search">
+      <TextField fx:id="searchTxt" layoutX="30.0" layoutY="120.0" prefHeight="38.0" prefWidth="274.0" promptText="Search">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </TextField>
-      <TableView fx:id="itemTbl" layoutX="30.0" layoutY="177.0" prefHeight="348.0" prefWidth="582.0">
+      <TableView fx:id="itemTbl" layoutX="30.0" layoutY="177.0" prefHeight="348.0" prefWidth="376.0">
         <columns>
           <TableColumn fx:id="idCol" prefWidth="80.00000381469727" text="Item ID" />
           <TableColumn fx:id="nameCol" prefWidth="195.1999969482422" text="Item Name" />
-            <TableColumn fx:id="priceCol" prefWidth="105.60003662109375" text="Price" />
-            <TableColumn fx:id="sellingPriceCol" prefWidth="101.59991455078125" text="Selling Price" />
             <TableColumn fx:id="deleteCol" prefWidth="96.800048828125" text="Delete" />
         </columns>
       </TableView>
-      <TextField fx:id="nameTxt" alignment="CENTER" layoutX="651.0" layoutY="316.0" prefHeight="30.0" prefWidth="218.0">
+      <TextField fx:id="nameTxt" alignment="CENTER" layoutX="442.0" layoutY="316.0" prefHeight="30.0" prefWidth="218.0" promptText="Item Name">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </TextField>
-      <TextField fx:id="sellingPriceTxt" alignment="CENTER" layoutX="766.0" layoutY="419.0" prefHeight="30.0" prefWidth="101.0">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-      </TextField>
-      <TextField fx:id="priceTxt" alignment="CENTER" layoutX="766.0" layoutY="366.0" prefHeight="30.0" prefWidth="102.0">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-      </TextField>
-      <Button layoutX="483.0" layoutY="120.0" mnemonicParsing="false" onAction="#refreshOnAction" prefHeight="37.0" prefWidth="86.0" style="-fx-background-color: #48dbfb;" text="Refresh">
+      <Button layoutX="319.0" layoutY="120.0" mnemonicParsing="false" onAction="#refreshOnAction" prefHeight="37.0" prefWidth="86.0" style="-fx-background-color: #48dbfb;" text="Refresh">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -63,7 +51,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="addOrUpdateTxt" layoutX="789.0" layoutY="488.0" mnemonicParsing="false" onAction="#addOrUpdateOnAction" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #1dd1a1;" text="Add">
+      <Button fx:id="addOrUpdateTxt" layoutX="578.0" layoutY="378.0" mnemonicParsing="false" onAction="#addOrUpdateOnAction" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #1dd1a1;" text="Add">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -71,7 +59,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button layoutX="651.0" layoutY="488.0" mnemonicParsing="false" onAction="#resetOnAction" style="-fx-background-color: #ff6b6b;" text="Reset">
+      <Button layoutX="440.0" layoutY="378.0" mnemonicParsing="false" onAction="#resetOnAction" style="-fx-background-color: #ff6b6b;" text="Reset">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -79,7 +67,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <TextField fx:id="idTxt" alignment="CENTER" editable="false" layoutX="766.0" layoutY="262.0" prefHeight="30.0" prefWidth="102.0">
+      <TextField fx:id="idTxt" alignment="CENTER" editable="false" layoutX="557.0" layoutY="262.0" prefHeight="30.0" prefWidth="102.0" promptText="Item ID">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
