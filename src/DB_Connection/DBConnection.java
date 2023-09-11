@@ -2,8 +2,8 @@ package DB_Connection;
 
 import javafx.scene.control.Alert;
 import model.Item;
+import model.Stock;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -25,7 +25,7 @@ public class DBConnection {
             stm = connection.createStatement();
 
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "Database Connection Error !\n(" + e.getMessage() + ")" ).show();
+            new Alert(Alert.AlertType.ERROR, "Database Connection Error !\n(" + e.getMessage() + ")").show();
 //            System.out.println("JDBC Class not found ...!\n" + e.getMessage());
         }
     }
@@ -35,11 +35,15 @@ public class DBConnection {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            Connection connection = DriverManager.getConnection(url, userName, password);
+            connection = DriverManager.getConnection(url, userName, password);
 
-            Statement stm = connection.createStatement();
+            stm = connection.createStatement();
 
-            ResultSet reset = stm.executeQuery("SELECT * FROM items;");
+            //ResultSet reset = stm.executeQuery("SELECT * FROM items;");
+
+//            while(reset.next()) {
+//                System.out.println(reset.getRow());
+//            }
 
             connection.close();
 
@@ -56,7 +60,6 @@ public class DBConnection {
         return instance;
     }
 
-
     public boolean checkUserLogin(String userName, String password) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT password FROM users WHERE user_name = '" + userName + "';");
 
@@ -67,39 +70,49 @@ public class DBConnection {
         return false;
     }
 
-    public String getItemName(String itemID) throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT item_name FROM items WHERE item_id = '" + itemID + "';");
-
-        if (reset.next()) {
-            return reset.getString(1);
-        }
-
-        return "";
-    }
-
     public ArrayList<Item> getItemTable() throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT * FROM items;");
 
         ArrayList<Item> items = new ArrayList<>();
 
         while(reset.next()) {
-            items.add(new Item(reset.getInt("item_id"), reset.getString("item_name"),
-                    10, reset.getDouble("price"),
-                    reset.getDouble("selling_price")));
+            items.add(new Item(reset.getInt("item_id"), reset.getString("item_name")));
+        }
+
+        ArrayList<Stock> stocks = getStockTable();
+
+        for (Item i : items) {
+            for (Stock s : stocks) {
+                if(i.getItemId() == s.getItemId()) {
+                    i.addStock(new Stock(s.getStockId(), s.getItemId(), s.getQuantity(), s.getPrice(), s.getSellingPrice()));
+                }
+            }
         }
 
         // reset = stm.executeQuery("SELECT quantity FROM stock WHERE item_id;");
         return items;
     }
 
+    public ArrayList<Stock> getStockTable() throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT * FROM stock;");
+
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(reset.next()) {
+            stocks.add(new Stock(reset.getInt("stock_id"), reset.getInt("item_id"),
+                    reset.getInt("quantity"), reset.getDouble("price"),
+                    reset.getDouble("selling_price")));
+        }
+
+        return stocks;
+    }
+
     public boolean addItem(Item item) {
-        String sql = "INSERT INTO items (item_name, price, selling_price) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO items (item_name) VALUES (?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             // Set the values for the placeholders
             preparedStatement.setString(1, item.getItemName());
-            preparedStatement.setDouble(2, item.getPrice());
-            preparedStatement.setDouble(3, item.getSellingPrice());
 
             // Execute the query
             return preparedStatement.executeUpdate() > 0;
@@ -110,14 +123,12 @@ public class DBConnection {
     }
 
     public boolean updateItem(Item item) {
-        String sql = "UPDATE items SET item_name = ?, price = ?, selling_price = ? WHERE item_id = ?";
+        String sql = "UPDATE items SET item_name = ? WHERE item_id = ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             // Set the values for the placeholders
             preparedStatement.setString(1, item.getItemName());
-            preparedStatement.setDouble(2, item.getPrice());
-            preparedStatement.setDouble(3, item.getSellingPrice());
-            preparedStatement.setInt(4, item.getItemId());
+            preparedStatement.setInt(2, item.getItemId());
 
             // Execute the query
             return preparedStatement.executeUpdate() > 0;

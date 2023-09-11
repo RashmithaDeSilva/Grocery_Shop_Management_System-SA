@@ -12,6 +12,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Item;
+import model.Stock;
 import model.tableRows.InvoiceItem;
 import model.tableRows.SellItem;
 
@@ -92,7 +93,9 @@ public class SellFormController {
 
                         for (Item i : items) {
                             if(i.getItemId() == Integer.parseInt(idTxt.getText())) {
-                                price = i.getSellingPrice();
+                                if(!i.getStocks().isEmpty()) {
+                                    price = i.getStocks().get(0).getSellingPrice();
+                                }
                             }
                         }
 
@@ -200,7 +203,11 @@ public class SellFormController {
         nameTxt.setText(newValue.getItemName());
         for (Item i : items) {
             if(i.getItemId() == newValue.getItemId()) {
-                availableQuantityTxt.setText(Integer.toString(i.getQuantity()));
+                int quantity = 0;
+                for (Stock s : i.getStocks()) {
+                    quantity += s.getQuantity();
+                }
+                availableQuantityTxt.setText(Integer.toString(quantity));
                 break;
             }
         }
@@ -217,9 +224,13 @@ public class SellFormController {
                 resetAllInputs();
                 idTxt.setText(Integer.toString(i.getItemId()));
                 nameTxt.setText(i.getItemName());
-                availableQuantityTxt.setText(Integer.toString(i.getQuantity()));
+                int quantity = 0;
+                for (Stock s : i.getStocks()) {
+                    quantity += s.getQuantity();
+                }
+                availableQuantityTxt.setText(Integer.toString(quantity));
                 quantityTxt.setText("1");
-                priceTxt.setText(Double.toString(i.getSellingPrice()));
+                priceTxt.setText(Double.toString(i.getStocks().get(0).getSellingPrice()));
                 addOrUpdateBtn.setText("Add");
                 break;
             }
@@ -460,7 +471,9 @@ public class SellFormController {
     private void setTable2Data() throws SQLException {
         ObservableList<SellItem> obList = FXCollections.observableArrayList();
         for (Item i : items) {
-            obList.add(new SellItem(i.getItemId(), i.getItemName()));
+            if(i.getStocks() != null) {
+                obList.add(new SellItem(i.getItemId(), i.getItemName()));
+            }
         }
         itemTbl.setItems(obList);
     }
@@ -480,4 +493,7 @@ public class SellFormController {
         alert.show();
     }
 
+    public void sellLogOnAction(ActionEvent actionEvent) throws IOException {
+        setUI("SellLogForm");
+    }
 }

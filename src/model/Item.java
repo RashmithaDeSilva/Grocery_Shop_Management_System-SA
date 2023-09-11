@@ -1,24 +1,26 @@
 package model;
 
+import java.util.ArrayList;
+
 public class Item {
     private int itemId;
     private String itemName;
-    private int quantity;
-    private double price;
-    private double sellingPrice;
+    private ArrayList<Stock> stocks;
 
 
     public Item() {
     }
 
-    public Item(int itemId, String itemName, int quantity, double price, double sellingPrice) {
+    public Item(int itemId, String itemName) {
         this.itemId = itemId;
         this.itemName = itemName;
-        this.quantity = quantity;
-        this.price = price;
-        this.sellingPrice = sellingPrice;
     }
 
+    public Item(int itemId, String itemName, ArrayList<Stock> stocks) {
+        this.itemId = itemId;
+        this.itemName = itemName;
+        this.stocks = stocks;
+    }
 
     public int getItemId() {
         return itemId;
@@ -36,22 +38,18 @@ public class Item {
         this.itemName = itemName;
     }
 
-    public double getPrice() {
-        return price;
+    public ArrayList<Stock> getStocks() {return stocks;}
+
+    public void setStocks(ArrayList<Stock> stocks) {this.stocks = stocks;}
+
+    public void addStock(Stock stock) {
+        if(this.stocks != null) {
+            this.stocks.add(stock);
+
+        } else {
+            this.stocks = new ArrayList<>();
+            this.stocks.add(stock);
+        }
     }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public double getSellingPrice() {
-        return sellingPrice;
-    }
-
-    public void setSellingPrice(double sellingPrice) {
-        this.sellingPrice = sellingPrice;
-    }
-    public int getQuantity() { return quantity; }
-
-    public void setQuantity(int quantity) { this.quantity = quantity; }
 }
