@@ -26,8 +26,6 @@ public class ItemFormController {
     public TableColumn<Object, String> nameCol;
     public TableColumn<Object, String> deleteCol;
     public TextField nameTxt;
-    public TextField sellingPriceTxt;
-    public TextField priceTxt;
     public TextField idTxt;
     public Button addOrUpdateTxt;
     private ArrayList<model.Item> items;
@@ -120,7 +118,7 @@ public class ItemFormController {
                     refreshOnAction(actionEvent);
                     resetOnAction(actionEvent);
                     alert(Alert.AlertType.INFORMATION, "Successful", "Successfully Added Item",
-                            "Successfully added item " + name + "With Item ID " + idTxt.getText());
+                            "Successfully added item " + name + " With Item ID " + idTxt.getText());
 
                 } else {
                     // alert(Alert.AlertType type, String title, String headerText, String contentText)
@@ -162,8 +160,6 @@ public class ItemFormController {
         refreshOnAction(actionEvent);
         idTxt.setText(items != null ? String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
         nameTxt.clear();
-        priceTxt.clear();
-        sellingPriceTxt.clear();
         addOrUpdateTxt.setText("Add");
     }
 

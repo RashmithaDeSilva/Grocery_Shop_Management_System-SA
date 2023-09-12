@@ -1,1 +1,1 @@
-# Grocery-Shop Application
+# Grocery Shop Management System
