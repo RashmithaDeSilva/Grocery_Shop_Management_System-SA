@@ -1,11 +1,13 @@
-package model;
+package model.tableRows;
+
+import javafx.scene.control.Button;
 
 import java.sql.Date;
 import java.sql.Time;
 
 public class Stock {
     private int stockId;
-    private int userId;
+    private String userName;
     private int itemId;
     private int quantity;
     private int refillQuantity;
@@ -13,22 +15,15 @@ public class Stock {
     private double sellingPrice;
     private Date lastRefillDate;
     private Time lastRefillTime;
+    private Button delete;
 
 
     public Stock() {}
 
-    public Stock(int stockId, int itemId, int quantity, double price, double sellingPrice) {
+    public Stock(int stockId, String userName, int itemId, int quantity, int refillQuantity, double price,
+                 double sellingPrice, Date lastRefillDate, Time lastRefillTime, Button delete) {
         this.stockId = stockId;
-        this.itemId = itemId;
-        this.quantity = quantity;
-        this.price = price;
-        this.sellingPrice = sellingPrice;
-    }
-
-    public Stock(int stockId, int userId, int itemId, int quantity, int refillQuantity,
-                 double price, double sellingPrice, Date lastRefillDate, Time lastRefillTime) {
-        this.stockId = stockId;
-        this.userId = userId;
+        this.userName = userName;
         this.itemId = itemId;
         this.quantity = quantity;
         this.refillQuantity = refillQuantity;
@@ -36,6 +31,7 @@ public class Stock {
         this.sellingPrice = sellingPrice;
         this.lastRefillDate = lastRefillDate;
         this.lastRefillTime = lastRefillTime;
+        this.delete = delete;
     }
 
     public int getStockId() {
@@ -44,6 +40,14 @@ public class Stock {
 
     public void setStockId(int stockId) {
         this.stockId = stockId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public int getItemId() {
@@ -62,6 +66,14 @@ public class Stock {
         this.quantity = quantity;
     }
 
+    public int getRefillQuantity() {
+        return refillQuantity;
+    }
+
+    public void setRefillQuantity(int refillQuantity) {
+        this.refillQuantity = refillQuantity;
+    }
+
     public double getPrice() {
         return price;
     }
@@ -78,22 +90,6 @@ public class Stock {
         this.sellingPrice = sellingPrice;
     }
 
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public int getRefillQuantity() {
-        return refillQuantity;
-    }
-
-    public void setRefillQuantity(int refillQuantity) {
-        this.refillQuantity = refillQuantity;
-    }
-
     public Date getLastRefillDate() {
         return lastRefillDate;
     }
@@ -108,5 +104,13 @@ public class Stock {
 
     public void setLastRefillTime(Time lastRefillTime) {
         this.lastRefillTime = lastRefillTime;
+    }
+
+    public Button getDelete() {
+        return delete;
+    }
+
+    public void setDelete(Button delete) {
+        this.delete = delete;
     }
 }

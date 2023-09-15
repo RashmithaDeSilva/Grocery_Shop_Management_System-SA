@@ -38,6 +38,7 @@ CREATE TABLE stock (
    user_id INT,
    item_id INT,
    quantity INT,
+   refill_quantity INT,
    price DECIMAL(10, 2),
    selling_price DECIMAL(10, 2),
    refill_date DATE,

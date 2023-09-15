@@ -19,6 +19,8 @@ public class DashboardFormController {
     public Label userNameTxt;
     public Label incomeTxt;
     private static String userName = "Admin";
+    private static int userRoll = -1;
+
 
     public void initialize() {
         userNameTxt.setText(userName);
@@ -52,6 +54,14 @@ public class DashboardFormController {
 
     public void setUserName(String userName) {
         DashboardFormController.userName = userName;
+    }
+
+    public int getUserRoll() {
+        return userRoll;
+    }
+
+    public void setUserRoll(int userRoll) {
+        DashboardFormController.userRoll = userRoll;
     }
 
     public void logoutOnAction(ActionEvent actionEvent) throws SQLException {

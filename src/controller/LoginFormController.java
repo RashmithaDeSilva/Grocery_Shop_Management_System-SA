@@ -25,6 +25,7 @@ public class LoginFormController {
 
         if (dbConnection.checkUserLogin(userNameTxt.getText(), passwordTxt.getText())) {
             new DashboardFormController().setUserName(userNameTxt.getText());
+            new DashboardFormController().setUserRoll(dbConnection.getUserRoll(userNameTxt.getText()));
             setUI("DashboardForm");
             new Alert(Alert.AlertType.INFORMATION, "Welcome " + userNameTxt.getText()).show();
 

@@ -70,6 +70,12 @@ public class DBConnection {
         return false;
     }
 
+    public int getUserRoll(String userName) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT title FROM users WHERE user_name = '" + userName +"';");
+
+        return reset.next() ? reset.getInt("title") : -1;
+    }
+
     public ArrayList<Item> getItemTable() throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT * FROM items;");
 
