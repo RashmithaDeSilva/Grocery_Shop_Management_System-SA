@@ -72,8 +72,12 @@ public class DBConnection {
 
     public int getUserRoll(String userName) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT title FROM users WHERE user_name = '" + userName +"';");
-
         return reset.next() ? reset.getInt("title") : -1;
+    }
+
+    public int getTableRowCount(String tableName) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT COUNT(*) FROM " + tableName + ";");
+        return reset.next() ? reset.getInt(1) : -1;
     }
 
     public ArrayList<Item> getItemTable() throws SQLException {

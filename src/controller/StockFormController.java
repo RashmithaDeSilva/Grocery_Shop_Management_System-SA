@@ -2,12 +2,16 @@ package controller;
 
 import DB_Connection.DBConnection;
 import javafx.event.ActionEvent;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.util.Objects;
 
 public class StockFormController {
     public AnchorPane contextStock;
@@ -53,7 +57,8 @@ public class StockFormController {
         deleteCol.setCellValueFactory(new PropertyValueFactory<>("delete"));
     }
 
-    public void backOnAction(ActionEvent actionEvent) {
+    public void backOnAction(ActionEvent actionEvent) throws IOException {
+        setUI("DashboardForm");
     }
 
     public void refreshStockOnAction(ActionEvent actionEvent) {
@@ -66,5 +71,20 @@ public class StockFormController {
     }
 
     public void addOrUpdateOnAction(ActionEvent actionEvent) {
+    }
+
+    private void setUI(String UI_Name) throws IOException {
+        Parent parent = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/" + UI_Name + ".fxml")));
+        Stage stage = (Stage) contextStock.getScene().getWindow();
+        stage.setScene(new Scene(parent));
+        stage.centerOnScreen();
+    }
+
+    private void alert(Alert.AlertType type, String title, String headerText, String contentText) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+        alert.show();
     }
 }
