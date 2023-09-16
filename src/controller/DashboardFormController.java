@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -19,7 +20,7 @@ public class DashboardFormController {
     public Label userNameTxt;
     public Label incomeTxt;
     private static String userName = "Admin";
-    private static int userRoll = -1;
+    private static int userRoll = 0;
 
 
     public void initialize() {
@@ -38,18 +39,43 @@ public class DashboardFormController {
     }
 
     public void itemOnAction(ActionEvent actionEvent) throws IOException {
-        setUI("ItemForm");
+        if(userRoll == 0 || userRoll == 1) {
+            setUI("ItemForm");
+
+        } else {
+            alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
+                    "Admins accuses only");
+        }
     }
 
     public void stockOnAction(ActionEvent actionEvent) throws IOException {
-        setUI("StockForm");
+        if(userRoll == 0 || userRoll == 1) {
+            setUI("StockForm");
+
+        } else {
+            alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
+                    "Admins accuses only");
+        }
     }
 
     public void lockerOnAction(ActionEvent actionEvent) throws IOException {
-        setUI("LockerForm");
+        if(userRoll == 0) {
+            setUI("LockerForm");
+
+        } else {
+            alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
+                    "Super admin can only accuses");
+        }
     }
 
     public void userAccOnAction(MouseEvent mouseEvent) {
+        if(userRoll == 0 || userRoll == 1) {
+
+
+        } else {
+            alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
+                    "Admins accuses only");
+        }
     }
 
     public void setUserName(String userName) {
@@ -67,5 +93,13 @@ public class DashboardFormController {
     public void logoutOnAction(ActionEvent actionEvent) throws SQLException {
         DBConnection.getInstance().closeConnection();
         System.exit(0);
+    }
+
+    private void alert(Alert.AlertType type, String title, String headerText, String contentText) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+        alert.show();
     }
 }
