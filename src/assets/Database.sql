@@ -33,7 +33,7 @@ CREATE TABLE items (
 --     FOREIGN KEY (item_id) REFERENCES items(item_id)
 -- );
 
-CREATE TABLE stock (
+CREATE TABLE stocks (
    stock_id INT AUTO_INCREMENT PRIMARY KEY,
    user_id INT,
    item_id INT,
@@ -61,7 +61,7 @@ CREATE TABLE sells (
    FOREIGN KEY (item_id) REFERENCES items(item_id)
 );
 
-CREATE TABLE sells_edit (
+CREATE TABLE sell_edits (
      user_id INT,
      sale_id INT,
      log_date DATE,

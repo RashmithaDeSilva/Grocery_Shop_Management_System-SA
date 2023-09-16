@@ -20,19 +20,25 @@ public class LoginFormController {
     public PasswordField passwordTxt;
     public AnchorPane contextLoginForm;
 
-    public void loginOnActonBtn(ActionEvent actionEvent) throws SQLException, IOException {
+    public void loginOnActonBtn(ActionEvent actionEvent) {
         DBConnection dbConnection = DBConnection.getInstance();
 
-        if (dbConnection.checkUserLogin(userNameTxt.getText(), passwordTxt.getText())) {
-            new DashboardFormController().setUserName(userNameTxt.getText());
-            new DashboardFormController().setUserRoll(dbConnection.getUserRoll(userNameTxt.getText()));
-            setUI("DashboardForm");
-            new Alert(Alert.AlertType.INFORMATION, "Welcome " + userNameTxt.getText()).show();
+        try {
+            if (dbConnection.checkUserLogin(userNameTxt.getText(), passwordTxt.getText())) {
+                new DashboardFormController().setUserName(userNameTxt.getText());
+                new DashboardFormController().setUserRoll(dbConnection.getUserRoll(userNameTxt.getText()));
+                setUI("DashboardForm");
+                alert(Alert.AlertType.INFORMATION, "INFORMATION", "Login Successful",
+                        "Welcome " + userNameTxt.getText());
 
-        } else {
-            new Alert(Alert.AlertType.ERROR, "Wrong User or Password").show();
+            } else {
+                alert(Alert.AlertType.ERROR, "ERROR", "Can't Logging",
+                        "Wrong User or Password");
+            }
+
+        } catch (SQLException | IOException e){
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
-
     }
 
     private void setUI(String UI_Name) throws IOException {
@@ -40,5 +46,13 @@ public class LoginFormController {
         Stage stage = (Stage) contextLoginForm.getScene().getWindow();
         stage.setScene(new Scene(parent));
         stage.centerOnScreen();
+    }
+
+    private void alert(Alert.AlertType type, String title, String headerText, String contentText) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+        alert.show();
     }
 }

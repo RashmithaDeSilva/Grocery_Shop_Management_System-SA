@@ -11,6 +11,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class StockFormController {
@@ -42,6 +43,7 @@ public class StockFormController {
     public TextField refillQuantityTxt;
     public CheckBox showAllItemsCheckBx;
     private final DBConnection dbConnection = DBConnection.getInstance();
+    private int stockTableDataCount;
 
 
     public void initialize() {
@@ -55,6 +57,13 @@ public class StockFormController {
         refillDateCol.setCellValueFactory(new PropertyValueFactory<>("lastRefillDate"));
         refillTimeCol.setCellValueFactory(new PropertyValueFactory<>("lastRefillTime"));
         deleteCol.setCellValueFactory(new PropertyValueFactory<>("delete"));
+
+        try {
+            stockTableDataCount = dbConnection.getTableRowCount("stock");
+
+        } catch (SQLException e){
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
     }
 
     public void backOnAction(ActionEvent actionEvent) throws IOException {
@@ -71,6 +80,18 @@ public class StockFormController {
     }
 
     public void addOrUpdateOnAction(ActionEvent actionEvent) {
+    }
+
+    public void previewStockTableOnAction(ActionEvent actionEvent) {
+    }
+
+    public void nextStockTableOnAction(ActionEvent actionEvent) {
+    }
+
+    public void previewRefillTableOnAction(ActionEvent actionEvent) {
+    }
+
+    public void nextRefillTableOnAction(ActionEvent actionEvent) {
     }
 
     private void setUI(String UI_Name) throws IOException {
