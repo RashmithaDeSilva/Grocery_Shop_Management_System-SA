@@ -13,8 +13,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Item;
 import model.Stock;
-import model.tableRows.InvoiceItem;
-import model.tableRows.SellItem;
+import model.tableRows.sellWindow.InvoiceItem;
+import model.tableRows.sellWindow.SellItem;
 
 import java.io.*;
 import java.sql.SQLException;

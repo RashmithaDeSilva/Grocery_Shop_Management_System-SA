@@ -1,4 +1,4 @@
-package model.tableRows;
+package model.tableRows.itemWindow;
 
 import javafx.scene.control.Button;
 

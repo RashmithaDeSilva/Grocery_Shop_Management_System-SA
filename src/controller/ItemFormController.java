@@ -21,7 +21,7 @@ import java.util.Objects;
 public class ItemFormController {
     public AnchorPane contextItemForm;
     public TextField searchTxt;
-    public TableView<model.tableRows.Item> itemTbl;
+    public TableView<model.tableRows.itemWindow.Item> itemTbl;
     public TableColumn<Object, String> idCol;
     public TableColumn<Object, String> nameCol;
     public TableColumn<Object, String> deleteCol;
@@ -49,11 +49,11 @@ public class ItemFormController {
         idTxt.setText(items != null ? String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
 
         searchTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            ObservableList<model.tableRows.Item> obList = FXCollections.observableArrayList();
+            ObservableList<model.tableRows.itemWindow.Item> obList = FXCollections.observableArrayList();
             for (Item i : items) {
                 if (i.getItemName().toLowerCase().contains(searchTxt.getText().toLowerCase()) ||
                         Integer.toString(i.getItemId()).contains(searchTxt.getText())) {
-                    obList.add(new model.tableRows.Item(i.getItemId(), i.getItemName(), getDeleteButton()));
+                    obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(), getDeleteButton()));
                 }
             }
             itemTbl.setItems(obList);
@@ -67,16 +67,16 @@ public class ItemFormController {
         });
     }
 
-    private void setDataIntoInputs(model.tableRows.Item newValue) {
+    private void setDataIntoInputs(model.tableRows.itemWindow.Item newValue) {
         idTxt.setText(String.valueOf(newValue.getId()));
         nameTxt.setText(newValue.getName());
         addOrUpdateTxt.setText("Update");
     }
 
     private void setTableData() {
-        ObservableList<model.tableRows.Item> obList = FXCollections.observableArrayList();
+        ObservableList<model.tableRows.itemWindow.Item> obList = FXCollections.observableArrayList();
         for (Item i : items) {
-            obList.add(new model.tableRows.Item(i.getItemId(), i.getItemName(), getDeleteButton()));
+            obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(), getDeleteButton()));
         }
         itemTbl.setItems(obList);
     }

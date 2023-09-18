@@ -1,6 +1,8 @@
 package controller;
 
 import DB_Connection.DBConnection;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,14 +11,16 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import model.Stock;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class StockFormController {
     public AnchorPane contextStock;
-    public TableView stockTbl;
+    public TableView<model.tableRows.stockWindow.Stock> stockTbl;
     public TableColumn<Object, String> stockIdCol;
     public TableColumn<Object, String> userNameCol;
     public TableColumn<Object, String> itemIdCol;
@@ -43,7 +47,7 @@ public class StockFormController {
     public TextField refillQuantityTxt;
     public CheckBox showAllItemsCheckBx;
     private final DBConnection dbConnection = DBConnection.getInstance();
-    private int stockTableDataCount;
+    private ArrayList<Stock> stocks;
 
 
     public void initialize() {
@@ -59,10 +63,57 @@ public class StockFormController {
         deleteCol.setCellValueFactory(new PropertyValueFactory<>("delete"));
 
         try {
-            stockTableDataCount = dbConnection.getTableRowCount("stock");
+            int stockTableDataCount = dbConnection.getTableRowCount("stock");
+
+            if(stockTableDataCount <= 50 && stockTableDataCount > 0) {
+                stocks = dbConnection.getStockTable(stockTableDataCount);
+            }
+
+            setDataIntoTable();
 
         } catch (SQLException e){
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
+
+
+    }
+
+    private void setDataIntoTable() throws SQLException {
+        ObservableList<model.tableRows.stockWindow.Stock> obList = FXCollections.observableArrayList();
+        ArrayList<String> userIdAndNames = new ArrayList<>();
+
+        if(stocks != null) {
+            userIdAndNames.add(stocks.get(0).getUserId() + "-");
+
+            for (model.Stock ss : stocks) {
+                for (String s : userIdAndNames) {
+                    if(ss.getUserId() != Integer.parseInt(s.split("-")[0])){
+                        userIdAndNames.add(stocks.get(0).getUserId() + "-");
+                    }
+                }
+            }
+
+            for (int i=0; i<userIdAndNames.size(); i++) {
+                userIdAndNames.set(i, userIdAndNames.get(i) +
+                        dbConnection.getUserName(Integer.parseInt(userIdAndNames.get(i).split("-")[0])));
+            }
+
+            for (model.Stock s : stocks) {
+                String userName = null;
+                for (String ss : userIdAndNames) {
+                    if(s.getUserId() == Integer.parseInt(ss.split("-")[0])) {
+                        userName = ss.split("-")[1];
+                    }
+                }
+
+                Button btn = new Button("Delete");
+
+                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                        s.getLastRefillTime(), btn));
+            }
+
+            stockTbl.setItems(obList);
         }
     }
 

@@ -1,4 +1,4 @@
-package model.tableRows;
+package model.tableRows.stockWindow;
 
 import javafx.scene.control.Button;
 
@@ -33,6 +33,7 @@ public class Stock {
         this.lastRefillTime = lastRefillTime;
         this.delete = delete;
     }
+
 
     public int getStockId() {
         return stockId;

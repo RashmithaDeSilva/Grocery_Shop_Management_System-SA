@@ -1,4 +1,4 @@
-package model.tableRows;
+package model.tableRows.sellWindow;
 
 public class SellItem {
     private int itemId;

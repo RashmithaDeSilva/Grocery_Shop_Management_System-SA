@@ -117,6 +117,38 @@ public class DBConnection {
         return stocks;
     }
 
+    public ArrayList<Stock> getStockTable(int stockCount) throws SQLException {
+        ResultSet reset;
+
+        if(stockCount > 50) {
+            reset = stm.executeQuery("SELECT * FROM stock LIMIT 50 OFFSET " + stockCount +";");
+
+        } else {
+            reset = stm.executeQuery("SELECT * FROM stock LIMIT 50 ;");
+        }
+
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(reset.next()) {
+            stocks.add(new Stock(reset.getInt("stock_id"), reset.getInt("user_id"),
+                    reset.getInt("item_id"), reset.getInt("quantity"),
+                    reset.getInt("refill_quantity"), reset.getDouble("price"),
+                    reset.getDouble("selling_price"), reset.getDate("refill_date"),
+                    reset.getTime("refill_time")));
+        }
+
+        return stocks;
+    }
+
+    public String getUserName(int userId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT user_name FROM users WHERE user_id = " + userId +";");
+
+        if(reset.next()) {
+            return reset.getString("user_name");
+        }
+        return null;
+    }
+
     public boolean addItem(Item item) {
         String sql = "INSERT INTO items (item_name) VALUES (?)";
 

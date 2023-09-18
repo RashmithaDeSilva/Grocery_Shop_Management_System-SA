@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contextStock" prefHeight="837.0" prefWidth="1143.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.StockFormController">
+<AnchorPane fx:id="contextStock" prefHeight="837.0" prefWidth="1166.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.StockFormController">
    <children>
       <Label layoutX="40.0" layoutY="35.0" text="Stock">
          <font>
@@ -27,7 +27,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <TableView fx:id="stockTbl" layoutX="30.0" layoutY="170.0" prefHeight="279.0" prefWidth="1082.0">
+      <TableView fx:id="stockTbl" layoutX="30.0" layoutY="170.0" prefHeight="279.0" prefWidth="1104.0">
         <columns>
           <TableColumn fx:id="stockIdCol" prefWidth="75.0" text="Stock ID" />
           <TableColumn fx:id="userNameCol" prefWidth="117.59998321533203" text="User Name" />

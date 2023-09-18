@@ -64,7 +64,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button layoutX="966.0" layoutY="38.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
+      <Button layoutX="1147.0" layoutY="38.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -72,7 +72,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button layoutX="1171.0" layoutY="38.0" mnemonicParsing="false" onAction="#sellOnAction" style="-fx-background-color: #1dd1a1;" text="Sell">
+      <Button layoutX="957.0" layoutY="38.0" mnemonicParsing="false" onAction="#sellOnAction" style="-fx-background-color: #1dd1a1;" text="Sell">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -127,7 +127,7 @@
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <Button layoutX="1065.0" layoutY="38.0" mnemonicParsing="false" onAction="#sellLogOnAction" style="-fx-background-color: #48dbfb;" text="Sell Log">
+      <Button layoutX="1037.0" layoutY="38.0" mnemonicParsing="false" onAction="#sellLogOnAction" style="-fx-background-color: #48dbfb;" text="Sell Log">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
