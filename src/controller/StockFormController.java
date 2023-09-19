@@ -46,7 +46,11 @@ public class StockFormController {
     public TextField sellingPriceTxt;
     public TextField refillQuantityTxt;
     public CheckBox showAllItemsCheckBx;
+    public Button previewStockTableBtn;
+    public Button nextStockTableBtn;
     private final DBConnection dbConnection = DBConnection.getInstance();
+    private int stockTableDataCount;
+    private int loadedRowCount = 5;
     private ArrayList<Stock> stocks;
 
 
@@ -63,10 +67,17 @@ public class StockFormController {
         deleteCol.setCellValueFactory(new PropertyValueFactory<>("delete"));
 
         try {
-            int stockTableDataCount = dbConnection.getTableRowCount("stock");
+            stockTableDataCount = dbConnection.getTableRowCount("stock");
 
-            if(stockTableDataCount <= 50 && stockTableDataCount > 0) {
+            if(stockTableDataCount < 5 && stockTableDataCount > 0) {
                 stocks = dbConnection.getStockTable(stockTableDataCount);
+                loadedRowCount = stockTableDataCount;
+                previewStockTableBtn.setDisable(true);
+                nextStockTableBtn.setDisable(true);
+
+            } else {
+                stocks = dbConnection.getStockTable(loadedRowCount);
+                previewStockTableBtn.setDisable(true);
             }
 
             setDataIntoTable();
@@ -83,37 +94,39 @@ public class StockFormController {
         ArrayList<String> userIdAndNames = new ArrayList<>();
 
         if(stocks != null) {
-            userIdAndNames.add(stocks.get(0).getUserId() + "-");
+            if(!stocks.isEmpty()) {
+                userIdAndNames.add(stocks.get(0).getUserId() + "-");
 
-            for (model.Stock ss : stocks) {
-                for (String s : userIdAndNames) {
-                    if(ss.getUserId() != Integer.parseInt(s.split("-")[0])){
-                        userIdAndNames.add(stocks.get(0).getUserId() + "-");
-                    }
-                }
-            }
-
-            for (int i=0; i<userIdAndNames.size(); i++) {
-                userIdAndNames.set(i, userIdAndNames.get(i) +
-                        dbConnection.getUserName(Integer.parseInt(userIdAndNames.get(i).split("-")[0])));
-            }
-
-            for (model.Stock s : stocks) {
-                String userName = null;
-                for (String ss : userIdAndNames) {
-                    if(s.getUserId() == Integer.parseInt(ss.split("-")[0])) {
-                        userName = ss.split("-")[1];
+                for (model.Stock ss : stocks) {
+                    for (String s : userIdAndNames) {
+                        if(ss.getUserId() != Integer.parseInt(s.split("-")[0])){
+                            userIdAndNames.add(stocks.get(0).getUserId() + "-");
+                        }
                     }
                 }
 
-                Button btn = new Button("Delete");
+                for (int i=0; i<userIdAndNames.size(); i++) {
+                    userIdAndNames.set(i, userIdAndNames.get(i) +
+                            dbConnection.getUserName(Integer.parseInt(userIdAndNames.get(i).split("-")[0])));
+                }
 
-                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
-                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                        s.getLastRefillTime(), btn));
+                for (model.Stock s : stocks) {
+                    String userName = null;
+                    for (String ss : userIdAndNames) {
+                        if(s.getUserId() == Integer.parseInt(ss.split("-")[0])) {
+                            userName = ss.split("-")[1];
+                        }
+                    }
+
+                    Button btn = new Button("Delete");
+
+                    obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                            s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                            s.getLastRefillTime(), btn));
+                }
+
+                stockTbl.setItems(obList);
             }
-
-            stockTbl.setItems(obList);
         }
     }
 
@@ -136,7 +149,22 @@ public class StockFormController {
     public void previewStockTableOnAction(ActionEvent actionEvent) {
     }
 
-    public void nextStockTableOnAction(ActionEvent actionEvent) {
+    public void nextStockTableOnAction(ActionEvent actionEvent) throws SQLException {
+        if(stocks != null) {
+            if(!stocks.isEmpty()) {
+                if((loadedRowCount + 5) < stockTableDataCount) {
+                    loadedRowCount += 5;
+                    stocks = dbConnection.getStockTable(loadedRowCount);
+                    setDataIntoTable();
+
+                } else {
+                    nextStockTableBtn.setDisable(true);
+                    previewStockTableBtn.setDisable(false);
+                    stocks = dbConnection.getStockTable(stockTableDataCount);
+                    setDataIntoTable();
+                }
+            }
+        }
     }
 
     public void previewRefillTableOnAction(ActionEvent actionEvent) {

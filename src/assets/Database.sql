@@ -33,7 +33,7 @@ CREATE TABLE items (
 --     FOREIGN KEY (item_id) REFERENCES items(item_id)
 -- );
 
-CREATE TABLE stocks (
+CREATE TABLE stock (
    stock_id INT AUTO_INCREMENT PRIMARY KEY,
    user_id INT,
    item_id INT,
