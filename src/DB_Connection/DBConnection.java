@@ -119,14 +119,11 @@ public class DBConnection {
 
     public ArrayList<Stock> getStockTable(int stockCount) throws SQLException {
         ResultSet reset;
-        int tableRowCount = getTableRowCount("stock");
 
-        if(stockCount > 5) {
-            reset = stm.executeQuery("SELECT * FROM stock LIMIT 5 OFFSET " + stockCount +";");
-            System.out.println("1");
+        if(stockCount > 0) {
+            reset = stm.executeQuery("SELECT * FROM stock LIMIT 25 OFFSET " + stockCount +";");
         } else {
-            reset = stm.executeQuery("SELECT * FROM stock LIMIT 5;");
-            System.out.println("2");
+            reset = stm.executeQuery("SELECT * FROM stock LIMIT 25;");
         }
 
         ArrayList<Stock> stocks = new ArrayList<>();

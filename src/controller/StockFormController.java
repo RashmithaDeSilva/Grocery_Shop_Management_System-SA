@@ -12,6 +12,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Stock;
+import model.tableRows.stockWindow.StockRefill;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -32,7 +33,7 @@ public class StockFormController {
     public TableColumn<Object, String> refillTimeCol;
     public TableColumn<Object, String> deleteCol;
     public TextField searchStockTxt;
-    public TableView refillTbl;
+    public TableView<StockRefill> refillTbl;
     public TableColumn<Object, String> stockId2Col;
     public TableColumn<Object, String> itemId2Col;
     public TableColumn<Object, String> itemNameCol;
@@ -50,7 +51,8 @@ public class StockFormController {
     public Button nextStockTableBtn;
     private final DBConnection dbConnection = DBConnection.getInstance();
     private int stockTableDataCount;
-    private int loadedRowCount = 5;
+    private int loadedRowCountStock = 0;
+    private int loadedRowCountStockRefill = 0;
     private ArrayList<Stock> stocks;
 
 
@@ -69,14 +71,14 @@ public class StockFormController {
         try {
             stockTableDataCount = dbConnection.getTableRowCount("stock");
 
-            if(stockTableDataCount < 5 && stockTableDataCount > 0) {
+            if(stockTableDataCount < 25 && stockTableDataCount > 0) {
                 stocks = dbConnection.getStockTable(stockTableDataCount);
-                loadedRowCount = stockTableDataCount;
+                loadedRowCountStock = stockTableDataCount;
                 previewStockTableBtn.setDisable(true);
                 nextStockTableBtn.setDisable(true);
 
             } else {
-                stocks = dbConnection.getStockTable(loadedRowCount);
+                stocks = dbConnection.getStockTable(loadedRowCountStock);
                 previewStockTableBtn.setDisable(true);
             }
 
@@ -140,34 +142,50 @@ public class StockFormController {
     public void refreshRefillOnAction(ActionEvent actionEvent) {
     }
 
-    public void resetOnAction(ActionEvent actionEvent) {
+    public void resetOnAction(ActionEvent actionEvent) { 
     }
 
     public void addOrUpdateOnAction(ActionEvent actionEvent) {
     }
 
-    public void previewStockTableOnAction(ActionEvent actionEvent) {
-    }
-
-    public void nextStockTableOnAction(ActionEvent actionEvent) throws SQLException {
+    public void previewStockTableOnAction(ActionEvent actionEvent) throws SQLException {
+        previewStockTableBtn.setDisable(true);
         if(stocks != null) {
             if(!stocks.isEmpty()) {
-                if((loadedRowCount + 5) < stockTableDataCount) {
-                    loadedRowCount += 5;
-                    stocks = dbConnection.getStockTable(loadedRowCount);
+                if((loadedRowCountStock - 25) >= 0) {
+                    loadedRowCountStock -= 25;
+                    stocks = dbConnection.getStockTable(loadedRowCountStock);
                     setDataIntoTable();
+                    nextStockTableBtn.setDisable(false);
 
-                } else {
-                    nextStockTableBtn.setDisable(true);
-                    previewStockTableBtn.setDisable(false);
-                    stocks = dbConnection.getStockTable(stockTableDataCount);
-                    setDataIntoTable();
+                    if((loadedRowCountStock - 25) >= 0) {
+                        previewStockTableBtn.setDisable(false);
+                    }
                 }
             }
         }
     }
 
-    public void previewRefillTableOnAction(ActionEvent actionEvent) {
+    public void nextStockTableOnAction(ActionEvent actionEvent) throws SQLException {
+        nextStockTableBtn.setDisable(true);
+        if(stocks != null) {
+            if(!stocks.isEmpty()) {
+                if((loadedRowCountStock + 25) < stockTableDataCount) {
+                    loadedRowCountStock += 25;
+                    stocks = dbConnection.getStockTable(loadedRowCountStock);
+                    setDataIntoTable();
+                    previewStockTableBtn.setDisable(false);
+
+                    if((loadedRowCountStock + 25) < stockTableDataCount) {
+                        nextStockTableBtn.setDisable(false);
+                    }
+                }
+            }
+        }
+    }
+
+    public void previewRefillTableOnAction(ActionEvent actionEvent) throws SQLException {
+
     }
 
     public void nextRefillTableOnAction(ActionEvent actionEvent) {
