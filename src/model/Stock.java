@@ -17,6 +17,13 @@ public class Stock {
 
     public Stock() {}
 
+    public Stock(int stockId, int itemId, int quantity, double price) {
+        this.stockId = stockId;
+        this.itemId = itemId;
+        this.quantity = quantity;
+        this.price = price;
+    }
+
     public Stock(int stockId, int itemId, int quantity, double price, double sellingPrice) {
         this.stockId = stockId;
         this.itemId = itemId;
@@ -37,6 +44,7 @@ public class Stock {
         this.lastRefillDate = lastRefillDate;
         this.lastRefillTime = lastRefillTime;
     }
+
 
     public int getStockId() {
         return stockId;

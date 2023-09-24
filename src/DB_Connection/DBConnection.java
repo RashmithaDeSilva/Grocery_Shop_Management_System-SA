@@ -44,6 +44,7 @@ public class DBConnection {
 //            while(reset.next()) {
 //                System.out.println(reset.getRow());
 //            }
+            getInstance().getRefillStockTable(0);
 
             connection.close();
 
@@ -77,6 +78,11 @@ public class DBConnection {
 
     public int getTableRowCount(String tableName) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT COUNT(*) FROM " + tableName + ";");
+        return reset.next() ? reset.getInt(1) : -1;
+    }
+
+    public  int getTableRefillRowCount() throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT COUNT(*) FROM stock WHERE quantity <= refill_quantity;");
         return reset.next() ? reset.getInt(1) : -1;
     }
 
@@ -139,11 +145,42 @@ public class DBConnection {
         return stocks;
     }
 
+    public ArrayList<Stock> getRefillStockTable(int stockCount) throws SQLException {
+        ResultSet reset;
+
+        if(stockCount > 0) {
+            String sql = "SELECT stock_id, item_id, quantity, price " +
+                    "FROM stock WHERE quantity <= refill_quantity LIMIT 25 OFFSET " + stockCount + ";";
+            reset = stm.executeQuery(sql);
+        } else {
+            reset = stm.executeQuery("SELECT stock_id, item_id, quantity, price " +
+                    "FROM stock WHERE quantity <= refill_quantity LIMIT 25;");
+        }
+
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(reset.next()) {
+            stocks.add(new Stock(reset.getInt("stock_id"), reset.getInt("item_id"),
+                    reset.getInt("quantity"), reset.getDouble("price")));
+        }
+
+        return stocks;
+    }
+
     public String getUserName(int userId) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT user_name FROM users WHERE user_id = " + userId +";");
 
         if(reset.next()) {
             return reset.getString("user_name");
+        }
+        return null;
+    }
+
+    public String getItemName(int itemId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT item_name FROM items WHERE item_id = " + itemId +";");
+
+        if(reset.next()) {
+            return reset.getString("item_name");
         }
         return null;
     }

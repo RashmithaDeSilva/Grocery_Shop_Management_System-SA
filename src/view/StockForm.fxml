@@ -142,7 +142,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button layoutX="330.0" layoutY="793.0" mnemonicParsing="false" onAction="#previewRefillTableOnAction" style="-fx-background-color: #48dbfb;" text="&lt;">
+      <Button fx:id="previewRefillTableBtn" layoutX="330.0" layoutY="793.0" mnemonicParsing="false" onAction="#previewRefillTableOnAction" style="-fx-background-color: #48dbfb;" text="&lt;">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -150,7 +150,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button layoutX="383.0" layoutY="793.0" mnemonicParsing="false" onAction="#nextRefillTableOnAction" style="-fx-background-color: #48dbfb;" text="&gt;">
+      <Button fx:id="nextRefillTableBtn" layoutX="383.0" layoutY="793.0" mnemonicParsing="false" onAction="#nextRefillTableOnAction" style="-fx-background-color: #48dbfb;" text="&gt;">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
