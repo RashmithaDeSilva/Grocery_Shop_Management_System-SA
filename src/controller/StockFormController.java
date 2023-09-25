@@ -98,10 +98,6 @@ public class StockFormController {
             refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
             previewRefillTableBtn.setDisable(true);
 
-//            System.out.println(refillStocks.size());
-//            for (Stock r : refillStocks) {
-//                System.out.println(r.getStockId());
-//            }
 
             setDataIntoStockTable();
             setDataIntoRefillStockTable();
@@ -112,7 +108,6 @@ public class StockFormController {
 
 
     }
-
 
     private void setDataIntoStockTable() throws SQLException {
         ObservableList<model.tableRows.stockWindow.Stock> obList = FXCollections.observableArrayList();
@@ -126,6 +121,7 @@ public class StockFormController {
                     for (String s : userIdAndNames) {
                         if(ss.getUserId() != Integer.parseInt(s.split("-")[0])){
                             userIdAndNames.add(ss.getUserId() + "-");
+                            break;
                         }
                     }
                 }
@@ -140,6 +136,7 @@ public class StockFormController {
                     for (String ss : userIdAndNames) {
                         if(s.getUserId() == Integer.parseInt(ss.split("-")[0])) {
                             userName = ss.split("-")[1];
+                            break;
                         }
                     }
 
@@ -164,46 +161,33 @@ public class StockFormController {
                 itemIdAndNames.add(refillStocks.get(0).getItemId() + "-");
 
                 for (Stock ss : refillStocks) {
-//                    System.out.println(itemIdAndNames.size() + "\t1");
-                    Iterator<String> iterator = itemIdAndNames.iterator();
-                    try{
-                        while (iterator.hasNext()) {
-                            String item = iterator.next();
-                            System.out.println(item);
+                    for (String s : itemIdAndNames) {
+                        if (ss.getItemId() != Integer.parseInt(s.split("-")[0])) {
+                            itemIdAndNames.add(ss.getItemId() + "-");
+                            break;
                         }
-//                        for (String s : iteration) {
-//                            System.out.println(itemIdAndNames.size() + "\t2");
-//                            if (ss.getItemId() != Integer.parseInt(s.split("-")[0])) {
-//                                itemIdAndNames.add(ss.getItemId() + "-");
-//                                System.out.println(itemIdAndNames.size() + "\t3");
-//                            }
-//                            System.out.println(itemIdAndNames.size() + "\t4");
-//                        }
-                    } catch (Exception e) {
-                        System.out.println(e);
-//                        System.out.println(itemIdAndNames.size() + "\t5");
                     }
-//                    System.out.println(itemIdAndNames.size() + "\t6");
                 }
 
-//                for (int i=0; i<itemIdAndNames.size(); i++) {
-//                    itemIdAndNames.set(i, itemIdAndNames.get(i) +
-//                            dbConnection.getItemName(Integer.parseInt(itemIdAndNames.get(i).split("-")[0])));
-//                }
-//
-//                for (Stock s : refillStocks) {
-//                    String userName = null;
-//                    for (String ss : itemIdAndNames) {
-//                        if(s.getUserId() == Integer.parseInt(ss.split("-")[0])) {
-//                            userName = ss.split("-")[1];
-//                        }
-//                    }
-//
-//                    obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
-//                            userName, s.getQuantity(), s.getPrice()));
-//                }
-//
-//                refillTbl.setItems(obList);
+                for (int i=0; i<itemIdAndNames.size(); i++) {
+                    itemIdAndNames.set(i, itemIdAndNames.get(i) +
+                            dbConnection.getItemName(Integer.parseInt(itemIdAndNames.get(i).split("-")[0])));
+                }
+
+                for (Stock s : refillStocks) {
+                    String itemName = null;
+                    for (String ss : itemIdAndNames) {
+                        if(s.getItemId() == Integer.parseInt(ss.split("-")[0])) {
+                            itemName = ss.split("-")[1];
+                            break;
+                        }
+                    }
+
+                    obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
+                            itemName, s.getQuantity(), s.getPrice()));
+                }
+
+                refillTbl.setItems(obList);
             }
         }
     }
@@ -261,10 +245,39 @@ public class StockFormController {
     }
 
     public void previewRefillTableOnAction(ActionEvent actionEvent) throws SQLException {
+        previewRefillTableBtn.setDisable(true);
+        if(refillStocks != null) {
+            if(!refillStocks.isEmpty()) {
+                if((loadedRowCountStockRefill - 25) >= 0) {
+                    loadedRowCountStockRefill -= 25;
+                    refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
+                    setDataIntoRefillStockTable();
+                    nextRefillTableBtn.setDisable(false);
 
+                    if((loadedRowCountStockRefill - 25) >= 0) {
+                        previewRefillTableBtn.setDisable(false);
+                    }
+                }
+            }
+        }
     }
 
-    public void nextRefillTableOnAction(ActionEvent actionEvent) {
+    public void nextRefillTableOnAction(ActionEvent actionEvent) throws SQLException {
+        nextRefillTableBtn.setDisable(true);
+        if(refillStocks != null) {
+            if(!refillStocks.isEmpty()) {
+                if((loadedRowCountStockRefill + 25) < stockRefillTableDataCount) {
+                    loadedRowCountStockRefill += 25;
+                    refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
+                    setDataIntoStockTable();
+                    previewRefillTableBtn.setDisable(false);
+
+                    if((loadedRowCountStockRefill + 25) < stockRefillTableDataCount) {
+                        nextRefillTableBtn.setDisable(false);
+                    }
+                }
+            }
+        }
     }
 
     private void setUI(String UI_Name) throws IOException {
