@@ -18,6 +18,7 @@ import model.staticType.TableTypes;
 import model.tableRows.stockWindow.RefillAndItem;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -111,6 +112,34 @@ public class StockFormController {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
 
+        searchStockTxt.textProperty().addListener((observable, oldValue, newValue) -> {
+            ObservableList<model.tableRows.stockWindow.Stock> obList = FXCollections.observableArrayList();
+
+            for (Stock s : stocks) {
+                if(Integer.toString(s.getStockId()).contains(searchStockTxt.getText()) ||
+                        Integer.toString(s.getItemId()).contains(searchStockTxt.getText()) ||
+                        Double.toString(s.getQuantity()).contains(searchStockTxt.getText()) ||
+                        Double.toString(s.getRefillQuantity()).contains(searchStockTxt.getText()) ||
+                        Double.toString(s.getPrice()).contains(searchStockTxt.getText()) ||
+                        Double.toString(s.getSellingPrice()).contains(searchStockTxt.getText()) ||
+                        String.valueOf(s.getLastRefillDate()).contains(searchStockTxt.getText()) ||
+                        String.valueOf(s.getLastRefillTime()).contains(searchStockTxt.getText())) {
+
+                    
+                }
+            }
+
+
+//            ObservableList<model.tableRows.itemWindow.Item> obList = FXCollections.observableArrayList();
+//            for (Item i : items) {
+//                if (i.getItemName().toLowerCase().contains(searchTxt.getText().toLowerCase()) ||
+//                        Integer.toString(i.getItemId()).contains(searchTxt.getText())) {
+//                    obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(), getDeleteButton()));
+//                }
+//            }
+//            itemTbl.setItems(obList);
+        });
+
         showAllItemsCheckBx.selectedProperty().addListener((observable, oldValue, newValue) -> {
             searchRefillTxt.clear();
 
@@ -145,8 +174,6 @@ public class StockFormController {
                 alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
             }
         });
-
-
 
     }
 
