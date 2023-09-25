@@ -163,13 +163,6 @@ public class StockFormController {
         });
 
 
-//        .getSelectionModel().selectedItemProperty().addListener(
-//                (observable, oldValue, newValue) -> {
-//                    if (null != newValue) {
-//                        setDataIntoInputs(newValue);
-//                    }
-//                });
-
 
     }
 
@@ -269,6 +262,25 @@ public class StockFormController {
     }
 
     public void refreshStockOnAction(ActionEvent actionEvent) {
+        searchStockTxt.clear();
+        loadedRowCountStock = 0;
+
+        try {
+            // Set stock table
+            stockTableDataCount = dbConnection.getTableRowCount(TableTypes.StockTable);
+            if(stockTableDataCount < 25 && stockTableDataCount > 0) {
+                nextStockTableBtn.setDisable(true);
+            } else {
+                nextStockTableBtn.setDisable(false);
+            }
+            
+            stocks = dbConnection.getStockTable(loadedRowCountStock);
+            previewStockTableBtn.setDisable(true);
+            setDataIntoStockTable();
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
     }
 
     public void refreshRefillOnAction(ActionEvent actionEvent) {
