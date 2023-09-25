@@ -11,14 +11,18 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import model.Item;
 import model.Stock;
-import model.tableRows.stockWindow.StockRefill;
+import model.staticType.RefillTableTypes;
+import model.staticType.TableTypes;
+import model.tableRows.stockWindow.RefillAndItem;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Objects;
+
+import static model.staticType.RefillTableTypes.*;
 
 public class StockFormController {
     public AnchorPane contextStock;
@@ -34,7 +38,7 @@ public class StockFormController {
     public TableColumn<Object, String> refillTimeCol;
     public TableColumn<Object, String> deleteCol;
     public TextField searchStockTxt;
-    public TableView<StockRefill> refillTbl;
+    public TableView<RefillAndItem> refillTbl;
     public TableColumn<Object, String> stockId2Col;
     public TableColumn<Object, String> itemId2Col;
     public TableColumn<Object, String> itemNameCol;
@@ -55,10 +59,13 @@ public class StockFormController {
     public Button nextRefillTableBtn;
     private int stockTableDataCount;
     private int stockRefillTableDataCount;
+    private int itemTableDataCount;
     private int loadedRowCountStock = 0;
     private int loadedRowCountStockRefill = 0;
+    private int loadedRowCountItems = 0;
     private ArrayList<Stock> stocks;
     private ArrayList<Stock> refillStocks;
+    private ArrayList<Item> items;
 
 
     public void initialize() {
@@ -79,10 +86,9 @@ public class StockFormController {
         quantity2Col.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         price2Col.setCellValueFactory(new PropertyValueFactory<>("price"));
 
-
         try {
-            stockTableDataCount = dbConnection.getTableRowCount("stock");
-            stockRefillTableDataCount = dbConnection.getTableRefillRowCount();
+            stockTableDataCount = dbConnection.getTableRowCount(TableTypes.StockTable);
+            stockRefillTableDataCount = dbConnection.getTableRowCount(TableTypes.StockRefillTable);
 
             // Set stock table
             if(stockTableDataCount < 25 && stockTableDataCount > 0) {
@@ -98,13 +104,71 @@ public class StockFormController {
             refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
             previewRefillTableBtn.setDisable(true);
 
-
             setDataIntoStockTable();
-            setDataIntoRefillStockTable();
+            setDataIntoRefillStockTable(RefillStock);
 
         } catch (SQLException e){
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
+
+        showAllItemsCheckBx.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue) {
+                stockId2Col.setVisible(false);
+                quantity2Col.setVisible(false);
+                price2Col.setVisible(false);
+                loadedRowCountItems = 0;
+
+                try {
+                    itemTableDataCount = dbConnection.getTableRowCount(TableTypes.ItemTable);
+
+                    // Set item table
+                    if(itemTableDataCount < 25 && itemTableDataCount > 0) {
+                        nextRefillTableBtn.setDisable(true);
+
+                    } else {
+                        nextRefillTableBtn.setDisable(false);
+                    }
+
+                    items = dbConnection.getItemTable(loadedRowCountItems);
+                    previewRefillTableBtn.setDisable(true);
+                    setDataIntoRefillStockTable(Items);
+
+                } catch (SQLException e) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                }
+
+            } else {
+                stockId2Col.setVisible(true);
+                quantity2Col.setVisible(true);
+                price2Col.setVisible(true);
+                loadedRowCountStockRefill = 0;
+
+                try {
+                    // Set refill stock table
+                    if(stockRefillTableDataCount < 25 && stockRefillTableDataCount > 0) {
+                        nextRefillTableBtn.setDisable(true);
+
+                    } else {
+                        nextRefillTableBtn.setDisable(false);
+                    }
+
+                    refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
+                    previewRefillTableBtn.setDisable(true);
+                    setDataIntoRefillStockTable(RefillStock);
+
+                } catch (SQLException e) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                }
+            }
+        });
+
+
+//        .getSelectionModel().selectedItemProperty().addListener(
+//                (observable, oldValue, newValue) -> {
+//                    if (null != newValue) {
+//                        setDataIntoInputs(newValue);
+//                    }
+//                });
 
 
     }
@@ -152,12 +216,13 @@ public class StockFormController {
         }
     }
 
-    private void setDataIntoRefillStockTable() throws SQLException {
-        ObservableList<model.tableRows.stockWindow.StockRefill> obList = FXCollections.observableArrayList();
-        ArrayList<String> itemIdAndNames = new ArrayList<>();
+    private void setDataIntoRefillStockTable(RefillTableTypes type) throws SQLException {
+        ObservableList<RefillAndItem> obList = FXCollections.observableArrayList();
 
-        if(refillStocks != null) {
-            if(!refillStocks.isEmpty()) {
+        if(type == RefillStock) {
+            ArrayList<String> itemIdAndNames = new ArrayList<>();
+
+            if(refillStocks != null && !refillStocks.isEmpty()) {
                 itemIdAndNames.add(refillStocks.get(0).getItemId() + "-");
 
                 for (Stock ss : refillStocks) {
@@ -186,10 +251,17 @@ public class StockFormController {
                     obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
                             itemName, s.getQuantity(), s.getPrice()));
                 }
+            }
 
-                refillTbl.setItems(obList);
+        } else if(type == Items) {
+            if(items != null && !items.isEmpty()){
+                for (Item i : items) {
+                    obList.add(new model.tableRows.stockWindow.Item(i.getItemId(), i.getItemName()));
+                }
             }
         }
+
+        refillTbl.setItems(obList);
     }
 
     public void backOnAction(ActionEvent actionEvent) throws IOException {
@@ -246,12 +318,13 @@ public class StockFormController {
 
     public void previewRefillTableOnAction(ActionEvent actionEvent) throws SQLException {
         previewRefillTableBtn.setDisable(true);
-        if(refillStocks != null) {
-            if(!refillStocks.isEmpty()) {
+
+        if(stockId2Col.isVisible()) {
+            if(refillStocks != null && !refillStocks.isEmpty()) {
                 if((loadedRowCountStockRefill - 25) >= 0) {
                     loadedRowCountStockRefill -= 25;
                     refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
-                    setDataIntoRefillStockTable();
+                    setDataIntoRefillStockTable(RefillStock);
                     nextRefillTableBtn.setDisable(false);
 
                     if((loadedRowCountStockRefill - 25) >= 0) {
@@ -259,20 +332,50 @@ public class StockFormController {
                     }
                 }
             }
+
+        } else {
+            if(items != null && !items.isEmpty()) {
+                if((loadedRowCountItems - 25) >= 0) {
+                    loadedRowCountItems -= 25;
+                    items = dbConnection.getItemTable(loadedRowCountItems);
+                    setDataIntoRefillStockTable(Items);
+                    nextRefillTableBtn.setDisable(false);
+
+                    if((loadedRowCountItems - 25) >= 0) {
+                        previewRefillTableBtn.setDisable(false);
+                    }
+                }
+            }
         }
+
     }
 
     public void nextRefillTableOnAction(ActionEvent actionEvent) throws SQLException {
         nextRefillTableBtn.setDisable(true);
-        if(refillStocks != null) {
-            if(!refillStocks.isEmpty()) {
+
+        if(stockId2Col.isVisible()) {
+            if(refillStocks != null && !refillStocks.isEmpty()) {
                 if((loadedRowCountStockRefill + 25) < stockRefillTableDataCount) {
                     loadedRowCountStockRefill += 25;
                     refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
-                    setDataIntoStockTable();
+                    setDataIntoRefillStockTable(RefillStock);
                     previewRefillTableBtn.setDisable(false);
 
                     if((loadedRowCountStockRefill + 25) < stockRefillTableDataCount) {
+                        nextRefillTableBtn.setDisable(false);
+                    }
+                }
+            }
+
+        } else {
+            if(items != null && !items.isEmpty()) {
+                if((loadedRowCountItems + 25) < itemTableDataCount) {
+                    loadedRowCountItems += 25;
+                    items = dbConnection.getItemTable(loadedRowCountItems);
+                    setDataIntoRefillStockTable(Items);
+                    previewRefillTableBtn.setDisable(false);
+
+                    if((loadedRowCountItems + 25) < itemTableDataCount) {
                         nextRefillTableBtn.setDisable(false);
                     }
                 }

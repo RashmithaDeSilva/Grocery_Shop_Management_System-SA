@@ -3,6 +3,7 @@ package DB_Connection;
 import javafx.scene.control.Alert;
 import model.Item;
 import model.Stock;
+import model.staticType.TableTypes;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class DBConnection {
 //            while(reset.next()) {
 //                System.out.println(reset.getRow());
 //            }
-            getInstance().getRefillStockTable(0);
+            getInstance().getItemTable(0);
 
             connection.close();
 
@@ -76,14 +77,24 @@ public class DBConnection {
         return reset.next() ? reset.getInt("title") : -1;
     }
 
-    public int getTableRowCount(String tableName) throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT COUNT(*) FROM " + tableName + ";");
-        return reset.next() ? reset.getInt(1) : -1;
-    }
+    public int getTableRowCount(TableTypes type) throws SQLException {
+        ResultSet reset = null;
 
-    public  int getTableRefillRowCount() throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT COUNT(*) FROM stock WHERE quantity <= refill_quantity;");
-        return reset.next() ? reset.getInt(1) : -1;
+        switch (type) {
+            case StockRefillTable:
+                reset = stm.executeQuery("SELECT COUNT(*) FROM stock WHERE quantity <= refill_quantity;");
+                break;
+
+            case StockTable:
+                reset = stm.executeQuery("SELECT COUNT(*) FROM stock;");
+                break;
+
+            case ItemTable:
+                reset = stm.executeQuery("SELECT COUNT(*) FROM items;");
+                break;
+        }
+
+        return (reset != null && reset.next()) ? reset.getInt(1) : -1;
     }
 
     public ArrayList<Item> getItemTable() throws SQLException {
@@ -106,6 +117,24 @@ public class DBConnection {
         }
 
         // reset = stm.executeQuery("SELECT quantity FROM stock WHERE item_id;");
+        return items;
+    }
+
+    public ArrayList<Item> getItemTable(int itemCount) throws SQLException {
+        ResultSet reset;
+
+        if(itemCount > 0) {
+            reset = stm.executeQuery("SELECT * FROM items LIMIT 25 OFFSET " + itemCount +";");
+        } else {
+            reset = stm.executeQuery("SELECT * FROM items LIMIT 25;");
+        }
+
+        ArrayList<Item> items = new ArrayList<>();
+
+        while(reset.next()) {
+            items.add(new Item(reset.getInt("item_id"), reset.getString("item_name")));
+        }
+
         return items;
     }
 

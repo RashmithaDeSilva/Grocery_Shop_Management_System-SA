@@ -1,6 +1,6 @@
 package model.tableRows.stockWindow;
 
-public class StockRefill {
+public class StockRefill implements RefillAndItem{
     private int stockId;
     private int itemId;
     private String itemName;
