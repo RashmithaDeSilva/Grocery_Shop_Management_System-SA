@@ -13,6 +13,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Item;
 import model.Stock;
+import model.User;
 import model.staticType.RefillTableTypes;
 import model.staticType.TableTypes;
 import model.tableRows.stockWindow.RefillAndItem;
@@ -21,7 +22,9 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static model.staticType.RefillTableTypes.*;
 
@@ -113,31 +116,52 @@ public class StockFormController {
         }
 
         searchStockTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            ObservableList<model.tableRows.stockWindow.Stock> obList = FXCollections.observableArrayList();
+            if(newValue != null && stocks != null && !stocks.isEmpty()) {
+                ObservableList<model.tableRows.stockWindow.Stock> obList = FXCollections.observableArrayList();
 
-            for (Stock s : stocks) {
-                if(Integer.toString(s.getStockId()).contains(searchStockTxt.getText()) ||
-                        Integer.toString(s.getItemId()).contains(searchStockTxt.getText()) ||
-                        Double.toString(s.getQuantity()).contains(searchStockTxt.getText()) ||
-                        Double.toString(s.getRefillQuantity()).contains(searchStockTxt.getText()) ||
-                        Double.toString(s.getPrice()).contains(searchStockTxt.getText()) ||
-                        Double.toString(s.getSellingPrice()).contains(searchStockTxt.getText()) ||
-                        String.valueOf(s.getLastRefillDate()).contains(searchStockTxt.getText()) ||
-                        String.valueOf(s.getLastRefillTime()).contains(searchStockTxt.getText())) {
+                List<Integer> uniqueUserIds = stocks.stream().map(Stock::getUserId).
+                        distinct().collect(Collectors.toList());
+                ArrayList<User> users = new ArrayList<>();
+                uniqueUserIds.forEach(userId -> users.add(new User(userId)));
 
-                    
+
+                for (User u : users) {
+                    try {
+                        u.setUserName(dbConnection.getUserName(u.getUserId()));
+                    } catch (SQLException e) {
+                        alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                    }
                 }
+
+                for (Stock s : stocks) {
+                    String userName = null;
+
+                    for (User u : users) {
+                        if(s.getUserId() == u.getUserId()) {
+                            userName = u.getUserName();
+                        }
+                    }
+
+                    if(Integer.toString(s.getStockId()).contains(newValue) ||
+                            Objects.requireNonNull(userName).contains(newValue) ||
+                            Integer.toString(s.getItemId()).contains(newValue) ||
+                            Double.toString(s.getQuantity()).contains(newValue) ||
+                            Double.toString(s.getRefillQuantity()).contains(newValue) ||
+                            Double.toString(s.getPrice()).contains(newValue) ||
+                            Double.toString(s.getSellingPrice()).contains(newValue) ||
+                            String.valueOf(s.getLastRefillDate()).contains(newValue) ||
+                            String.valueOf(s.getLastRefillTime()).contains(newValue)) {
+
+                        Button btn = new Button("Delete");
+
+                        obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                                s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                                s.getLastRefillTime(), btn));
+                    }
+                }
+
+                stockTbl.setItems(obList);
             }
-
-
-//            ObservableList<model.tableRows.itemWindow.Item> obList = FXCollections.observableArrayList();
-//            for (Item i : items) {
-//                if (i.getItemName().toLowerCase().contains(searchTxt.getText().toLowerCase()) ||
-//                        Integer.toString(i.getItemId()).contains(searchTxt.getText())) {
-//                    obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(), getDeleteButton()));
-//                }
-//            }
-//            itemTbl.setItems(obList);
         });
 
         showAllItemsCheckBx.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -339,6 +363,11 @@ public class StockFormController {
                 }
             }
         }
+        if(!searchStockTxt.getText().isEmpty()) {
+            String search = searchStockTxt.getText();
+            searchStockTxt.clear();
+            searchStockTxt.setText(search);
+        }
     }
 
     public void nextStockTableOnAction(ActionEvent actionEvent) throws SQLException {
@@ -356,6 +385,11 @@ public class StockFormController {
                     }
                 }
             }
+        }
+        if(!searchStockTxt.getText().isEmpty()) {
+            String search = searchStockTxt.getText();
+            searchStockTxt.clear();
+            searchStockTxt.setText(search);
         }
     }
 
