@@ -61,6 +61,8 @@ public class StockFormController {
     private final DBConnection dbConnection = DBConnection.getInstance();
     public Button previewRefillTableBtn;
     public Button nextRefillTableBtn;
+    public ComboBox<String> searchStockCbBx;
+    public ComboBox<String> searchRefillCbBx;
     private int stockTableDataCount;
     private int stockRefillTableDataCount;
     private int itemTableDataCount;
@@ -90,6 +92,14 @@ public class StockFormController {
         quantity2Col.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         price2Col.setCellValueFactory(new PropertyValueFactory<>("price"));
 
+        searchStockCbBx.setItems(FXCollections.observableArrayList("All", "Stock ID", "User Name", "Item ID",
+                "Quantity", "Refill Quantity", "Price", "Selling Price", "Refill Date", "Refill Time"));
+        searchStockCbBx.setValue("All");
+
+        searchRefillCbBx.setItems(FXCollections.observableArrayList("All", "Stock ID", "Item ID", "Item Name",
+                "Quantity", "Price"));
+        searchRefillCbBx.setValue("All");
+
         try {
             stockTableDataCount = dbConnection.getTableRowCount(TableTypes.StockTable);
             stockRefillTableDataCount = dbConnection.getTableRowCount(TableTypes.StockRefillTable);
@@ -114,6 +124,12 @@ public class StockFormController {
         } catch (SQLException e){
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
+
+        searchStockCbBx.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            String search = searchStockTxt.getText();
+            searchStockTxt.clear();
+            searchStockTxt.setText(search);
+        });
 
         searchStockTxt.textProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null && stocks != null && !stocks.isEmpty()) {
@@ -142,24 +158,99 @@ public class StockFormController {
                         }
                     }
 
-                    if(Integer.toString(s.getStockId()).contains(newValue) ||
-                            Objects.requireNonNull(userName).contains(newValue) ||
-                            Integer.toString(s.getItemId()).contains(newValue) ||
-                            Double.toString(s.getQuantity()).contains(newValue) ||
-                            Double.toString(s.getRefillQuantity()).contains(newValue) ||
-                            Double.toString(s.getPrice()).contains(newValue) ||
-                            Double.toString(s.getSellingPrice()).contains(newValue) ||
-                            String.valueOf(s.getLastRefillDate()).contains(newValue) ||
-                            String.valueOf(s.getLastRefillTime()).contains(newValue)) {
+                    Button btn = new Button("Delete");
 
-                        Button btn = new Button("Delete");
+                    switch (searchStockCbBx.getValue()) {
+                        case "Stock ID":
+                            if(Integer.toString(s.getStockId()).contains(newValue)) {
+                                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                                        s.getLastRefillTime(), btn));
+                            }
+                            break;
 
-                        obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
-                                s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                                s.getLastRefillTime(), btn));
+                        case "User Name":
+                            if(Objects.requireNonNull(userName).contains(newValue)) {
+                                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                                        s.getLastRefillTime(), btn));
+                            }
+                            break;
+
+                        case "Item ID":
+                            if(Integer.toString(s.getItemId()).contains(newValue)) {
+                                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                                        s.getLastRefillTime(), btn));
+                            }
+                            break;
+
+                        case "Quantity":
+                            if(Double.toString(s.getQuantity()).contains(newValue)) {
+                                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                                        s.getLastRefillTime(), btn));
+                            }
+                            break;
+
+                        case "Refill Quantity":
+                            if(Double.toString(s.getRefillQuantity()).contains(newValue)) {
+                                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                                        s.getLastRefillTime(), btn));
+                            }
+                            break;
+
+                        case "Price":
+                            if(Double.toString(s.getPrice()).contains(newValue)) {
+                                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                                        s.getLastRefillTime(), btn));
+                            }
+                            break;
+
+                        case "Selling Price":
+                            if(Double.toString(s.getSellingPrice()).contains(newValue)) {
+                                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                                        s.getLastRefillTime(), btn));
+                            }
+                            break;
+
+                        case "Refill Date":
+                            if(String.valueOf(s.getLastRefillDate()).contains(newValue)) {
+                                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                                        s.getLastRefillTime(), btn));
+                            }
+                            break;
+
+                        case "Refill Time":
+                            if(String.valueOf(s.getLastRefillTime()).contains(newValue)) {
+                                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                                        s.getLastRefillTime(), btn));
+                            }
+                            break;
+
+                        default:
+                            if(Integer.toString(s.getStockId()).contains(newValue) ||
+                                    Objects.requireNonNull(userName).contains(newValue) ||
+                                    Integer.toString(s.getItemId()).contains(newValue) ||
+                                    Double.toString(s.getQuantity()).contains(newValue) ||
+                                    Double.toString(s.getRefillQuantity()).contains(newValue) ||
+                                    Double.toString(s.getPrice()).contains(newValue) ||
+                                    Double.toString(s.getSellingPrice()).contains(newValue) ||
+                                    String.valueOf(s.getLastRefillDate()).contains(newValue) ||
+                                    String.valueOf(s.getLastRefillTime()).contains(newValue)) {
+
+                                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                                        s.getLastRefillTime(), btn));
+                            }
+                            break;
                     }
                 }
-
                 stockTbl.setItems(obList);
             }
         });
@@ -297,6 +388,7 @@ public class StockFormController {
     }
 
     public void refreshStockOnAction(ActionEvent actionEvent) {
+        searchStockCbBx.setValue("All");
         searchStockTxt.clear();
         loadedRowCountStock = 0;
 
