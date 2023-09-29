@@ -265,6 +265,10 @@ public class StockFormController {
                     price2Col.setVisible(false);
                     loadedRowCountItems = 0;
 
+                    // Combo box
+                    searchRefillCbBx.setItems(FXCollections.observableArrayList("All", "Item ID", "Item Name"));
+                    searchRefillCbBx.setValue(searchRefillCbBx.getValue() == null ? "All" : searchRefillCbBx.getValue());
+
                     // Set item table
                     itemTableDataCount = dbConnection.getTableRowCount(TableTypes.ItemTable);
                     nextRefillTableBtn.setDisable(itemTableDataCount < 25 && itemTableDataCount > 0);
@@ -278,6 +282,11 @@ public class StockFormController {
                     price2Col.setVisible(true);
                     loadedRowCountStockRefill = 0;
 
+                    // Combo box
+                    searchRefillCbBx.setItems(FXCollections.observableArrayList("All", "Stock ID", "Item ID",
+                            "Item Name", "Quantity", "Price"));
+                    searchRefillCbBx.setValue(searchRefillCbBx.getValue());
+
                     // Set refill stock table
                     nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount > 0);
                     refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
@@ -289,7 +298,6 @@ public class StockFormController {
                 alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
             }
         });
-
     }
 
     private void setDataIntoStockTable() throws SQLException {
