@@ -20,8 +20,12 @@ import model.tableRows.stockWindow.RefillAndItem;
 import model.tableRows.stockWindow.StockRefill;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -58,12 +62,12 @@ public class StockFormController {
     public CheckBox showAllItemsCheckBx;
     public Button previewStockTableBtn;
     public Button nextStockTableBtn;
-    private final DBConnection dbConnection = DBConnection.getInstance();
     public Button previewRefillTableBtn;
     public Button nextRefillTableBtn;
     public ComboBox<String> searchStockCbBx;
     public ComboBox<String> searchRefillCbBx;
     public Button addOrUpdateBtn;
+    private final DBConnection dbConnection = DBConnection.getInstance();
     private int stockTableDataCount;
     private int stockRefillTableDataCount;
     private int itemTableDataCount;
@@ -73,7 +77,7 @@ public class StockFormController {
     private ArrayList<Stock> stocks;
     private ArrayList<Stock> refillStocks;
     private ArrayList<Item> items;
-
+    private static int userID;
 
     public void initialize() {
         stockIdCol.setCellValueFactory(new PropertyValueFactory<>("stockId"));
@@ -634,6 +638,67 @@ public class StockFormController {
     }
 
     public void addOrUpdateOnAction(ActionEvent actionEvent) {
+        int quantity = -1;
+        int refillQuantity = -1;
+        double price = -1;
+        double sellingPrice = -1;
+
+        if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
+            try {
+                if(quantityTxt != null && !quantityTxt.getText().isEmpty() &&
+                        refillQuantityTxt != null && !refillQuantityTxt.getText().isEmpty() &&
+                        priceTxt != null && !priceTxt.getText().isEmpty() &&
+                        sellingPriceTxt != null && !sellingPriceTxt.getText().isEmpty()) {
+
+                    quantity = Integer.parseInt(quantityTxt.getText());
+                    refillQuantity = Integer.parseInt(refillQuantityTxt.getText());
+                    price = Double.parseDouble(priceTxt.getText());
+                    sellingPrice = Double.parseDouble(sellingPriceTxt.getText());
+
+                    if(quantity >= 0 && refillQuantity >= 0 && price >= 0 && sellingPrice >= 0){
+                        if(quantity >= refillQuantity) {
+                            if(price <= sellingPrice) {
+
+                                if (dbConnection.addStock(new Stock(0, userID,
+                                        Integer.parseInt(itemIDTxt.getText()), quantity,
+                                        refillQuantity, price, sellingPrice,
+                                        new Date(Calendar.getInstance().getTime().getTime()),
+                                        new Time(Calendar.getInstance().getTime().getTime())))) {
+
+                                    clearInputs();
+                                    alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                                            "Successfully Added Stock",
+                                            "Successfully Added stock into database");
+                                }
+
+                            } else {
+                                throw new NumberFormatException("Price greater than selling price");
+                            }
+
+                        } else {
+                            throw new NumberFormatException("Refill quantity greater than quantity");
+                        }
+
+                    } else {
+                        throw new NumberFormatException("Dont enter minus values");
+                    }
+
+                } else {
+                    throw new NumberFormatException("You didn't enter quantity,\nEnter quantity and try again");
+                }
+
+            } catch (NumberFormatException e) {
+                if(quantity <= -1 || refillQuantity <= -1 || price <= -1 || sellingPrice <= -1) {
+                    alert(Alert.AlertType.WARNING, "WARNING", "Enter Inputs Correctly", e.getMessage());
+                }
+
+            } catch (Exception e) {
+                alert(Alert.AlertType.WARNING, "WARNING", "Enter Inputs Correctly", e.getMessage());
+            }
+
+        } else if (addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
+            System.out.println("update");
+        }
     }
 
     public void previewStockTableOnAction(ActionEvent actionEvent) throws SQLException {
@@ -762,5 +827,13 @@ public class StockFormController {
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
         alert.show();
+    }
+
+    public int getUserID() {
+        return userID;
+    }
+
+    public void setUserID(int userID) {
+        StockFormController.userID = userID;
     }
 }

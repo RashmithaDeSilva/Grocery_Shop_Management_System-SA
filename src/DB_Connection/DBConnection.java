@@ -216,6 +216,14 @@ public class DBConnection {
         }
         return null;
     }
+    public int getUserId(String userName) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT user_id FROM users WHERE user_name = '" + userName +"';");
+
+        if(reset.next()) {
+            return reset.getInt("user_id");
+        }
+        return -1;
+    }
 
     public String getItemName(int itemId) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT item_name FROM items WHERE item_id = " + itemId +";");
@@ -232,6 +240,29 @@ public class DBConnection {
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             // Set the values for the placeholders
             preparedStatement.setString(1, item.getItemName());
+
+            // Execute the query
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean addStock(Stock stock) {
+        String sql = "INSERT INTO stock (user_id, item_id, quantity, refill_quantity, price, selling_price, " +
+                "refill_date, refill_time) VALUES (?,?,?,?,?,?,?,?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // Set the values for the placeholders
+            preparedStatement.setInt(1, stock.getUserId());
+            preparedStatement.setInt(2, stock.getItemId());
+            preparedStatement.setInt(3, stock.getQuantity());
+            preparedStatement.setInt(4, stock.getRefillQuantity());
+            preparedStatement.setDouble(5, stock.getPrice());
+            preparedStatement.setDouble(6, stock.getSellingPrice());
+            preparedStatement.setDate(7, stock.getLastRefillDate());
+            preparedStatement.setTime(8, stock.getLastRefillTime());
 
             // Execute the query
             return preparedStatement.executeUpdate() > 0;
@@ -288,5 +319,4 @@ public class DBConnection {
     public static void setPassword(String password) {
         DBConnection.password = password;
     }
-
 }

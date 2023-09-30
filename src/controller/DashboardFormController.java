@@ -21,6 +21,7 @@ public class DashboardFormController {
     public Label incomeTxt;
     private static String userName = "Admin";
     private static int userRoll = 0;
+    private final DBConnection dbConnection = DBConnection.getInstance();
 
 
     public void initialize() {
@@ -50,7 +51,13 @@ public class DashboardFormController {
 
     public void stockOnAction(ActionEvent actionEvent) throws IOException {
         if(userRoll == 0 || userRoll == 1) {
-            setUI("StockForm");
+            try {
+                new StockFormController().setUserID(dbConnection.getUserId(userName));
+                setUI("StockForm");
+
+            } catch (SQLException e) {
+                alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+            }
 
         } else {
             alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
