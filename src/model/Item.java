@@ -11,6 +11,10 @@ public class Item {
     public Item() {
     }
 
+    public Item(int itemId) {
+        this.itemId = itemId;
+    }
+
     public Item(int itemId, String itemName) {
         this.itemId = itemId;
         this.itemName = itemName;
@@ -21,6 +25,7 @@ public class Item {
         this.itemName = itemName;
         this.stocks = stocks;
     }
+
 
     public int getItemId() {
         return itemId;

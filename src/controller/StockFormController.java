@@ -131,6 +131,7 @@ public class StockFormController {
             searchStockTxt.setText(search);
         });
 
+        // Search stock
         searchStockTxt.textProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null && stocks != null && !stocks.isEmpty()) {
                 ObservableList<model.tableRows.stockWindow.Stock> obList = FXCollections.observableArrayList();
@@ -255,19 +256,123 @@ public class StockFormController {
             }
         });
 
-        showAllItemsCheckBx.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            searchRefillTxt.clear();
+        searchRefillCbBx.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(searchRefillCbBx.getValue() != null) {
+                String search = searchRefillTxt.getText();
+                searchRefillTxt.clear();
+                searchRefillTxt.setText(search);
+            }
+        });
 
+        // Search refill stock and item
+        searchRefillTxt.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null && refillStocks != null && !refillStocks.isEmpty()) {
+                ObservableList<RefillAndItem> obList = FXCollections.observableArrayList();
+
+                List<Integer> uniqueItemIds = refillStocks.stream().map(Stock::getItemId).
+                        distinct().collect(Collectors.toList());
+                ArrayList<Item> itemsTemp = new ArrayList<>();
+                uniqueItemIds.forEach(itemID ->itemsTemp.add(new Item(itemID)));
+
+
+                for (Item i : itemsTemp) {
+                    try {
+                        i.setItemName(dbConnection.getItemName(i.getItemId()));
+                    } catch (SQLException e) {
+                        alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                    }
+                }
+
+                for (Stock s : refillStocks) {
+                    String itemName = null;
+
+                    for (Item i : itemsTemp) {
+                        if(s.getItemId() == i.getItemId()) {
+                            itemName = i.getItemName();
+                        }
+                    }
+
+                    switch (searchRefillCbBx.getValue()) {
+                        case "Stock ID" :
+                            if(!showAllItemsCheckBx.isSelected()) {
+                                if(Integer.toString(s.getStockId()).contains(newValue)) {
+                                    obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
+                                            itemName, s.getQuantity(), s.getPrice()));
+                                }
+                                break;
+                            }
+
+                        case "Item ID" :
+                            if(!showAllItemsCheckBx.isSelected()) {
+                                if(Integer.toString(s.getItemId()).contains(newValue)) {
+                                    obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
+                                            itemName, s.getQuantity(), s.getPrice()));
+                                }
+
+                            } else {
+                                if(Integer.toString(s.getItemId()).contains(newValue)) {
+                                    obList.add(new model.tableRows.stockWindow.Item(s.getItemId(), itemName));
+                                }
+                            }
+                            break;
+
+                        case "Item Name" :
+                            if(!showAllItemsCheckBx.isSelected()) {
+                                if(Objects.requireNonNull(itemName).contains(newValue)) {
+                                    obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
+                                            itemName, s.getQuantity(), s.getPrice()));
+                                }
+
+                            } else {
+                                if(Objects.requireNonNull(itemName).contains(newValue)) {
+                                    obList.add(new model.tableRows.stockWindow.Item(s.getItemId(), itemName));
+                                }
+                            }
+                            break;
+
+                        case "Quantity" :
+                            if(!showAllItemsCheckBx.isSelected()) {
+                                if(Double.toString(s.getQuantity()).contains(newValue)) {
+                                    obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
+                                            itemName, s.getQuantity(), s.getPrice()));
+                                }
+                                break;
+                            }
+
+                        case "Price" :
+                            if(!showAllItemsCheckBx.isSelected()) {
+                                if(Double.toString(s.getPrice()).contains(newValue)) {
+                                    obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
+                                            itemName, s.getQuantity(), s.getPrice()));
+                                }
+                                break;
+                            }
+
+                        default:
+                            if(Integer.toString(s.getStockId()).contains(newValue) ||
+                                    Integer.toString(s.getItemId()).contains(newValue) ||
+                                    Objects.requireNonNull(itemName).contains(newValue) ||
+                                    Double.toString(s.getQuantity()).contains(newValue) ||
+                                    Double.toString(s.getPrice()).contains(newValue)) {
+
+                                obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
+                                        itemName, s.getQuantity(), s.getPrice()));
+                            }
+                            break;
+                    }
+                }
+                refillTbl.setItems(obList);
+            }
+        });
+
+        showAllItemsCheckBx.selectedProperty().addListener((observable, oldValue, newValue) -> {
+//            searchRefillTxt.clear();
             try {
                 if(newValue) {
                     stockId2Col.setVisible(false);
                     quantity2Col.setVisible(false);
                     price2Col.setVisible(false);
                     loadedRowCountItems = 0;
-
-                    // Combo box
-                    searchRefillCbBx.setItems(FXCollections.observableArrayList("All", "Item ID", "Item Name"));
-                    searchRefillCbBx.setValue(searchRefillCbBx.getValue() == null ? "All" : searchRefillCbBx.getValue());
 
                     // Set item table
                     itemTableDataCount = dbConnection.getTableRowCount(TableTypes.ItemTable);
@@ -276,22 +381,26 @@ public class StockFormController {
                     previewRefillTableBtn.setDisable(true);
                     setDataIntoRefillStockTable(Items);
 
+                    // Combo box
+                    searchRefillCbBx.setItems(FXCollections.observableArrayList("All", "Item ID", "Item Name"));
+                    searchRefillCbBx.setValue(searchRefillCbBx.getValue() == null ? "All" : searchRefillCbBx.getValue());
+
                 } else {
                     stockId2Col.setVisible(true);
                     quantity2Col.setVisible(true);
                     price2Col.setVisible(true);
                     loadedRowCountStockRefill = 0;
 
-                    // Combo box
-                    searchRefillCbBx.setItems(FXCollections.observableArrayList("All", "Stock ID", "Item ID",
-                            "Item Name", "Quantity", "Price"));
-                    searchRefillCbBx.setValue(searchRefillCbBx.getValue());
-
                     // Set refill stock table
                     nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount > 0);
                     refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
                     previewRefillTableBtn.setDisable(true);
                     setDataIntoRefillStockTable(RefillStock);
+
+                    // Combo box
+                    searchRefillCbBx.setItems(FXCollections.observableArrayList("All", "Stock ID", "Item ID",
+                            "Item Name", "Quantity", "Price"));
+                    searchRefillCbBx.setValue(searchRefillCbBx.getValue());
                 }
 
             } catch (SQLException e) {
