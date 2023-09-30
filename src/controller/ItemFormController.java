@@ -61,7 +61,7 @@ public class ItemFormController {
 
         itemTbl.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> {
-                if (null != newValue) {
+                if (newValue != null) {
                     setDataIntoInputs(newValue);
                 }
         });

@@ -17,9 +17,9 @@ import model.User;
 import model.staticType.RefillTableTypes;
 import model.staticType.TableTypes;
 import model.tableRows.stockWindow.RefillAndItem;
+import model.tableRows.stockWindow.StockRefill;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +50,8 @@ public class StockFormController {
     public TableColumn<Object, String> price2Col;
     public TextField searchRefillTxt;
     public TextField itemIDTxt;
-    public TextField ItemNameTxt;
-    public TextField QuantityTxt;
+    public TextField itemNameTxt;
+    public TextField quantityTxt;
     public TextField priceTxt;
     public TextField sellingPriceTxt;
     public TextField refillQuantityTxt;
@@ -63,6 +63,7 @@ public class StockFormController {
     public Button nextRefillTableBtn;
     public ComboBox<String> searchStockCbBx;
     public ComboBox<String> searchRefillCbBx;
+    public Button addOrUpdateBtn;
     private int stockTableDataCount;
     private int stockRefillTableDataCount;
     private int itemTableDataCount;
@@ -126,9 +127,11 @@ public class StockFormController {
         }
 
         searchStockCbBx.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            String search = searchStockTxt.getText();
-            searchStockTxt.clear();
-            searchStockTxt.setText(search);
+            if(searchStockCbBx.getValue() != null) {
+                String search = searchStockTxt.getText();
+                searchStockTxt.clear();
+                searchStockTxt.setText(search);
+            }
         });
 
         // Search stock
@@ -407,6 +410,26 @@ public class StockFormController {
                 alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
             }
         });
+
+        stockTbl.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null) {
+                try {
+                    setRowDataIntoInputs(newValue);
+                } catch (SQLException e) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                }
+            }
+        });
+
+        refillTbl.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null) {
+                try {
+                    setRowDataIntoInputs(newValue);
+                } catch (SQLException e) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                }
+            }
+        });
     }
 
     private void setDataIntoStockTable() throws SQLException {
@@ -500,6 +523,51 @@ public class StockFormController {
         refillTbl.setItems(obList);
     }
 
+    private void setRowDataIntoInputs(model.tableRows.stockWindow.Stock newValue) throws SQLException {
+        clearInputs();
+        addOrUpdateBtn.setText("Update");
+        addOrUpdateBtn.setStyle("-fx-background-color: #feca57;");
+        itemIDTxt.setText(String.valueOf(newValue.getItemId()));
+        itemNameTxt.setText(dbConnection.getItemName(newValue.getItemId()));
+        quantityTxt.setText(String.valueOf(newValue.getQuantity()));
+        refillQuantityTxt.setText(String.valueOf(newValue.getRefillQuantity()));
+        priceTxt.setText(String.valueOf(newValue.getPrice()));
+        sellingPriceTxt.setText(String.valueOf(newValue.getSellingPrice()));
+    }
+
+    private void setRowDataIntoInputs(model.tableRows.stockWindow.RefillAndItem newValue) throws SQLException {
+        clearInputs();
+
+        if(newValue.toString().split("\\.")[3].split("@")[0].equals("StockRefill")) {
+            addOrUpdateBtn.setText("Update");
+            addOrUpdateBtn.setStyle("-fx-background-color: #feca57;");
+
+            StockRefill stockRefill = (model.tableRows.stockWindow.StockRefill) newValue;
+
+            for (Stock s : refillStocks) {
+                if(stockRefill.getStockId() == s.getStockId()) {
+                    s = dbConnection.getRefillQuantityAndSellingPrice(s);
+                    itemIDTxt.setText(String.valueOf(s.getItemId()));
+                    itemNameTxt.setText(dbConnection.getItemName(s.getItemId()));
+                    quantityTxt.setText(String.valueOf(s.getQuantity()));
+                    refillQuantityTxt.setText(String.valueOf(s.getRefillQuantity()));
+                    priceTxt.setText(String.valueOf(s.getPrice()));
+                    sellingPriceTxt.setText(String.valueOf(s.getSellingPrice()));
+                }
+            }
+
+        } else if (newValue.toString().split("\\.")[3].split("@")[0].equals("Item")) {
+            model.tableRows.stockWindow.Item item = (model.tableRows.stockWindow.Item) newValue;
+
+            for (Item i : items) {
+                if(item.getItemId() == i.getItemId()) {
+                    itemIDTxt.setText(String.valueOf(i.getItemId()));
+                    itemNameTxt.setText(i.getItemName());
+                }
+            }
+        }
+    }
+
     public void backOnAction(ActionEvent actionEvent) throws IOException {
         setUI("DashboardForm");
     }
@@ -550,7 +618,19 @@ public class StockFormController {
         }
     }
 
-    public void resetOnAction(ActionEvent actionEvent) { 
+    public void resetOnAction(ActionEvent actionEvent) {
+        clearInputs();
+    }
+
+    private void clearInputs() {
+        itemIDTxt.clear();
+        itemNameTxt.clear();
+        quantityTxt.clear();
+        refillQuantityTxt.clear();
+        priceTxt.clear();
+        sellingPriceTxt.clear();
+        addOrUpdateBtn.setText("Add");
+        addOrUpdateBtn.setStyle("-fx-background-color:  #1dd1a1;");
     }
 
     public void addOrUpdateOnAction(ActionEvent actionEvent) {

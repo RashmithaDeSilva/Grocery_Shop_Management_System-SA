@@ -196,6 +196,18 @@ public class DBConnection {
         return stocks;
     }
 
+    public Stock getRefillQuantityAndSellingPrice(Stock stock) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT selling_price, refill_quantity FROM stock WHERE stock_id = "
+                + stock.getStockId() +";");
+
+        if(reset.next()) {
+            stock.setSellingPrice(reset.getDouble("selling_price"));
+            stock.setRefillQuantity(reset.getInt("refill_quantity"));
+        }
+
+        return stock;
+    }
+
     public String getUserName(int userId) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT user_name FROM users WHERE user_id = " + userId +";");
 
