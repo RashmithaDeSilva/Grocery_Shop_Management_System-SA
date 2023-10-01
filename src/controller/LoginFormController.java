@@ -36,8 +36,11 @@ public class LoginFormController {
                         "Wrong User or Password");
             }
 
-        } catch (SQLException | IOException e){
+        } catch (SQLException e){
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+
+        }  catch (IOException e){
+            alert(Alert.AlertType.ERROR, "ERROR", "Dashboard Loading Error", e.getMessage());
         }
     }
 

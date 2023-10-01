@@ -62,11 +62,23 @@ public class DBConnection {
         return instance;
     }
 
-    public boolean checkUserLogin(String userName, String password) throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT password FROM users WHERE user_name = '" + userName + "';");
+    public boolean checkUserLogin(String userName, String password) {
+        String sql = "SELECT COUNT(*) AS count FROM users WHERE user_name = ? AND password = ?";
 
-        if (reset.next()) {
-            return reset.getString(1).equals(password);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, userName);
+            preparedStatement.setString(2, password);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()) {
+                if(resultSet.getInt("count") == 1) {
+                    return true;
+                }
+            }
+
+        } catch (SQLException e) {
+            return false;
         }
 
         return false;
@@ -272,22 +284,36 @@ public class DBConnection {
         }
     }
 
-    public boolean checkItemAndPrice(int itemId, double price) throws SQLException {
+    public boolean checkItemAndPrice(int itemId, double price) {
         String sql = "SELECT COUNT(*) AS count FROM stock WHERE item_id = ? AND price = ?";
 
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, itemId);
-        preparedStatement.setDouble(2, price);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, itemId);
+            preparedStatement.setDouble(2, price);
 
-        ResultSet resultSet = preparedStatement.executeQuery();
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-        if(resultSet.next()) {
-            if(resultSet.getInt("count") == 0) {
-                return true;
+            if(resultSet.next()) {
+                if(resultSet.getInt("count") == 0) {
+                    return true;
+                }
             }
+
+        } catch (SQLException e) {
+            return false;
         }
 
         return false;
+    }
+
+    public int getStockId(int itemId, double price) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT stock_id FROM stock WHERE item_id = " + itemId +" " +
+                "&& price = " + price +";");
+
+        if(reset.next()) {
+            return reset.getInt("stock_id");
+        }
+        return -1;
     }
 
     public boolean updateItem(Item item) {
@@ -299,6 +325,30 @@ public class DBConnection {
             preparedStatement.setInt(2, item.getItemId());
 
             // Execute the query
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean updateStock(Stock stock) {
+        String sql = "UPDATE stock " +
+                "SET user_id = ?, item_id = ?, quantity = ?, refill_quantity = ?, price = ?, " +
+                "selling_price = ?, refill_date = ?, refill_time = ? " +
+                "WHERE stock_id = ?";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, stock.getUserId());
+            preparedStatement.setInt(2, stock.getItemId());
+            preparedStatement.setInt(3, stock.getQuantity());
+            preparedStatement.setInt(4, stock.getRefillQuantity());
+            preparedStatement.setDouble(5, stock.getPrice());
+            preparedStatement.setDouble(6, stock.getSellingPrice());
+            preparedStatement.setDate(7, stock.getLastRefillDate());
+            preparedStatement.setTime(8, stock.getLastRefillTime());
+            preparedStatement.setInt(9, stock.getStockId());
+
             return preparedStatement.executeUpdate() > 0;
 
         } catch (SQLException e) {

@@ -78,6 +78,8 @@ public class StockFormController {
     private ArrayList<Stock> refillStocks;
     private ArrayList<Item> items;
     private static int userID;
+    private int selectedStockId;
+
 
     public void initialize() {
         stockIdCol.setCellValueFactory(new PropertyValueFactory<>("stockId"));
@@ -427,6 +429,7 @@ public class StockFormController {
             if(newValue != null) {
                 try {
                     setRowDataIntoInputs(newValue);
+                    selectedStockId = newValue.getStockId();
                 } catch (SQLException e) {
                     alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
                 }
@@ -555,6 +558,7 @@ public class StockFormController {
             addOrUpdateBtn.setStyle("-fx-background-color: #feca57;");
 
             StockRefill stockRefill = (model.tableRows.stockWindow.StockRefill) newValue;
+            selectedStockId = stockRefill.getStockId();
 
             for (Stock s : refillStocks) {
                 if(stockRefill.getStockId() == s.getStockId()) {
@@ -670,31 +674,62 @@ public class StockFormController {
                     if(quantity >= refillQuantity) {
                         if(price <= sellingPrice) {
 
-                            if(dbConnection.checkItemAndPrice(itemId, price)) {
-                                if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
-
+                            if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
+                                if(dbConnection.checkItemAndPrice(itemId, price)) {
                                     if (dbConnection.addStock(new Stock(0, userID, itemId, quantity,
                                             refillQuantity, price, sellingPrice,
                                             new Date(Calendar.getInstance().getTime().getTime()),
                                             new Time(Calendar.getInstance().getTime().getTime())))) {
 
-                                        clearInputs();
-
-                                        stockTableDataCount = dbConnection.getTableRowCount(TableTypes.StockTable);
-                                        stocks = dbConnection.getStockTable(loadedRowCountStock);
-
-                                        setDataIntoStockTable();
+                                        reloadTables();
                                         alert(Alert.AlertType.INFORMATION, "INFORMATION",
                                                 "Successfully Added Stock",
                                                 "Successfully Added stock into database");
+
+                                    } else {
+                                        throw new SQLException("Cant save data in database throw some error");
                                     }
 
-                                } else if (addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
-
+                                } else {
+                                    throw new NumberFormatException("Already exist this item stock in this price");
                                 }
 
-                            } else {
-                                throw new NumberFormatException("Already exist this item stock in this price");
+                            } else if (addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
+                                if(dbConnection.checkItemAndPrice(itemId, price)) {
+                                    if(dbConnection.updateStock(new Stock(selectedStockId, userID, itemId,
+                                            quantity, refillQuantity, price, sellingPrice,
+                                            new Date(Calendar.getInstance().getTime().getTime()),
+                                            new Time(Calendar.getInstance().getTime().getTime())))) {
+
+                                        reloadTables();
+                                        alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                                                "Successfully Update Stock",
+                                                "Successfully Update stock into database");
+
+                                    } else {
+                                        throw new SQLException("Cant save data in database throw some error");
+                                    }
+
+                                } else {
+                                    if(dbConnection.getStockId(itemId, price) == selectedStockId) {
+                                        if(dbConnection.updateStock(new Stock(selectedStockId, userID, itemId,
+                                                quantity, refillQuantity, price, sellingPrice,
+                                                new Date(Calendar.getInstance().getTime().getTime()),
+                                                new Time(Calendar.getInstance().getTime().getTime())))) {
+
+                                            reloadTables();
+                                            alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                                                    "Successfully Update Stock",
+                                                    "Successfully Update stock into database");
+
+                                        } else {
+                                            throw new SQLException("Cant save data in database throw some error");
+                                        }
+
+                                    }else {
+                                        throw new NumberFormatException("Already exist this item stock in this price");
+                                    }
+                                }
                             }
 
                         } else {
@@ -716,9 +751,20 @@ public class StockFormController {
         } catch (NumberFormatException e) {
             alert(Alert.AlertType.WARNING, "WARNING", "Enter Inputs Correctly", e.getMessage());
 
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+
         } catch (Exception e) {
             alert(Alert.AlertType.ERROR, "ERROR", "Method Error", e.getMessage());
         }
+    }
+
+    private void reloadTables() throws SQLException {
+        clearInputs();
+        stocks = dbConnection.getStockTable(loadedRowCountStock);
+        refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
+        setDataIntoStockTable();
+        setDataIntoRefillStockTable(RefillStock);
     }
 
     public void previewStockTableOnAction(ActionEvent actionEvent) throws SQLException {
