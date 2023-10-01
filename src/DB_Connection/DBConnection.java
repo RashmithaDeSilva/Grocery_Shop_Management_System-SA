@@ -368,6 +368,16 @@ public class DBConnection {
         }
     }
 
+    public double getIncome(String date) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT SUM(sale_amount) - SUM(discount) AS net_sale_amount " +
+                "FROM sells WHERE sale_date = '" + date + "';");
+
+        if(reset.next()) {
+            return reset.getDouble("net_sale_amount");
+        }
+        return -1;
+    }
+
     public void closeConnection() throws SQLException {
         connection.close();
     }

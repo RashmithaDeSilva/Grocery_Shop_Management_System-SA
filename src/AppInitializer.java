@@ -1,10 +1,12 @@
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Objects;
+
 
 public class AppInitializer extends Application {
 
@@ -19,6 +21,8 @@ public class AppInitializer extends Application {
         ));
         primaryStage.centerOnScreen();
         primaryStage.setResizable(false);
+        primaryStage.setTitle("POS System");
+//        primaryStage.getIcons().add(new Image("src/assets/imagers/pos-system.png"));
         primaryStage.show();
     }
 }

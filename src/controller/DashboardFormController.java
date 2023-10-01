@@ -12,7 +12,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 public class DashboardFormController {
@@ -24,8 +26,11 @@ public class DashboardFormController {
     private final DBConnection dbConnection = DBConnection.getInstance();
 
 
-    public void initialize() {
+    public void initialize() throws SQLException {
         userNameTxt.setText(userName);
+        double income = dbConnection.getIncome(String.format(new SimpleDateFormat("yyyy-MM-dd")
+                .format(new Date(System.currentTimeMillis()))));
+        incomeTxt.setText(String.valueOf(income >= 0 ? income : 0));
     }
 
     private void setUI(String UI_Name) throws IOException {
