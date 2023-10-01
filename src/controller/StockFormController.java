@@ -276,98 +276,106 @@ public class StockFormController {
             if(newValue != null && refillStocks != null && !refillStocks.isEmpty()) {
                 ObservableList<RefillAndItem> obList = FXCollections.observableArrayList();
 
-                List<Integer> uniqueItemIds = refillStocks.stream().map(Stock::getItemId).
-                        distinct().collect(Collectors.toList());
-                ArrayList<Item> itemsTemp = new ArrayList<>();
-                uniqueItemIds.forEach(itemID ->itemsTemp.add(new Item(itemID)));
+                if(!showAllItemsCheckBx.isSelected()) {
+                    List<Integer> uniqueItemIds = refillStocks.stream().map(Stock::getItemId).
+                            distinct().collect(Collectors.toList());
+                    ArrayList<Item> itemsTemp = new ArrayList<>();
+                    uniqueItemIds.forEach(itemID ->itemsTemp.add(new Item(itemID)));
 
-
-                for (Item i : itemsTemp) {
-                    try {
-                        i.setItemName(dbConnection.getItemName(i.getItemId()));
-                    } catch (SQLException e) {
-                        alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
-                    }
-                }
-
-                for (Stock s : refillStocks) {
-                    String itemName = null;
 
                     for (Item i : itemsTemp) {
-                        if(s.getItemId() == i.getItemId()) {
-                            itemName = i.getItemName();
+                        try {
+                            i.setItemName(dbConnection.getItemName(i.getItemId()));
+                        } catch (SQLException e) {
+                            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
                         }
                     }
 
-                    switch (searchRefillCbBx.getValue()) {
-                        case "Stock ID" :
-                            if(!showAllItemsCheckBx.isSelected()) {
+                    for (Stock s : refillStocks) {
+                        String itemName = null;
+
+                        for (Item i : itemsTemp) {
+                            if(s.getItemId() == i.getItemId()) {
+                                itemName = i.getItemName();
+                            }
+                        }
+
+                        switch (searchRefillCbBx.getValue()) {
+                            case "Stock ID" :
                                 if(Integer.toString(s.getStockId()).contains(newValue)) {
                                     obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
                                             itemName, s.getQuantity(), s.getPrice()));
                                 }
                                 break;
-                            }
 
-                        case "Item ID" :
-                            if(!showAllItemsCheckBx.isSelected()) {
+                            case "Item ID" :
                                 if(Integer.toString(s.getItemId()).contains(newValue)) {
                                     obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
                                             itemName, s.getQuantity(), s.getPrice()));
                                 }
+                                break;
 
-                            } else {
-                                if(Integer.toString(s.getItemId()).contains(newValue)) {
-                                    obList.add(new model.tableRows.stockWindow.Item(s.getItemId(), itemName));
-                                }
-                            }
-                            break;
-
-                        case "Item Name" :
-                            if(!showAllItemsCheckBx.isSelected()) {
+                            case "Item Name" :
                                 if(Objects.requireNonNull(itemName).contains(newValue)) {
                                     obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
                                             itemName, s.getQuantity(), s.getPrice()));
                                 }
+                                break;
 
-                            } else {
-                                if(Objects.requireNonNull(itemName).contains(newValue)) {
-                                    obList.add(new model.tableRows.stockWindow.Item(s.getItemId(), itemName));
-                                }
-                            }
-                            break;
-
-                        case "Quantity" :
-                            if(!showAllItemsCheckBx.isSelected()) {
+                            case "Quantity" :
                                 if(Double.toString(s.getQuantity()).contains(newValue)) {
                                     obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
                                             itemName, s.getQuantity(), s.getPrice()));
                                 }
                                 break;
-                            }
 
-                        case "Price" :
-                            if(!showAllItemsCheckBx.isSelected()) {
+                            case "Price" :
                                 if(Double.toString(s.getPrice()).contains(newValue)) {
                                     obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
                                             itemName, s.getQuantity(), s.getPrice()));
                                 }
                                 break;
-                            }
 
-                        default:
-                            if(Integer.toString(s.getStockId()).contains(newValue) ||
-                                    Integer.toString(s.getItemId()).contains(newValue) ||
-                                    Objects.requireNonNull(itemName).contains(newValue) ||
-                                    Double.toString(s.getQuantity()).contains(newValue) ||
-                                    Double.toString(s.getPrice()).contains(newValue)) {
+                            default:
+                                if(Integer.toString(s.getStockId()).contains(newValue) ||
+                                        Integer.toString(s.getItemId()).contains(newValue) ||
+                                        Objects.requireNonNull(itemName).contains(newValue) ||
+                                        Double.toString(s.getQuantity()).contains(newValue) ||
+                                        Double.toString(s.getPrice()).contains(newValue)) {
 
-                                obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
-                                        itemName, s.getQuantity(), s.getPrice()));
-                            }
-                            break;
+                                    obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
+                                            itemName, s.getQuantity(), s.getPrice()));
+                                }
+                                break;
+                        }
+                    }
+
+                } else {
+                    for (Item i : items) {
+                        switch (searchRefillCbBx.getValue()) {
+                            case "Item ID" :
+                                if(Integer.toString(i.getItemId()).contains(newValue)) {
+                                    obList.add(new model.tableRows.stockWindow.Item(i.getItemId(), i.getItemName()));
+                                }
+                                break;
+
+                            case "Item Name" :
+                                if(i.getItemName().contains(newValue)) {
+                                    obList.add(new model.tableRows.stockWindow.Item(i.getItemId(), i.getItemName()));
+                                }
+                                break;
+
+                            default:
+                                if(Integer.toString(i.getItemId()).contains(newValue) ||
+                                        i.getItemName().contains(newValue)) {
+
+                                    obList.add(new model.tableRows.stockWindow.Item(i.getItemId(), i.getItemName()));
+                                }
+                                break;
+                        }
                     }
                 }
+
                 refillTbl.setItems(obList);
             }
         });
