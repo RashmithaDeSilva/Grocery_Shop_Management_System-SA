@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
-import java.text.SimpleDateFormat;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -168,14 +169,12 @@ public class StockFormController {
                         }
                     }
 
-                    Button btn = new Button("Delete");
-
                     switch (searchStockCbBx.getValue()) {
                         case "Stock ID":
                             if(Integer.toString(s.getStockId()).contains(newValue)) {
                                 obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
                                         s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                                        s.getLastRefillTime(), btn));
+                                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
                             }
                             break;
 
@@ -183,7 +182,7 @@ public class StockFormController {
                             if(Objects.requireNonNull(userName).contains(newValue)) {
                                 obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
                                         s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                                        s.getLastRefillTime(), btn));
+                                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
                             }
                             break;
 
@@ -191,7 +190,7 @@ public class StockFormController {
                             if(Integer.toString(s.getItemId()).contains(newValue)) {
                                 obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
                                         s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                                        s.getLastRefillTime(), btn));
+                                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
                             }
                             break;
 
@@ -199,7 +198,7 @@ public class StockFormController {
                             if(Double.toString(s.getQuantity()).contains(newValue)) {
                                 obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
                                         s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                                        s.getLastRefillTime(), btn));
+                                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
                             }
                             break;
 
@@ -207,7 +206,7 @@ public class StockFormController {
                             if(Double.toString(s.getRefillQuantity()).contains(newValue)) {
                                 obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
                                         s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                                        s.getLastRefillTime(), btn));
+                                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
                             }
                             break;
 
@@ -215,7 +214,7 @@ public class StockFormController {
                             if(Double.toString(s.getPrice()).contains(newValue)) {
                                 obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
                                         s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                                        s.getLastRefillTime(), btn));
+                                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
                             }
                             break;
 
@@ -223,7 +222,7 @@ public class StockFormController {
                             if(Double.toString(s.getSellingPrice()).contains(newValue)) {
                                 obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
                                         s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                                        s.getLastRefillTime(), btn));
+                                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
                             }
                             break;
 
@@ -231,7 +230,7 @@ public class StockFormController {
                             if(String.valueOf(s.getLastRefillDate()).contains(newValue)) {
                                 obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
                                         s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                                        s.getLastRefillTime(), btn));
+                                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
                             }
                             break;
 
@@ -239,7 +238,7 @@ public class StockFormController {
                             if(String.valueOf(s.getLastRefillTime()).contains(newValue)) {
                                 obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
                                         s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                                        s.getLastRefillTime(), btn));
+                                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
                             }
                             break;
 
@@ -256,7 +255,7 @@ public class StockFormController {
 
                                 obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
                                         s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                                        s.getLastRefillTime(), btn));
+                                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
                             }
                             break;
                     }
@@ -383,7 +382,6 @@ public class StockFormController {
         });
 
         showAllItemsCheckBx.selectedProperty().addListener((observable, oldValue, newValue) -> {
-//            searchRefillTxt.clear();
             try {
                 if(newValue) {
                     stockId2Col.setVisible(false);
@@ -478,16 +476,72 @@ public class StockFormController {
                         }
                     }
 
-                    Button btn = new Button("Delete");
-
                     obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
                             s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                            s.getLastRefillTime(), btn));
+                            s.getLastRefillTime(), getDeleteButton(s.getStockId())));
                 }
 
                 stockTbl.setItems(obList);
             }
         }
+    }
+
+    private Button getDeleteButton(int stockId) {
+        Button btn = new Button("Delete");
+        btn.setStyle("-fx-background-color:  #ff6b6b;");
+
+        btn.setOnAction((e) -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("CONFIRMATION");
+            alert.setHeaderText("Conform DELETE");
+            alert.setContentText("Are you sure do you want to DELETE this STOCK?");
+            alert.getButtonTypes().set(0, ButtonType.YES);
+            alert.getButtonTypes().set(1, ButtonType.NO);
+
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.YES) {
+                    if(dbConnection.deleteStock(stockId)) {
+                        try {
+
+                            for (Stock s : stocks) {
+                                if(s.getStockId() == stockId) {
+                                    stocks.remove(s);
+                                    break;
+                                }
+                            }
+                            setDataIntoStockTable();
+
+                            for (Stock s : refillStocks) {
+                                if(s.getStockId() == stockId) {
+                                    stocks.remove(s);
+                                    break;
+                                }
+                            }
+
+                            if(showAllItemsCheckBx.isSelected()) {
+                                setDataIntoRefillStockTable(Items);
+
+                            } else {
+                                setDataIntoRefillStockTable(RefillStock);
+                            }
+
+                            alert(Alert.AlertType.INFORMATION, "INFORMATION", "Delete Successful",
+                                    "Delete successfully stock id = " + stockId);
+
+                        } catch (SQLException ex) {
+                            alert(Alert.AlertType.ERROR, "ERROR", "Data Reload Error",
+                                    "Cant reload data in table");
+                        }
+
+                    } else {
+                        alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                                "Cant delete data in database throw some error");
+                    }
+                }
+            });
+        });
+
+        return btn;
     }
 
     private void setDataIntoRefillStockTable(RefillTableTypes type) throws SQLException {
@@ -611,7 +665,7 @@ public class StockFormController {
 
         try {
             if(!stockId2Col.isVisible()) {
-                // Set stock table
+                // Set item table
                 loadedRowCountItems = 0;
                 itemTableDataCount = dbConnection.getTableRowCount(TableTypes.ItemTable);
                 nextRefillTableBtn.setDisable(itemTableDataCount < 25 && itemTableDataCount > 0);
@@ -620,7 +674,7 @@ public class StockFormController {
                 setDataIntoRefillStockTable(Items);
 
             } else {
-                // Set stock table
+                // Set refill stock table
                 loadedRowCountStockRefill = 0;
                 stockRefillTableDataCount = dbConnection.getTableRowCount(TableTypes.StockRefillTable);
                 nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount > 0);
@@ -764,7 +818,11 @@ public class StockFormController {
         stocks = dbConnection.getStockTable(loadedRowCountStock);
         refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
         setDataIntoStockTable();
-        setDataIntoRefillStockTable(RefillStock);
+        if(showAllItemsCheckBx.isSelected()) {
+            setDataIntoRefillStockTable(Items);
+        } else {
+            setDataIntoRefillStockTable(RefillStock);
+        }
     }
 
     public void previewStockTableOnAction(ActionEvent actionEvent) throws SQLException {

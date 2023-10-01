@@ -356,6 +356,18 @@ public class DBConnection {
         }
     }
 
+    public boolean deleteStock(int stockId) {
+        String sql = "DELETE FROM stock WHERE stock_id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, stockId);
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
     public void closeConnection() throws SQLException {
         connection.close();
     }
