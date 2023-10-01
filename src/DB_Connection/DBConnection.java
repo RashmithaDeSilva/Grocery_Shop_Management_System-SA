@@ -272,6 +272,24 @@ public class DBConnection {
         }
     }
 
+    public boolean checkItemAndPrice(int itemId, double price) throws SQLException {
+        String sql = "SELECT COUNT(*) AS count FROM stock WHERE item_id = ? AND price = ?";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, itemId);
+        preparedStatement.setDouble(2, price);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        if(resultSet.next()) {
+            if(resultSet.getInt("count") == 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public boolean updateItem(Item item) {
         String sql = "UPDATE items SET item_name = ? WHERE item_id = ?";
 

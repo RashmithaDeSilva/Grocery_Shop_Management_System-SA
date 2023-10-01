@@ -646,66 +646,78 @@ public class StockFormController {
     }
 
     public void addOrUpdateOnAction(ActionEvent actionEvent) {
-        int quantity = -1;
-        int refillQuantity = -1;
-        double price = -1;
-        double sellingPrice = -1;
+        int itemId;
+        int quantity;
+        int refillQuantity;
+        double price;
+        double sellingPrice;
 
-        if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
-            try {
-                if(quantityTxt != null && !quantityTxt.getText().isEmpty() &&
-                        refillQuantityTxt != null && !refillQuantityTxt.getText().isEmpty() &&
-                        priceTxt != null && !priceTxt.getText().isEmpty() &&
-                        sellingPriceTxt != null && !sellingPriceTxt.getText().isEmpty()) {
+        try {
+            if(itemIDTxt != null && !itemIDTxt.getText().isEmpty() &&
+                    itemNameTxt != null && !itemNameTxt.getText().isEmpty() &&
+                    quantityTxt != null && !quantityTxt.getText().isEmpty() &&
+                    refillQuantityTxt != null && !refillQuantityTxt.getText().isEmpty() &&
+                    priceTxt != null && !priceTxt.getText().isEmpty() &&
+                    sellingPriceTxt != null && !sellingPriceTxt.getText().isEmpty()) {
 
-                    quantity = Integer.parseInt(quantityTxt.getText());
-                    refillQuantity = Integer.parseInt(refillQuantityTxt.getText());
-                    price = Double.parseDouble(priceTxt.getText());
-                    sellingPrice = Double.parseDouble(sellingPriceTxt.getText());
+                itemId = Integer.parseInt(itemIDTxt.getText());
+                quantity = Integer.parseInt(quantityTxt.getText());
+                refillQuantity = Integer.parseInt(refillQuantityTxt.getText());
+                price = Double.parseDouble(priceTxt.getText());
+                sellingPrice = Double.parseDouble(sellingPriceTxt.getText());
 
-                    if(quantity >= 0 && refillQuantity >= 0 && price >= 0 && sellingPrice >= 0){
-                        if(quantity >= refillQuantity) {
-                            if(price <= sellingPrice) {
+                if(quantity >= 0 && refillQuantity >= 0 && price >= 0 && sellingPrice >= 0){
+                    if(quantity >= refillQuantity) {
+                        if(price <= sellingPrice) {
 
-                                if (dbConnection.addStock(new Stock(0, userID,
-                                        Integer.parseInt(itemIDTxt.getText()), quantity,
-                                        refillQuantity, price, sellingPrice,
-                                        new Date(Calendar.getInstance().getTime().getTime()),
-                                        new Time(Calendar.getInstance().getTime().getTime())))) {
+                            if(dbConnection.checkItemAndPrice(itemId, price)) {
+                                if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
 
-                                    clearInputs();
-                                    alert(Alert.AlertType.INFORMATION, "INFORMATION",
-                                            "Successfully Added Stock",
-                                            "Successfully Added stock into database");
+                                    if (dbConnection.addStock(new Stock(0, userID, itemId, quantity,
+                                            refillQuantity, price, sellingPrice,
+                                            new Date(Calendar.getInstance().getTime().getTime()),
+                                            new Time(Calendar.getInstance().getTime().getTime())))) {
+
+                                        clearInputs();
+
+                                        stockTableDataCount = dbConnection.getTableRowCount(TableTypes.StockTable);
+                                        stocks = dbConnection.getStockTable(loadedRowCountStock);
+
+                                        setDataIntoStockTable();
+                                        alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                                                "Successfully Added Stock",
+                                                "Successfully Added stock into database");
+                                    }
+
+                                } else if (addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
+
                                 }
 
                             } else {
-                                throw new NumberFormatException("Price greater than selling price");
+                                throw new NumberFormatException("Already exist this item stock in this price");
                             }
 
                         } else {
-                            throw new NumberFormatException("Refill quantity greater than quantity");
+                            throw new NumberFormatException("Price greater than selling price");
                         }
 
                     } else {
-                        throw new NumberFormatException("Dont enter minus values");
+                        throw new NumberFormatException("Refill quantity greater than quantity");
                     }
 
                 } else {
-                    throw new NumberFormatException("You didn't enter quantity,\nEnter quantity and try again");
+                    throw new NumberFormatException("Dont enter minus values");
                 }
 
-            } catch (NumberFormatException e) {
-                if(quantity <= -1 || refillQuantity <= -1 || price <= -1 || sellingPrice <= -1) {
-                    alert(Alert.AlertType.WARNING, "WARNING", "Enter Inputs Correctly", e.getMessage());
-                }
-
-            } catch (Exception e) {
-                alert(Alert.AlertType.WARNING, "WARNING", "Enter Inputs Correctly", e.getMessage());
+            } else {
+                throw new NumberFormatException("You didn't enter input,\nEnter input and try again");
             }
 
-        } else if (addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
-            System.out.println("update");
+        } catch (NumberFormatException e) {
+            alert(Alert.AlertType.WARNING, "WARNING", "Enter Inputs Correctly", e.getMessage());
+
+        } catch (Exception e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Method Error", e.getMessage());
         }
     }
 
