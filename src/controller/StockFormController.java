@@ -107,8 +107,8 @@ public class StockFormController {
         searchRefillCbBx.setValue("All");
 
         try {
-            stockTableDataCount = dbConnection.getTableRowCount(TableTypes.StockTable);
-            stockRefillTableDataCount = dbConnection.getTableRowCount(TableTypes.StockRefillTable);
+            stockTableDataCount = dbConnection.getTableRowCount(TableTypes.STOCK_TABLE);
+            stockRefillTableDataCount = dbConnection.getTableRowCount(TableTypes.STOCK_REFILL_TABLE);
 
             // Set stock table
             if(stockTableDataCount < 25 && stockTableDataCount > 0) {
@@ -125,7 +125,7 @@ public class StockFormController {
             previewRefillTableBtn.setDisable(true);
 
             setDataIntoStockTable();
-            setDataIntoRefillStockTable(RefillStock);
+            setDataIntoRefillStockTable(REFILL_STOCK);
 
         } catch (SQLException e){
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
@@ -388,11 +388,11 @@ public class StockFormController {
                     loadedRowCountItems = 0;
 
                     // Set item table
-                    itemTableDataCount = dbConnection.getTableRowCount(TableTypes.ItemTable);
+                    itemTableDataCount = dbConnection.getTableRowCount(TableTypes.ITEM_TABLE);
                     nextRefillTableBtn.setDisable(itemTableDataCount < 25 && itemTableDataCount > 0);
                     items = dbConnection.getItemTable(loadedRowCountItems);
                     previewRefillTableBtn.setDisable(true);
-                    setDataIntoRefillStockTable(Items);
+                    setDataIntoRefillStockTable(ITEMS);
 
                     // Combo box
                     searchRefillCbBx.setItems(FXCollections.observableArrayList("All", "Item ID", "Item Name"));
@@ -408,7 +408,7 @@ public class StockFormController {
                     nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount > 0);
                     refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
                     previewRefillTableBtn.setDisable(true);
-                    setDataIntoRefillStockTable(RefillStock);
+                    setDataIntoRefillStockTable(REFILL_STOCK);
 
                     // Combo box
                     searchRefillCbBx.setItems(FXCollections.observableArrayList("All", "Stock ID", "Item ID",
@@ -517,10 +517,10 @@ public class StockFormController {
                             }
 
                             if(showAllItemsCheckBx.isSelected()) {
-                                setDataIntoRefillStockTable(Items);
+                                setDataIntoRefillStockTable(ITEMS);
 
                             } else {
-                                setDataIntoRefillStockTable(RefillStock);
+                                setDataIntoRefillStockTable(REFILL_STOCK);
                             }
 
                             alert(Alert.AlertType.INFORMATION, "INFORMATION", "Delete Successful",
@@ -545,7 +545,7 @@ public class StockFormController {
     private void setDataIntoRefillStockTable(RefillTableTypes type) throws SQLException {
         ObservableList<RefillAndItem> obList = FXCollections.observableArrayList();
 
-        if(type == RefillStock) {
+        if(type == REFILL_STOCK) {
             ArrayList<String> itemIdAndNames = new ArrayList<>();
 
             if(refillStocks != null && !refillStocks.isEmpty()) {
@@ -579,7 +579,7 @@ public class StockFormController {
                 }
             }
 
-        } else if(type == Items) {
+        } else if(type == ITEMS) {
             if(items != null && !items.isEmpty()){
                 for (Item i : items) {
                     obList.add(new model.tableRows.stockWindow.Item(i.getItemId(), i.getItemName()));
@@ -647,7 +647,7 @@ public class StockFormController {
 
         try {
             // Set stock table
-            stockTableDataCount = dbConnection.getTableRowCount(TableTypes.StockTable);
+            stockTableDataCount = dbConnection.getTableRowCount(TableTypes.STOCK_TABLE);
             nextStockTableBtn.setDisable(stockTableDataCount < 25 && stockTableDataCount > 0);
             stocks = dbConnection.getStockTable(loadedRowCountStock);
             previewStockTableBtn.setDisable(true);
@@ -665,20 +665,20 @@ public class StockFormController {
             if(!stockId2Col.isVisible()) {
                 // Set item table
                 loadedRowCountItems = 0;
-                itemTableDataCount = dbConnection.getTableRowCount(TableTypes.ItemTable);
+                itemTableDataCount = dbConnection.getTableRowCount(TableTypes.ITEM_TABLE);
                 nextRefillTableBtn.setDisable(itemTableDataCount < 25 && itemTableDataCount > 0);
                 items = dbConnection.getItemTable(loadedRowCountItems);
                 previewRefillTableBtn.setDisable(true);
-                setDataIntoRefillStockTable(Items);
+                setDataIntoRefillStockTable(ITEMS);
 
             } else {
                 // Set refill stock table
                 loadedRowCountStockRefill = 0;
-                stockRefillTableDataCount = dbConnection.getTableRowCount(TableTypes.StockRefillTable);
+                stockRefillTableDataCount = dbConnection.getTableRowCount(TableTypes.STOCK_REFILL_TABLE);
                 nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount > 0);
                 refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
                 previewRefillTableBtn.setDisable(true);
-                setDataIntoRefillStockTable(RefillStock);
+                setDataIntoRefillStockTable(REFILL_STOCK);
             }
 
         } catch (SQLException e) {
@@ -817,9 +817,9 @@ public class StockFormController {
         refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
         setDataIntoStockTable();
         if(showAllItemsCheckBx.isSelected()) {
-            setDataIntoRefillStockTable(Items);
+            setDataIntoRefillStockTable(ITEMS);
         } else {
-            setDataIntoRefillStockTable(RefillStock);
+            setDataIntoRefillStockTable(REFILL_STOCK);
         }
     }
 
@@ -877,7 +877,7 @@ public class StockFormController {
                 if((loadedRowCountStockRefill - 25) >= 0) {
                     loadedRowCountStockRefill -= 25;
                     refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
-                    setDataIntoRefillStockTable(RefillStock);
+                    setDataIntoRefillStockTable(REFILL_STOCK);
                     nextRefillTableBtn.setDisable(false);
 
                     if((loadedRowCountStockRefill - 25) >= 0) {
@@ -891,7 +891,7 @@ public class StockFormController {
                 if((loadedRowCountItems - 25) >= 0) {
                     loadedRowCountItems -= 25;
                     items = dbConnection.getItemTable(loadedRowCountItems);
-                    setDataIntoRefillStockTable(Items);
+                    setDataIntoRefillStockTable(ITEMS);
                     nextRefillTableBtn.setDisable(false);
 
                     if((loadedRowCountItems - 25) >= 0) {
@@ -911,7 +911,7 @@ public class StockFormController {
                 if((loadedRowCountStockRefill + 25) < stockRefillTableDataCount) {
                     loadedRowCountStockRefill += 25;
                     refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
-                    setDataIntoRefillStockTable(RefillStock);
+                    setDataIntoRefillStockTable(REFILL_STOCK);
                     previewRefillTableBtn.setDisable(false);
 
                     if((loadedRowCountStockRefill + 25) < stockRefillTableDataCount) {
@@ -925,7 +925,7 @@ public class StockFormController {
                 if((loadedRowCountItems + 25) < itemTableDataCount) {
                     loadedRowCountItems += 25;
                     items = dbConnection.getItemTable(loadedRowCountItems);
-                    setDataIntoRefillStockTable(Items);
+                    setDataIntoRefillStockTable(ITEMS);
                     previewRefillTableBtn.setDisable(false);
 
                     if((loadedRowCountItems + 25) < itemTableDataCount) {

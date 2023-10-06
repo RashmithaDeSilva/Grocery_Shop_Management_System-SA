@@ -4,6 +4,7 @@ import javafx.scene.control.Alert;
 import model.Item;
 import model.Log;
 import model.Stock;
+import model.staticType.IncomeTypes;
 import model.staticType.TableTypes;
 
 import java.sql.*;
@@ -94,15 +95,15 @@ public class DBConnection {
         ResultSet reset = null;
 
         switch (type) {
-            case StockRefillTable:
+            case STOCK_REFILL_TABLE:
                 reset = stm.executeQuery("SELECT COUNT(*) FROM stock WHERE quantity <= refill_quantity;");
                 break;
 
-            case StockTable:
+            case STOCK_TABLE:
                 reset = stm.executeQuery("SELECT COUNT(*) FROM stock;");
                 break;
 
-            case ItemTable:
+            case ITEM_TABLE:
                 reset = stm.executeQuery("SELECT COUNT(*) FROM items;");
                 break;
         }
@@ -409,6 +410,20 @@ public class DBConnection {
         }
         return -1;
     }
+
+    public double getLockerMoney() throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT " +
+                "    (SUM(CASE WHEN income_and_expenses_type IN (1, 2) THEN amount ELSE 0 END) - " +
+                "     SUM(CASE WHEN income_and_expenses_type IN (3, 4, 5) THEN amount ELSE 0 END)) AS result " +
+                "FROM log;");
+
+        if(reset.next()) {
+            return reset.getDouble("result");
+        }
+        return -1;
+    }
+
+
 
     public void closeConnection() throws SQLException {
         connection.close();

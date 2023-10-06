@@ -1,12 +1,15 @@
 package controller;
 
 import DB_Connection.DBConnection;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -16,6 +19,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Objects;
 
@@ -30,13 +34,31 @@ public class LockerFormController {
     public TextField lastWeekIncomeTxt;
     public TextField lastMonthIncomeTxt;
     public CheckBox payBillChBx;
+    public ComboBox<String> todayCmb;
+    public ComboBox<String> lastWeekCmb;
+    public ComboBox<String> lastMonthCmb;
     private DBConnection dbConnection = DBConnection.getInstance();
     private static int userId = -1;
 
 
     public void initialize() {
+        ObservableList<String> comboBoxSelections =
+                FXCollections.observableArrayList("All", "Income", "Expenses");
+
+        todayCmb.setItems(comboBoxSelections);
+        todayCmb.setValue(comboBoxSelections.get(0));
+
+        lastWeekCmb.setItems(comboBoxSelections);
+        lastWeekCmb.setValue(comboBoxSelections.get(0));
+
+        lastMonthCmb.setItems(comboBoxSelections);
+        lastMonthCmb.setValue(comboBoxSelections.get(0));
+
         try {
-            stockValueTxt.setText("Rs: " + dbConnection.getAllStockadeValue());
+            stockValueTxt.setText(new DecimalFormat("#,##0.00").
+                    format(dbConnection.getAllStockadeValue()) + " Rs");
+            lockerMoneyTxt.setText(new DecimalFormat("#,##0.00").
+                    format(dbConnection.getLockerMoney()) + " Rs");
 
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());

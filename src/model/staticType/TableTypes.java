@@ -1,7 +1,7 @@
 package model.staticType;
 
 public enum TableTypes {
-    ItemTable,
-    StockTable,
-    StockRefillTable
+    ITEM_TABLE,
+    STOCK_TABLE,
+    STOCK_REFILL_TABLE
 }
