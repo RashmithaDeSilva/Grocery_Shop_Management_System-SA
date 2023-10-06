@@ -35,6 +35,14 @@ public class LockerFormController {
 
 
     public void withdrawMoneyOnAction(ActionEvent actionEvent) {
+        if(forWhatTxt != null && !forWhatTxt.getText().isEmpty()) {
+            if(withdrawTxt != null && !withdrawTxt.getText().isEmpty()) {
+
+            }
+        } else {
+            alert(Alert.AlertType.ERROR, "Error", "Invalid Input",
+                    "Try again");
+        }
     }
 
     public void lockerLogOnAction(ActionEvent actionEvent) {
@@ -45,19 +53,24 @@ public class LockerFormController {
             try {
                 double amount = Double.parseDouble(addMoneyTxt.getText());
 
-               if( dbConnection.addMoney(new Log(userId, "Add money Rs: " + addMoneyTxt.getText(), 3,
-                       new Date(Calendar.getInstance().getTime().getTime()),
-                       new Time(Calendar.getInstance().getTime().getTime()),
-                       amount, true)) && amount > 0) {
+                if(amount > 0) {
+                    if( dbConnection.addMoney(new Log(userId, "Add money Rs: " + addMoneyTxt.getText(),
+                            3, new Date(Calendar.getInstance().getTime().getTime()),
+                            new Time(Calendar.getInstance().getTime().getTime()), amount, true))) {
 
-                   addMoneyTxt.clear();
-                   alert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Successfully Added",
-                           "Successfully added money into locker");
+                        addMoneyTxt.clear();
+                        alert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Successfully Added",
+                                "Successfully added money into locker");
 
-               } else {
-                   alert(Alert.AlertType.ERROR, "Error", "Invalid Input",
-                           "Try again");
-               }
+                    } else {
+                        alert(Alert.AlertType.ERROR, "Error", "Database Connection Error",
+                                "Try again");
+                    }
+
+                } else {
+                    alert(Alert.AlertType.ERROR, "Error", "Invalid Input",
+                            "Try again");
+                }
 
             } catch (NumberFormatException e) {
                 alert(Alert.AlertType.ERROR, "Error", "Invalid Input", e.getMessage());
