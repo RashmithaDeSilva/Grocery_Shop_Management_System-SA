@@ -43,18 +43,20 @@ public class LockerFormController {
     public void addMoneyOnAction(ActionEvent actionEvent) {
         if(addMoneyTxt != null && !addMoneyTxt.getText().isEmpty()) {
             try {
+                double amount = Double.parseDouble(addMoneyTxt.getText());
+
                if( dbConnection.addMoney(new Log(userId, "Add money Rs: " + addMoneyTxt.getText(), 3,
                        new Date(Calendar.getInstance().getTime().getTime()),
                        new Time(Calendar.getInstance().getTime().getTime()),
-                       Double.parseDouble(addMoneyTxt.getText()), true))) {
+                       amount, true)) && amount > 0) {
 
                    addMoneyTxt.clear();
                    alert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Successfully Added",
                            "Successfully added money into locker");
 
                } else {
-                   alert(Alert.AlertType.ERROR, "Error", "Database Error",
-                           "Database error try again");
+                   alert(Alert.AlertType.ERROR, "Error", "Invalid Input",
+                           "Try again");
                }
 
             } catch (NumberFormatException e) {
