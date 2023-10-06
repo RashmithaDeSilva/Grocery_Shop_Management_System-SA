@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Log;
+
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -22,6 +23,7 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Objects;
 import static model.staticType.IncomeDayTypes.*;
+import static model.staticType.IncomeOrExpensesTypes.*;
 
 
 public class LockerFormController {
@@ -62,15 +64,93 @@ public class LockerFormController {
                     format(dbConnection.getLockerMoney()) + " Rs");
 
             todayIncomeTxt.setText(new DecimalFormat("#,##0.00").
-                    format(dbConnection.getIncome(TODAY)) + " Rs");
+                    format(dbConnection.getIncome(TODAY, ALL)) + " Rs");
             lastWeekIncomeTxt.setText(new DecimalFormat("#,##0.00").
-                    format(dbConnection.getIncome(LAST_WEEK)) + " Rs");
+                    format(dbConnection.getIncome(LAST_WEEK, ALL)) + " Rs");
             lastMonthIncomeTxt.setText(new DecimalFormat("#,##0.00").
-                    format(dbConnection.getIncome(LAST_MONTH)) + " Rs");
+                    format(dbConnection.getIncome(LAST_MONTH, ALL)) + " Rs");
 
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
+
+        todayCmb.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                if(newValue != null && !newValue.isEmpty()) {
+                    switch (newValue) {
+                        case "All":
+                            todayIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                                    format(dbConnection.getIncome(TODAY, ALL)) + " Rs");
+                            break;
+
+                        case "Income":
+                            todayIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                                    format(dbConnection.getIncome(TODAY, INCOME)) + " Rs");
+                            break;
+
+                        case "Expenses":
+                            todayIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                                    format(dbConnection.getIncome(TODAY, EXPENSES)) + " Rs");
+                            break;
+                    }
+                }
+
+            } catch (SQLException e) {
+                alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+            }
+        });
+
+        lastWeekCmb.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                if(newValue != null && !newValue.isEmpty()) {
+                    switch (newValue) {
+                        case "All":
+                            lastWeekIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                                    format(dbConnection.getIncome(LAST_WEEK, ALL)) + " Rs");
+                            break;
+
+                        case "Income":
+                            lastWeekIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                                    format(dbConnection.getIncome(LAST_WEEK, INCOME)) + " Rs");
+                            break;
+
+                        case "Expenses":
+                            lastWeekIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                                    format(dbConnection.getIncome(LAST_WEEK, EXPENSES)) + " Rs");
+                            break;
+                    }
+                }
+
+            } catch (SQLException e) {
+                alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+            }
+        });
+
+        lastMonthCmb.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                if(newValue != null && !newValue.isEmpty()) {
+                    switch (newValue) {
+                        case "All":
+                            lastMonthIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                                    format(dbConnection.getIncome(LAST_MONTH, ALL)) + " Rs");
+                            break;
+
+                        case "Income":
+                            lastMonthIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                                    format(dbConnection.getIncome(LAST_MONTH, INCOME)) + " Rs");
+                            break;
+
+                        case "Expenses":
+                            lastMonthIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                                    format(dbConnection.getIncome(LAST_MONTH, EXPENSES)) + " Rs");
+                            break;
+                    }
+                }
+
+            } catch (SQLException e) {
+                alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+            }
+        });
     }
 
     public void withdrawMoneyOnAction(ActionEvent actionEvent) {

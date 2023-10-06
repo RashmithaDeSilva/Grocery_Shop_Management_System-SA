@@ -5,6 +5,7 @@ import model.Item;
 import model.Log;
 import model.Stock;
 import model.staticType.IncomeDayTypes;
+import model.staticType.IncomeOrExpensesTypes;
 import model.staticType.TableTypes;
 
 import java.sql.*;
@@ -423,13 +424,27 @@ public class DBConnection {
         return -1;
     }
 
-    public double getIncome(IncomeDayTypes type) throws SQLException {
-        String sql = "SELECT " +
-                "    (SUM(CASE WHEN income_and_expenses_type IN (1, 2) THEN amount ELSE 0 END) - " +
-                "     SUM(CASE WHEN income_and_expenses_type IN (3, 4, 5) THEN amount ELSE 0 END)) AS result " +
-                "FROM log ";
+    public double getIncome(IncomeDayTypes incomeDayTypes, IncomeOrExpensesTypes incomeOrExpensesTypes) throws SQLException {
+        String sql = "SELECT ";
 
-        switch (type) {
+        switch (incomeOrExpensesTypes) {
+            case ALL:
+                sql += "    (SUM(CASE WHEN income_and_expenses_type IN (1, 2) THEN amount ELSE 0 END) - " +
+                        "     SUM(CASE WHEN income_and_expenses_type IN (3, 4, 5) THEN amount ELSE 0 END))";
+                break;
+
+            case INCOME:
+                sql += "SUM(CASE WHEN income_and_expenses_type IN (1, 2) THEN amount ELSE 0 END)";
+                break;
+
+            case EXPENSES:
+                sql += "SUM(CASE WHEN income_and_expenses_type IN (3, 4, 5) THEN amount ELSE 0 END)";
+                break;
+        }
+
+        sql += "AS result FROM log ";
+
+        switch (incomeDayTypes) {
             case TODAY:
                 sql += "WHERE log_date = CURDATE()";
                 break;
