@@ -10,20 +10,20 @@ public class Log {
     private Date date;
     private Time time;
     private double amount;
-    private boolean incomeOrExpenses;
+    private int incomeOrExpensesType;
 
 
     public Log() {
     }
 
-    public Log(int userId, String logName, int logType, Date date, Time time, double amount, boolean incomeOrExpenses) {
+    public Log(int userId, String logName, int logType, Date date, Time time, double amount, int incomeOrExpensesType) {
         this.userId = userId;
         this.logName = logName;
         this.logType = logType;
         this.date = date;
         this.time = time;
         this.amount = amount;
-        this.incomeOrExpenses = incomeOrExpenses;
+        this.incomeOrExpensesType = incomeOrExpensesType;
     }
 
 
@@ -75,11 +75,11 @@ public class Log {
         this.logType = logType;
     }
 
-    public boolean getIncomeOrExpenses() {
-        return incomeOrExpenses;
+    public int getIncomeOrExpenses() {
+        return incomeOrExpensesType;
     }
 
-    public void setIncomeOrExpenses(boolean incomeOrExpenses) {
-        this.incomeOrExpenses = incomeOrExpenses;
+    public void setIncomeOrExpenses(int incomeOrExpensesType) {
+        this.incomeOrExpensesType = incomeOrExpensesType;
     }
 }

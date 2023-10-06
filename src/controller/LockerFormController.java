@@ -35,14 +35,46 @@ public class LockerFormController {
 
 
     public void withdrawMoneyOnAction(ActionEvent actionEvent) {
-        if(forWhatTxt != null && !forWhatTxt.getText().isEmpty()) {
-            if(withdrawTxt != null && !withdrawTxt.getText().isEmpty()) {
+        try {
+            double amount = Double.parseDouble(withdrawTxt.getText());
 
+            if(forWhatTxt != null && !forWhatTxt.getText().isEmpty()) {
+                if(withdrawTxt != null && !withdrawTxt.getText().isEmpty()) {
+                    if(amount > 0) {
+                        if( dbConnection.addLog(new Log(userId, "Withdraw money Rs: " + amount,
+                                3, new Date(Calendar.getInstance().getTime().getTime()),
+                                new Time(Calendar.getInstance().getTime().getTime()), amount,
+                                payBillChBx.isSelected() ? 5 : 4))) {
+
+                            forWhatTxt.clear();
+                            payBillChBx.setSelected(false);
+                            withdrawTxt.clear();
+                            alert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Successfully Withdraw",
+                                    "Successfully withdraw money in locker");
+
+                        } else {
+                            alert(Alert.AlertType.ERROR, "Error", "Database Connection Error",
+                                    "Try again");
+                        }
+
+                    } else {
+                        alert(Alert.AlertType.ERROR, "Error", "Invalid Input",
+                                "Try again");
+                    }
+
+                } else {
+                    alert(Alert.AlertType.ERROR, "Error", "Invalid Input",
+                            "Try again");
+                }
+
+            } else {
+                alert(Alert.AlertType.ERROR, "Error", "Enter Input", "Enter withdraw reason");
             }
-        } else {
-            alert(Alert.AlertType.ERROR, "Error", "Invalid Input",
-                    "Try again");
+
+        } catch (NumberFormatException e) {
+            alert(Alert.AlertType.ERROR, "Error", "Invalid Input", e.getMessage());
         }
+
     }
 
     public void lockerLogOnAction(ActionEvent actionEvent) {
@@ -54,9 +86,9 @@ public class LockerFormController {
                 double amount = Double.parseDouble(addMoneyTxt.getText());
 
                 if(amount > 0) {
-                    if( dbConnection.addMoney(new Log(userId, "Add money Rs: " + addMoneyTxt.getText(),
+                    if( dbConnection.addLog(new Log(userId, "Add money Rs: " + amount,
                             3, new Date(Calendar.getInstance().getTime().getTime()),
-                            new Time(Calendar.getInstance().getTime().getTime()), amount, true))) {
+                            new Time(Calendar.getInstance().getTime().getTime()), amount, 2))) {
 
                         addMoneyTxt.clear();
                         alert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Successfully Added",

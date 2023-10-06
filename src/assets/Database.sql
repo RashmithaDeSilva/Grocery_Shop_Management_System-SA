@@ -81,6 +81,6 @@ CREATE TABLE log (
    log_date DATE,
    log_time TIME,
    amount DECIMAL(10, 2),
-   income_or_expenses BOOLEAN,
+   income_and_expenses_type INT, # 1) sell income   2) add money    3) Buy items    4) Withdraw money   5) Pay bills
    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );

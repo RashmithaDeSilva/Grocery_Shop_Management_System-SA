@@ -379,9 +379,9 @@ public class DBConnection {
         return -1;
     }
 
-    public boolean addMoney(Log log) {
-        String sql = "INSERT INTO log (user_id, log_name, log_date, log_time, amount, log_type, income_or_expenses) " +
-                "VALUES (?,?,?,?,?,?,?)";
+    public boolean addLog(Log log) {
+        String sql = "INSERT INTO log (user_id, log_name, log_date, log_time, amount, log_type, " +
+                "income_and_expenses_type) VALUES (?,?,?,?,?,?,?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             // Set the values for the placeholders
@@ -391,7 +391,7 @@ public class DBConnection {
             preparedStatement.setTime(4, log.getTime());
             preparedStatement.setDouble(5, log.getAmount());
             preparedStatement.setInt(6, log.getLogType());
-            preparedStatement.setBoolean(7, log.getIncomeOrExpenses());
+            preparedStatement.setInt(7, log.getIncomeOrExpenses());
 
             // Execute the query
             return preparedStatement.executeUpdate() > 0;
