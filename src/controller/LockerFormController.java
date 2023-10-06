@@ -165,9 +165,7 @@ public class LockerFormController {
                                 new Time(Calendar.getInstance().getTime().getTime()), amount,
                                 payBillChBx.isSelected() ? 5 : 4))) {
 
-                            forWhatTxt.clear();
-                            payBillChBx.setSelected(false);
-                            withdrawTxt.clear();
+                            setUI("LockerForm");
                             alert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Successfully Withdraw",
                                     "Successfully withdraw money in locker");
 
@@ -192,6 +190,9 @@ public class LockerFormController {
 
         } catch (NumberFormatException e) {
             alert(Alert.AlertType.ERROR, "Error", "Invalid Input", e.getMessage());
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -209,7 +210,7 @@ public class LockerFormController {
                             3, new Date(Calendar.getInstance().getTime().getTime()),
                             new Time(Calendar.getInstance().getTime().getTime()), amount, 2))) {
 
-                        addMoneyTxt.clear();
+                        setUI("LockerForm");
                         alert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Successfully Added",
                                 "Successfully added money into locker");
 
@@ -225,6 +226,9 @@ public class LockerFormController {
 
             } catch (NumberFormatException e) {
                 alert(Alert.AlertType.ERROR, "Error", "Invalid Input", e.getMessage());
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
