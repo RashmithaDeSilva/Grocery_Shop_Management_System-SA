@@ -24,7 +24,7 @@
          <font>
             <Font name="System Bold" size="16.0" />
          </font></TextField>
-      <Button fx:id="addMoneyOnAction" layoutX="200.0" layoutY="122.0" mnemonicParsing="false" style="-fx-background-color: #1dd1a1;" text="Add money">
+      <Button layoutX="200.0" layoutY="122.0" mnemonicParsing="false" onAction="#addMoneyOnAction" style="-fx-background-color: #1dd1a1;" text="Add money">
          <font>
             <Font name="System Bold" size="16.0" />
          </font></Button>

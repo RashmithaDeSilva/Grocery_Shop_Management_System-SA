@@ -77,8 +77,10 @@ CREATE TABLE sell_edits (
 CREATE TABLE log (
    user_id INT,
    log_name VARCHAR(255),
+   log_type INT, #  1) [ERROR],   2) [WARNING],   3) [INFO]
    log_date DATE,
    log_time TIME,
    amount DECIMAL(10, 2),
+   income_or_expenses BOOLEAN,
    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );

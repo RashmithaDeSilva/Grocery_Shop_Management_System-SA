@@ -1,5 +1,6 @@
 package controller;
 
+import DB_Connection.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,15 +11,18 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import model.Log;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.sql.Time;
+import java.util.Calendar;
 import java.util.Objects;
 
 public class LockerFormController {
     public AnchorPane contextLocker;
     public TextField addMoneyTxt;
     public TextField forWhatTxt;
-    public Button addMoneyOnAction;
     public TextField withdrawTxt;
     public TextField stockValueTxt;
     public TextField lockerMoneyTxt;
@@ -26,6 +30,8 @@ public class LockerFormController {
     public TextField lastWeekIncomeTxt;
     public TextField lastMonthIncomeTxt;
     public CheckBox payBillChBx;
+    private DBConnection dbConnection = DBConnection.getInstance();
+    private static int userId = -1;
 
 
     public void withdrawMoneyOnAction(ActionEvent actionEvent) {
@@ -34,8 +40,39 @@ public class LockerFormController {
     public void lockerLogOnAction(ActionEvent actionEvent) {
     }
 
+    public void addMoneyOnAction(ActionEvent actionEvent) {
+        if(addMoneyTxt != null && !addMoneyTxt.getText().isEmpty()) {
+            try {
+               if( dbConnection.addMoney(new Log(userId, "Add money Rs: " + addMoneyTxt.getText(), 3,
+                       new Date(Calendar.getInstance().getTime().getTime()),
+                       new Time(Calendar.getInstance().getTime().getTime()),
+                       Double.parseDouble(addMoneyTxt.getText()), true))) {
+
+                   addMoneyTxt.clear();
+                   alert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Successfully Added",
+                           "Successfully added money into locker");
+
+               } else {
+                   alert(Alert.AlertType.ERROR, "Error", "Database Error",
+                           "Database error try again");
+               }
+
+            } catch (NumberFormatException e) {
+                alert(Alert.AlertType.ERROR, "Error", "Invalid Input", e.getMessage());
+            }
+        }
+    }
+
     public void backOnAction(ActionEvent actionEvent) throws IOException {
         setUI("DashboardForm");
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        LockerFormController.userId = userId;
     }
 
     private void setUI(String UI_Name) throws IOException {
@@ -52,4 +89,5 @@ public class LockerFormController {
         alert.setContentText(contentText);
         alert.show();
     }
+
 }

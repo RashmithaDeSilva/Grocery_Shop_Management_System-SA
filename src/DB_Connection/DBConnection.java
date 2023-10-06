@@ -2,6 +2,7 @@ package DB_Connection;
 
 import javafx.scene.control.Alert;
 import model.Item;
+import model.Log;
 import model.Stock;
 import model.staticType.TableTypes;
 
@@ -376,6 +377,28 @@ public class DBConnection {
             return reset.getDouble("net_sale_amount");
         }
         return -1;
+    }
+
+    public boolean addMoney(Log log) {
+        String sql = "INSERT INTO log (user_id, log_name, log_date, log_time, amount, log_type, income_or_expenses) " +
+                "VALUES (?,?,?,?,?,?,?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // Set the values for the placeholders
+            preparedStatement.setInt(1, log.getUserId());
+            preparedStatement.setString(2, log.getLogName());
+            preparedStatement.setDate(3, log.getDate());
+            preparedStatement.setTime(4, log.getTime());
+            preparedStatement.setDouble(5, log.getAmount());
+            preparedStatement.setInt(6, log.getLogType());
+            preparedStatement.setBoolean(7, log.getIncomeOrExpenses());
+
+            // Execute the query
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     public void closeConnection() throws SQLException {

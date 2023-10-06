@@ -72,7 +72,13 @@ public class DashboardFormController {
 
     public void lockerOnAction(ActionEvent actionEvent) throws IOException {
         if(userRoll == 0) {
-            setUI("LockerForm");
+            try {
+                new LockerFormController().setUserId(dbConnection.getUserId(userName));
+                setUI("LockerForm");
+
+            } catch (SQLException e) {
+                alert(Alert.AlertType.ERROR, "Error", "Item Table Data Load Error", e.getMessage());
+            }
 
         } else {
             alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
