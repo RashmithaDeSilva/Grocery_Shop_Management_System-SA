@@ -14,7 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Log;
-
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -22,6 +21,8 @@ import java.sql.Time;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Objects;
+import static model.staticType.IncomeDayTypes.*;
+
 
 public class LockerFormController {
     public AnchorPane contextLocker;
@@ -59,6 +60,13 @@ public class LockerFormController {
                     format(dbConnection.getAllStockadeValue()) + " Rs");
             lockerMoneyTxt.setText(new DecimalFormat("#,##0.00").
                     format(dbConnection.getLockerMoney()) + " Rs");
+
+            todayIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                    format(dbConnection.getIncome(TODAY)) + " Rs");
+            lastWeekIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                    format(dbConnection.getIncome(LAST_WEEK)) + " Rs");
+            lastMonthIncomeTxt.setText(new DecimalFormat("#,##0.00").
+                    format(dbConnection.getIncome(LAST_MONTH)) + " Rs");
 
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());

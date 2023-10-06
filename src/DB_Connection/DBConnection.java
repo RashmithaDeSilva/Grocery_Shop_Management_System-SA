@@ -4,7 +4,7 @@ import javafx.scene.control.Alert;
 import model.Item;
 import model.Log;
 import model.Stock;
-import model.staticType.IncomeTypes;
+import model.staticType.IncomeDayTypes;
 import model.staticType.TableTypes;
 
 import java.sql.*;
@@ -423,7 +423,33 @@ public class DBConnection {
         return -1;
     }
 
+    public double getIncome(IncomeDayTypes type) throws SQLException {
+        String sql = "SELECT " +
+                "    (SUM(CASE WHEN income_and_expenses_type IN (1, 2) THEN amount ELSE 0 END) - " +
+                "     SUM(CASE WHEN income_and_expenses_type IN (3, 4, 5) THEN amount ELSE 0 END)) AS result " +
+                "FROM log ";
 
+        switch (type) {
+            case TODAY:
+                sql += "WHERE log_date = CURDATE()";
+                break;
+
+            case LAST_WEEK:
+                sql += "WHERE log_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 WEEK) AND CURDATE();";
+                break;
+
+            case LAST_MONTH:
+                sql += "WHERE log_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 MONTH) AND CURDATE();";
+                break;
+        }
+
+        ResultSet reset = stm.executeQuery(sql);
+
+        if(reset.next()) {
+            return reset.getDouble("result");
+        }
+        return -1;
+    }
 
     public void closeConnection() throws SQLException {
         connection.close();
