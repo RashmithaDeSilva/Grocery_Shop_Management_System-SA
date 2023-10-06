@@ -401,6 +401,15 @@ public class DBConnection {
         }
     }
 
+    public double getAllStockadeValue() throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT SUM(quantity * price) AS total_stock_value FROM stock;");
+
+        if(reset.next()) {
+            return reset.getDouble("total_stock_value");
+        }
+        return -1;
+    }
+
     public void closeConnection() throws SQLException {
         connection.close();
     }

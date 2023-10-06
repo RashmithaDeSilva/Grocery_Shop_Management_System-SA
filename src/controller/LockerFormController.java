@@ -6,7 +6,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -15,6 +14,7 @@ import model.Log;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.util.Calendar;
 import java.util.Objects;
@@ -33,6 +33,15 @@ public class LockerFormController {
     private DBConnection dbConnection = DBConnection.getInstance();
     private static int userId = -1;
 
+
+    public void initialize() {
+        try {
+            stockValueTxt.setText("Rs: " + dbConnection.getAllStockadeValue());
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
+    }
 
     public void withdrawMoneyOnAction(ActionEvent actionEvent) {
         try {

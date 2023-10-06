@@ -43,13 +43,13 @@
          <font>
             <Font name="System Bold" size="16.0" />
          </font></TextField>
-      <Label layoutX="204.0" layoutY="332.0" text="Stock value">
+      <Label layoutX="250.0" layoutY="332.0" text="Stock value">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
       <Separator layoutX="40.0" layoutY="294.0" prefHeight="3.0" prefWidth="720.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" />
-      <Label layoutX="204.0" layoutY="384.0" prefHeight="26.0" prefWidth="110.0" text="Locker money">
+      <Label layoutX="250.0" layoutY="384.0" prefHeight="26.0" prefWidth="110.0" text="Locker money">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -69,27 +69,27 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <TextField fx:id="stockValueTxt" editable="false" layoutX="40.0" layoutY="327.0" prefHeight="30.0" prefWidth="144.0">
+      <TextField fx:id="stockValueTxt" alignment="CENTER" editable="false" layoutX="40.0" layoutY="327.0" prefHeight="37.0" prefWidth="186.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="lockerMoneyTxt" editable="false" layoutX="40.0" layoutY="379.0" prefHeight="30.0" prefWidth="144.0">
+      <TextField fx:id="lockerMoneyTxt" alignment="CENTER" editable="false" layoutX="40.0" layoutY="379.0" prefHeight="37.0" prefWidth="186.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="todayIncomeTxt" editable="false" layoutX="458.0" layoutY="327.0" prefHeight="30.0" prefWidth="144.0">
+      <TextField fx:id="todayIncomeTxt" alignment="CENTER" editable="false" layoutX="458.0" layoutY="327.0" prefHeight="30.0" prefWidth="144.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="lastWeekIncomeTxt" editable="false" layoutX="459.0" layoutY="379.0" prefHeight="30.0" prefWidth="144.0">
+      <TextField fx:id="lastWeekIncomeTxt" alignment="CENTER" editable="false" layoutX="459.0" layoutY="379.0" prefHeight="30.0" prefWidth="144.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="lastMonthIncomeTxt" editable="false" layoutX="459.0" layoutY="433.0" prefHeight="30.0" prefWidth="144.0">
+      <TextField fx:id="lastMonthIncomeTxt" alignment="CENTER" editable="false" layoutX="459.0" layoutY="433.0" prefHeight="30.0" prefWidth="144.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
