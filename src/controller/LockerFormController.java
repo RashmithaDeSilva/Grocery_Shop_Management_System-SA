@@ -20,8 +20,12 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
 import static model.staticType.IncomeDayTypes.*;
 import static model.staticType.IncomeOrExpensesTypes.*;
 
@@ -156,22 +160,31 @@ public class LockerFormController {
     public void withdrawMoneyOnAction(ActionEvent actionEvent) {
         try {
             double amount = Double.parseDouble(withdrawTxt.getText());
+            double lockerMoney = Double.parseDouble(String.join("",
+                    lockerMoneyTxt.getText().split(" ")[0].split(",")));
 
             if(forWhatTxt != null && !forWhatTxt.getText().isEmpty()) {
                 if(withdrawTxt != null && !withdrawTxt.getText().isEmpty()) {
                     if(amount > 0) {
-                        if( dbConnection.addLog(new Log(userId, "Withdraw money Rs: " + amount,
-                                3, new Date(Calendar.getInstance().getTime().getTime()),
-                                new Time(Calendar.getInstance().getTime().getTime()), amount,
-                                payBillChBx.isSelected() ? 5 : 4))) {
+                        if(amount <= lockerMoney) {
+                            if( dbConnection.addLog(new Log(userId, "Withdraw money Rs: " + amount,
+                                    3, new Date(Calendar.getInstance().getTime().getTime()),
+                                    new Time(Calendar.getInstance().getTime().getTime()), amount,
+                                    payBillChBx.isSelected() ? 5 : 4))) {
 
-                            setUI("LockerForm");
-                            alert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Successfully Withdraw",
-                                    "Successfully withdraw money in locker");
+                                setUI("LockerForm");
+                                lockerMoneyTxt.setText(new DecimalFormat("#,##0.00").format(lockerMoney - amount) + " Rs");
+                                alert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Successfully Withdraw",
+                                        "Successfully withdraw money in locker");
+
+                            } else {
+                                alert(Alert.AlertType.ERROR, "Error", "Database Connection Error",
+                                        "Try again");
+                            }
 
                         } else {
-                            alert(Alert.AlertType.ERROR, "Error", "Database Connection Error",
-                                    "Try again");
+                            alert(Alert.AlertType.ERROR, "ERROR", "There have No Money",
+                                    "There have no money enough");
                         }
 
                     } else {
