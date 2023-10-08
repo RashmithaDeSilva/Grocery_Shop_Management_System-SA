@@ -449,12 +449,27 @@ public class DBConnection {
                 sql += "WHERE log_date = CURDATE()";
                 break;
 
+            case YESTERDAY:
+                sql += "WHERE log_date = DATE_SUB(CURDATE(), INTERVAL 1 DAY);";
+                break;
+
+            case THIS_WEEK:
+                sql += "WHERE log_date >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) " +
+                        "AND log_date <= DATE_ADD(CURDATE(), INTERVAL 6 - WEEKDAY(CURDATE()) DAY);";
+                break;
+
             case LAST_WEEK:
-                sql += "WHERE log_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 WEEK) AND CURDATE();";
+                sql += "WHERE log_date >= DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 7) DAY) " +
+                        "AND log_date <= DATE_SUB(CURDATE(), INTERVAL (WEEKDAY(CURDATE()) + 1) DAY);";
+                break;
+
+            case THIS_MONTH:
+                sql += "WHERE log_date >= DATE_FORMAT(CURDATE(), '%Y-%m-01') AND log_date <= LAST_DAY(CURDATE());";
                 break;
 
             case LAST_MONTH:
-                sql += "WHERE log_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 MONTH) AND CURDATE();";
+                sql += "WHERE log_date >= DATE_FORMAT(CURDATE() - INTERVAL 1 MONTH, '%Y-%m-01') " +
+                        "AND log_date <= DATE_SUB(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 1 DAY);";
                 break;
         }
 

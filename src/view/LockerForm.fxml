@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contextLocker" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LockerFormController">
+<AnchorPane fx:id="contextLocker" prefHeight="602.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LockerFormController">
    <children>
       <Separator layoutX="40.0" layoutY="101.0" prefHeight="3.0" prefWidth="388.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" />
       <Label layoutX="40.0" layoutY="38.0" prefHeight="54.0" prefWidth="122.0" text="Locker">
@@ -18,84 +18,84 @@
             <Font name="System Bold" size="36.0" />
          </font>
       </Label>
-      <TextField fx:id="addMoneyTxt" layoutX="40.0" layoutY="123.0" prefHeight="30.0" prefWidth="144.0" promptText="Amount">
+      <TextField fx:id="addMoneyTxt" layoutX="40.0" layoutY="123.0" prefHeight="38.0" prefWidth="198.0" promptText="Amount">
          <font>
             <Font name="System Bold" size="16.0" />
          </font></TextField>
-      <TextField fx:id="forWhatTxt" layoutX="461.0" layoutY="123.0" prefHeight="30.0" prefWidth="298.0" promptText="For what">
+      <TextField fx:id="forWhatTxt" layoutX="559.0" layoutY="125.0" prefHeight="30.0" prefWidth="298.0" promptText="For what">
          <font>
             <Font name="System Bold" size="16.0" />
          </font></TextField>
-      <Button layoutX="200.0" layoutY="122.0" mnemonicParsing="false" onAction="#addMoneyOnAction" style="-fx-background-color: #1dd1a1;" text="Add money">
+      <Button layoutX="267.0" layoutY="123.0" mnemonicParsing="false" onAction="#addMoneyOnAction" style="-fx-background-color: #1dd1a1;" text="Add money">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Button layoutX="609.0" layoutY="233.0" mnemonicParsing="false" onAction="#withdrawMoneyOnAction" style="-fx-background-color: #feca57;" text="Withdraw money">
+      <Button layoutX="707.0" layoutY="235.0" mnemonicParsing="false" onAction="#withdrawMoneyOnAction" style="-fx-background-color: #feca57;" text="Withdraw money">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <TextField fx:id="withdrawTxt" layoutX="616.0" layoutY="179.0" prefHeight="30.0" prefWidth="144.0" promptText="Amount">
+      <TextField fx:id="withdrawTxt" layoutX="660.0" layoutY="181.0" prefHeight="37.0" prefWidth="198.0" promptText="Amount">
          <font>
             <Font name="System Bold" size="16.0" />
          </font></TextField>
-      <Label layoutX="250.0" layoutY="332.0" text="Stock value">
+      <Label layoutX="291.0" layoutY="332.0" text="Stock value">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
       <Separator layoutX="40.0" layoutY="294.0" prefHeight="3.0" prefWidth="720.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" />
-      <Label layoutX="250.0" layoutY="384.0" prefHeight="26.0" prefWidth="110.0" text="Locker money">
+      <Label layoutX="727.0" layoutY="333.0" prefHeight="26.0" prefWidth="110.0" text="Locker money">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label layoutX="680.0" layoutY="332.0" text="Today">
+      <Label layoutX="332.0" layoutY="431.0" text="Today">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label layoutX="682.0" layoutY="384.0" text="Last week">
+      <Label layoutX="334.0" layoutY="486.0" text="This week">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label layoutX="682.0" layoutY="438.0" text="Last month">
+      <Label layoutX="334.0" layoutY="540.0" text="This month">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <TextField fx:id="stockValueTxt" alignment="CENTER_RIGHT" editable="false" layoutX="40.0" layoutY="327.0" prefHeight="37.0" prefWidth="186.0">
+      <TextField fx:id="stockValueTxt" alignment="CENTER_RIGHT" editable="false" layoutX="40.0" layoutY="327.0" prefHeight="38.0" prefWidth="234.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="lockerMoneyTxt" alignment="CENTER_RIGHT" editable="false" layoutX="40.0" layoutY="379.0" prefHeight="37.0" prefWidth="186.0">
+      <TextField fx:id="lockerMoneyTxt" alignment="CENTER_RIGHT" editable="false" layoutX="472.0" layoutY="327.0" prefHeight="38.0" prefWidth="234.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="todayIncomeTxt" alignment="CENTER_RIGHT" editable="false" layoutX="514.0" layoutY="327.0" prefHeight="30.0" prefWidth="144.0">
+      <TextField fx:id="todayIncomeTxt" alignment="CENTER_RIGHT" editable="false" layoutX="166.0" layoutY="426.0" prefHeight="30.0" prefWidth="144.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="lastWeekIncomeTxt" alignment="CENTER_RIGHT" editable="false" layoutX="515.0" layoutY="379.0" prefHeight="30.0" prefWidth="144.0">
+      <TextField fx:id="thisWeekIncomeTxt" alignment="CENTER_RIGHT" editable="false" layoutX="167.0" layoutY="481.0" prefHeight="30.0" prefWidth="144.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="lastMonthIncomeTxt" alignment="CENTER_RIGHT" editable="false" layoutX="515.0" layoutY="433.0" prefHeight="30.0" prefWidth="144.0">
+      <TextField fx:id="thisMonthIncomeTxt" alignment="CENTER_RIGHT" editable="false" layoutX="167.0" layoutY="535.0" prefHeight="30.0" prefWidth="144.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <CheckBox fx:id="payBillChBx" layoutX="510.0" layoutY="187.0" mnemonicParsing="false" text="Pay bill">
+      <CheckBox fx:id="payBillChBx" layoutX="562.0" layoutY="189.0" mnemonicParsing="false" text="Pay bill">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -103,7 +103,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </CheckBox>
-      <Button layoutX="688.0" layoutY="47.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
+      <Button layoutX="786.0" layoutY="49.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -111,7 +111,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button layoutX="558.0" layoutY="47.0" mnemonicParsing="false" onAction="#lockerLogOnAction" style="-fx-background-color: #48dbfb;" text="Locker Log">
+      <Button layoutX="656.0" layoutY="49.0" mnemonicParsing="false" onAction="#lockerLogOnAction" style="-fx-background-color: #48dbfb;" text="Locker Log">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -119,20 +119,66 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <ComboBox fx:id="todayCmb" layoutX="388.0" layoutY="327.0" prefHeight="37.0" prefWidth="110.0">
+      <ComboBox fx:id="todayCmb" layoutX="40.0" layoutY="426.0" prefHeight="37.0" prefWidth="110.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </ComboBox>
-      <ComboBox fx:id="lastWeekCmb" layoutX="388.0" layoutY="379.0" prefHeight="37.0" prefWidth="110.0">
+      <ComboBox fx:id="thisWeekCmb" layoutX="40.0" layoutY="481.0" prefHeight="37.0" prefWidth="110.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </ComboBox>
-      <ComboBox fx:id="lastMonthCmb" layoutX="388.0" layoutY="432.0" prefHeight="37.0" prefWidth="110.0">
+      <ComboBox fx:id="thisMonthCmb" layoutX="40.0" layoutY="534.0" prefHeight="37.0" prefWidth="110.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </ComboBox>
+      <Label layoutX="764.0" layoutY="432.0" text="Yesterday">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="766.0" layoutY="484.0" text="Last week">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="766.0" layoutY="538.0" text="Last month">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Label>
+      <TextField fx:id="yesterdayIncomeTxt" alignment="CENTER_RIGHT" editable="false" layoutX="598.0" layoutY="427.0" prefHeight="30.0" prefWidth="144.0">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="lastWeekIncomeTxt" alignment="CENTER_RIGHT" editable="false" layoutX="599.0" layoutY="479.0" prefHeight="30.0" prefWidth="144.0">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="lastMonthIncomeTxt" alignment="CENTER_RIGHT" editable="false" layoutX="599.0" layoutY="533.0" prefHeight="30.0" prefWidth="144.0">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </TextField>
+      <ComboBox fx:id="yesterdayCmb" layoutX="472.0" layoutY="427.0" prefHeight="37.0" prefWidth="110.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </ComboBox>
+      <ComboBox fx:id="lastWeekCmb" layoutX="472.0" layoutY="479.0" prefHeight="37.0" prefWidth="110.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </ComboBox>
+      <ComboBox fx:id="lastMonthCmb" layoutX="472.0" layoutY="532.0" prefHeight="37.0" prefWidth="110.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </ComboBox>
+      <Separator layoutX="40.0" layoutY="397.0" prefHeight="3.0" prefWidth="720.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" />
    </children>
 </AnchorPane>
