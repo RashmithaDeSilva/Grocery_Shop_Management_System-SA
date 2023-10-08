@@ -13,6 +13,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Item;
 import model.Stock;
+import model.Window;
 import model.tableRows.sellWindow.InvoiceItem;
 import model.tableRows.sellWindow.SellItem;
 
@@ -24,7 +25,7 @@ import java.util.Objects;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class SellFormController {
+public class SellFormController extends Window{
     public AnchorPane contextSellForm;
     public TableView<InvoiceItem> quotationTbl;
     public TableColumn<Object, String> idCol;
@@ -47,11 +48,12 @@ public class SellFormController {
     public Label totalBill;
     public Button addOrUpdateBtn;
     private ArrayList<Item> items;
-    private final DBConnection dbConnection = DBConnection.getInstance();
     DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
 
     public void initialize() {
+        super.context = contextSellForm;
+
         idCol2.setCellValueFactory(new PropertyValueFactory<>("itemId"));
         nameCol2.setCellValueFactory(new PropertyValueFactory<>("itemName"));
         idCol.setCellValueFactory(new PropertyValueFactory<>("itemId"));
@@ -480,21 +482,6 @@ public class SellFormController {
             obList.add(new SellItem(i.getItemId(), i.getItemName()));
         }
         itemTbl.setItems(obList);
-    }
-
-    private void setUI(String UI_Name) throws IOException {
-        Parent parent = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/" + UI_Name + ".fxml")));
-        Stage stage = (Stage) contextSellForm.getScene().getWindow();
-        stage.setScene(new Scene(parent));
-        stage.centerOnScreen();
-    }
-
-    private void alert(Alert.AlertType type, String title, String headerText, String contentText) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
-        alert.show();
     }
 
     public void sellLogOnAction(ActionEvent actionEvent) throws IOException {

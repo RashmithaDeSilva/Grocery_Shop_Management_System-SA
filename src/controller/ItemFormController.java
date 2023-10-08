@@ -12,13 +12,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Item;
+import model.Window;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class ItemFormController {
+public class ItemFormController extends Window{
     public AnchorPane contextItemForm;
     public TextField searchTxt;
     public TableView<model.tableRows.itemWindow.Item> itemTbl;
@@ -29,9 +30,9 @@ public class ItemFormController {
     public TextField idTxt;
     public Button addOrUpdateTxt;
     private ArrayList<model.Item> items;
-    private final DBConnection dbConnection = DBConnection.getInstance();
 
     public void initialize() {
+        super.context = contextItemForm;
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         deleteCol.setCellValueFactory(new PropertyValueFactory<>("deleteBtn"));
@@ -163,18 +164,4 @@ public class ItemFormController {
         addOrUpdateTxt.setText("Add");
     }
 
-    private void setUI(String UI_Name) throws IOException {
-        Parent parent = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/" + UI_Name + ".fxml")));
-        Stage stage = (Stage) contextItemForm.getScene().getWindow();
-        stage.setScene(new Scene(parent));
-        stage.centerOnScreen();
-    }
-
-    private void alert(Alert.AlertType type, String title, String headerText, String contentText) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
-        alert.show();
-    }
 }

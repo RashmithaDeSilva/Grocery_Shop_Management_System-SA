@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Log;
+import model.Window;
 import model.staticType.MoneyType;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ import static model.staticType.IncomeOrExpensesTypes.*;
 import static model.staticType.MoneyType.*;
 
 
-public class LockerFormController {
+public class LockerFormController extends Window {
     public AnchorPane contextLocker;
     public TextField addMoneyTxt;
     public TextField forWhatTxt;
@@ -46,11 +47,10 @@ public class LockerFormController {
     public TextField yesterdayIncomeTxt;
     public TextField thisWeekIncomeTxt;
     public TextField thisMonthIncomeTxt;
-    private DBConnection dbConnection = DBConnection.getInstance();
-    private static int userId = -1;
 
 
     public void initialize() {
+        super.context = contextLocker;
         ObservableList<String> comboBoxSelections =
                 FXCollections.observableArrayList("All", "Income", "Expenses");
 
@@ -264,7 +264,7 @@ public class LockerFormController {
                 if(withdrawTxt != null && !withdrawTxt.getText().isEmpty()) {
                     if(amount > 0) {
                         if(amount <= lockerMoney) {
-                            if( dbConnection.addLog(new Log(userId, "Withdraw money Rs: " + amount
+                            if( dbConnection.addLog(new Log(super.getUserId(), "Withdraw money Rs: " + amount
                                     + "( " + forWhatTxt.getText().trim().toLowerCase() + " )",
                                     3, new Date(Calendar.getInstance().getTime().getTime()),
                                     new Time(Calendar.getInstance().getTime().getTime()), amount,
@@ -352,7 +352,7 @@ public class LockerFormController {
                 double amount = Double.parseDouble(addMoneyTxt.getText().trim());
 
                 if(amount > 0) {
-                    if( dbConnection.addLog(new Log(userId, "Add money Rs: " + amount,
+                    if( dbConnection.addLog(new Log(super.getUserId(), "Add money Rs: " + amount,
                             3, new Date(Calendar.getInstance().getTime().getTime()),
                             new Time(Calendar.getInstance().getTime().getTime()), amount, 2))) {
 
@@ -382,30 +382,6 @@ public class LockerFormController {
 
     public void backOnAction(ActionEvent actionEvent) throws IOException {
         setUI("DashboardForm");
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        LockerFormController.userId = userId;
-    }
-
-    private void setUI(String UI_Name) throws IOException {
-        Parent parent = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/" + UI_Name + ".fxml")));
-        Stage stage = (Stage) contextLocker.getScene().getWindow();
-        stage.setScene(new Scene(parent));
-        stage.centerOnScreen();
-    }
-
-    private void alert(Alert.AlertType type, String title, String headerText, String contentText) {
-        Alert alert = new Alert(type);
-        alert.initOwner(this.contextLocker.getScene().getWindow());
-        alert.setTitle(title);
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
-        alert.show();
     }
 
 }

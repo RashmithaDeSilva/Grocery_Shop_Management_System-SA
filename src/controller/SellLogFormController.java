@@ -1,4 +1,6 @@
 package controller;
 
-public class SellLogFormController {
+import model.Window;
+
+public class SellLogFormController extends Window {
 }

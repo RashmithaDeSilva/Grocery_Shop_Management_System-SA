@@ -1,19 +1,15 @@
 package controller;
 
-import DB_Connection.DBConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import model.Item;
 import model.Stock;
 import model.User;
+import model.Window;
 import model.staticType.RefillTableTypes;
 import model.staticType.TableTypes;
 import model.tableRows.stockWindow.RefillAndItem;
@@ -31,7 +27,7 @@ import java.util.stream.Collectors;
 
 import static model.staticType.RefillTableTypes.*;
 
-public class StockFormController {
+public class StockFormController extends Window {
     public AnchorPane contextStock;
     public TableView<model.tableRows.stockWindow.Stock> stockTbl;
     public TableColumn<Object, String> stockIdCol;
@@ -66,7 +62,6 @@ public class StockFormController {
     public ComboBox<String> searchStockCbBx;
     public ComboBox<String> searchRefillCbBx;
     public Button addOrUpdateBtn;
-    private final DBConnection dbConnection = DBConnection.getInstance();
     private int stockTableDataCount;
     private int stockRefillTableDataCount;
     private int itemTableDataCount;
@@ -76,11 +71,12 @@ public class StockFormController {
     private ArrayList<Stock> stocks;
     private ArrayList<Stock> refillStocks;
     private ArrayList<Item> items;
-    private static int userID;
     private int selectedStockId;
 
 
     public void initialize() {
+        super.context = contextStock;
+
         stockIdCol.setCellValueFactory(new PropertyValueFactory<>("stockId"));
         userNameCol.setCellValueFactory(new PropertyValueFactory<>("userName"));
         itemIdCol.setCellValueFactory(new PropertyValueFactory<>("itemId"));
@@ -728,7 +724,7 @@ public class StockFormController {
 
                             if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
                                 if(dbConnection.checkItemAndPrice(itemId, price)) {
-                                    if (dbConnection.addStock(new Stock(0, userID, itemId, quantity,
+                                    if (dbConnection.addStock(new Stock(0, super.getUserId(), itemId, quantity,
                                             refillQuantity, price, sellingPrice,
                                             new Date(Calendar.getInstance().getTime().getTime()),
                                             new Time(Calendar.getInstance().getTime().getTime())))) {
@@ -748,7 +744,7 @@ public class StockFormController {
 
                             } else if (addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
                                 if(dbConnection.checkItemAndPrice(itemId, price)) {
-                                    if(dbConnection.updateStock(new Stock(selectedStockId, userID, itemId,
+                                    if(dbConnection.updateStock(new Stock(selectedStockId, super.getUserId(), itemId,
                                             quantity, refillQuantity, price, sellingPrice,
                                             new Date(Calendar.getInstance().getTime().getTime()),
                                             new Time(Calendar.getInstance().getTime().getTime())))) {
@@ -764,7 +760,7 @@ public class StockFormController {
 
                                 } else {
                                     if(dbConnection.getStockId(itemId, price) == selectedStockId) {
-                                        if(dbConnection.updateStock(new Stock(selectedStockId, userID, itemId,
+                                        if(dbConnection.updateStock(new Stock(selectedStockId, super.getUserId(), itemId,
                                                 quantity, refillQuantity, price, sellingPrice,
                                                 new Date(Calendar.getInstance().getTime().getTime()),
                                                 new Time(Calendar.getInstance().getTime().getTime())))) {
@@ -934,28 +930,5 @@ public class StockFormController {
                 }
             }
         }
-    }
-
-    private void setUI(String UI_Name) throws IOException {
-        Parent parent = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/" + UI_Name + ".fxml")));
-        Stage stage = (Stage) contextStock.getScene().getWindow();
-        stage.setScene(new Scene(parent));
-        stage.centerOnScreen();
-    }
-
-    private void alert(Alert.AlertType type, String title, String headerText, String contentText) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
-        alert.show();
-    }
-
-    public int getUserID() {
-        return userID;
-    }
-
-    public void setUserID(int userID) {
-        StockFormController.userID = userID;
     }
 }

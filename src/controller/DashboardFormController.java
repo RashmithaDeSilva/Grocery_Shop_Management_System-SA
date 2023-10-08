@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import model.Window;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -17,27 +18,18 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
 
-public class DashboardFormController {
+public class DashboardFormController extends Window {
     public AnchorPane contextDashboardForm;
     public Label userNameTxt;
     public Label incomeTxt;
-    private static String userName = "Admin";
-    private static int userRoll = 0;
-    private final DBConnection dbConnection = DBConnection.getInstance();
 
 
     public void initialize() throws SQLException {
-        userNameTxt.setText(userName);
+        super.context = contextDashboardForm;
+        userNameTxt.setText(getUserName());
         double income = dbConnection.getIncome(String.format(new SimpleDateFormat("yyyy-MM-dd")
                 .format(new Date(System.currentTimeMillis()))));
         incomeTxt.setText(String.valueOf(income >= 0 ? income : 0));
-    }
-
-    private void setUI(String UI_Name) throws IOException {
-        Parent parent = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/" + UI_Name + ".fxml")));
-        Stage stage = (Stage) contextDashboardForm.getScene().getWindow();
-        stage.setScene(new Scene(parent));
-        stage.centerOnScreen();
     }
 
     public void sellOnAction(ActionEvent actionEvent) throws IOException {
@@ -45,7 +37,7 @@ public class DashboardFormController {
     }
 
     public void itemOnAction(ActionEvent actionEvent) throws IOException {
-        if(userRoll == 0 || userRoll == 1) {
+        if(getUserRoll() == 0 || getUserRoll() == 1) {
             setUI("ItemForm");
 
         } else {
@@ -55,14 +47,8 @@ public class DashboardFormController {
     }
 
     public void stockOnAction(ActionEvent actionEvent) throws IOException {
-        if(userRoll == 0 || userRoll == 1) {
-            try {
-                new StockFormController().setUserID(dbConnection.getUserId(userName));
+        if(getUserRoll() == 0 || getUserRoll() == 1) {
                 setUI("StockForm");
-
-            } catch (SQLException e) {
-                alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
-            }
 
         } else {
             alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
@@ -71,14 +57,8 @@ public class DashboardFormController {
     }
 
     public void lockerOnAction(ActionEvent actionEvent) throws IOException {
-        if(userRoll == 0) {
-            try {
-                new LockerFormController().setUserId(dbConnection.getUserId(userName));
+        if(getUserRoll() == 0) {
                 setUI("LockerForm");
-
-            } catch (SQLException e) {
-                alert(Alert.AlertType.ERROR, "Error", "Item Table Data Load Error", e.getMessage());
-            }
 
         } else {
             alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
@@ -87,7 +67,7 @@ public class DashboardFormController {
     }
 
     public void userAccOnAction(MouseEvent mouseEvent) {
-        if(userRoll == 0 || userRoll == 1) {
+        if(getUserRoll() == 0 || getUserRoll() == 1) {
 
 
         } else {
@@ -96,28 +76,9 @@ public class DashboardFormController {
         }
     }
 
-    public void setUserName(String userName) {
-        DashboardFormController.userName = userName;
-    }
-
-    public int getUserRoll() {
-        return userRoll;
-    }
-
-    public void setUserRoll(int userRoll) {
-        DashboardFormController.userRoll = userRoll;
-    }
-
     public void logoutOnAction(ActionEvent actionEvent) throws SQLException {
         DBConnection.getInstance().closeConnection();
         System.exit(0);
     }
 
-    private void alert(Alert.AlertType type, String title, String headerText, String contentText) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
-        alert.show();
-    }
 }
