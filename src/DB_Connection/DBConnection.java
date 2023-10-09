@@ -58,33 +58,119 @@ public class DBConnection {
     }
 
 
+    // Create
+
+    public boolean addItem(Item item) {
+        String sql = "INSERT INTO items (item_name) VALUES (?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // Set the values for the placeholders
+            preparedStatement.setString(1, item.getItemName());
+
+            // Execute the query
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean addStock(Stock stock) {
+        String sql = "INSERT INTO stock (user_id, item_id, quantity, refill_quantity, price, selling_price, " +
+                "refill_date, refill_time) VALUES (?,?,?,?,?,?,?,?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // Set the values for the placeholders
+            preparedStatement.setInt(1, stock.getUserId());
+            preparedStatement.setInt(2, stock.getItemId());
+            preparedStatement.setInt(3, stock.getQuantity());
+            preparedStatement.setInt(4, stock.getRefillQuantity());
+            preparedStatement.setDouble(5, stock.getPrice());
+            preparedStatement.setDouble(6, stock.getSellingPrice());
+            preparedStatement.setDate(7, stock.getLastRefillDate());
+            preparedStatement.setTime(8, stock.getLastRefillTime());
+
+            // Execute the query
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean addLog(Log log) {
+        String sql = "INSERT INTO log (user_id, log_name, log_date, log_time, amount, log_type, " +
+                "income_and_expenses_type) VALUES (?,?,?,?,?,?,?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // Set the values for the placeholders
+            preparedStatement.setInt(1, log.getUserId());
+            preparedStatement.setString(2, log.getLogName());
+            preparedStatement.setDate(3, log.getDate());
+            preparedStatement.setTime(4, log.getTime());
+            preparedStatement.setDouble(5, log.getAmount());
+            preparedStatement.setInt(6, log.getLogType());
+            preparedStatement.setInt(7, log.getIncomeOrExpenses());
+
+            // Execute the query
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+
+    // Update
+
+    public boolean updateItem(Item item) {
+        String sql = "UPDATE items SET item_name = ? WHERE item_id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+            // Set the values for the placeholders
+            preparedStatement.setString(1, item.getItemName());
+            preparedStatement.setInt(2, item.getItemId());
+
+            // Execute the query
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean updateStock(Stock stock) {
+        String sql = "UPDATE stock " +
+                "SET user_id = ?, item_id = ?, quantity = ?, refill_quantity = ?, price = ?, " +
+                "selling_price = ?, refill_date = ?, refill_time = ? " +
+                "WHERE stock_id = ?";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, stock.getUserId());
+            preparedStatement.setInt(2, stock.getItemId());
+            preparedStatement.setInt(3, stock.getQuantity());
+            preparedStatement.setInt(4, stock.getRefillQuantity());
+            preparedStatement.setDouble(5, stock.getPrice());
+            preparedStatement.setDouble(6, stock.getSellingPrice());
+            preparedStatement.setDate(7, stock.getLastRefillDate());
+            preparedStatement.setTime(8, stock.getLastRefillTime());
+            preparedStatement.setInt(9, stock.getStockId());
+
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+
+    // Retrieve
+
     public static DBConnection getInstance() {
         if (instance == null) {
             instance = new DBConnection();
         }
         return instance;
-    }
-
-    public boolean checkUserLogin(String userName, String password) {
-        String sql = "SELECT COUNT(*) AS count FROM users WHERE user_name = ? AND password = ?";
-
-        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, userName);
-            preparedStatement.setString(2, password);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if(resultSet.next()) {
-                if(resultSet.getInt("count") == 1) {
-                    return true;
-                }
-            }
-
-        } catch (SQLException e) {
-            return false;
-        }
-
-        return false;
     }
 
     public int getUserRoll(String userName) throws SQLException {
@@ -249,66 +335,6 @@ public class DBConnection {
         return null;
     }
 
-    public boolean addItem(Item item) {
-        String sql = "INSERT INTO items (item_name) VALUES (?)";
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            // Set the values for the placeholders
-            preparedStatement.setString(1, item.getItemName());
-
-            // Execute the query
-            return preparedStatement.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
-    public boolean addStock(Stock stock) {
-        String sql = "INSERT INTO stock (user_id, item_id, quantity, refill_quantity, price, selling_price, " +
-                "refill_date, refill_time) VALUES (?,?,?,?,?,?,?,?)";
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            // Set the values for the placeholders
-            preparedStatement.setInt(1, stock.getUserId());
-            preparedStatement.setInt(2, stock.getItemId());
-            preparedStatement.setInt(3, stock.getQuantity());
-            preparedStatement.setInt(4, stock.getRefillQuantity());
-            preparedStatement.setDouble(5, stock.getPrice());
-            preparedStatement.setDouble(6, stock.getSellingPrice());
-            preparedStatement.setDate(7, stock.getLastRefillDate());
-            preparedStatement.setTime(8, stock.getLastRefillTime());
-
-            // Execute the query
-            return preparedStatement.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
-    public boolean checkItemAndPrice(int itemId, double price) {
-        String sql = "SELECT COUNT(*) AS count FROM stock WHERE item_id = ? AND price = ?";
-
-        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, itemId);
-            preparedStatement.setDouble(2, price);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if(resultSet.next()) {
-                if(resultSet.getInt("count") == 0) {
-                    return true;
-                }
-            }
-
-        } catch (SQLException e) {
-            return false;
-        }
-
-        return false;
-    }
-
     public int getStockId(int itemId, double price) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT stock_id FROM stock WHERE item_id = " + itemId +" " +
                 "&& price = " + price +";");
@@ -319,58 +345,6 @@ public class DBConnection {
         return -1;
     }
 
-    public boolean updateItem(Item item) {
-        String sql = "UPDATE items SET item_name = ? WHERE item_id = ?";
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
-            // Set the values for the placeholders
-            preparedStatement.setString(1, item.getItemName());
-            preparedStatement.setInt(2, item.getItemId());
-
-            // Execute the query
-            return preparedStatement.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
-    public boolean updateStock(Stock stock) {
-        String sql = "UPDATE stock " +
-                "SET user_id = ?, item_id = ?, quantity = ?, refill_quantity = ?, price = ?, " +
-                "selling_price = ?, refill_date = ?, refill_time = ? " +
-                "WHERE stock_id = ?";
-
-        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, stock.getUserId());
-            preparedStatement.setInt(2, stock.getItemId());
-            preparedStatement.setInt(3, stock.getQuantity());
-            preparedStatement.setInt(4, stock.getRefillQuantity());
-            preparedStatement.setDouble(5, stock.getPrice());
-            preparedStatement.setDouble(6, stock.getSellingPrice());
-            preparedStatement.setDate(7, stock.getLastRefillDate());
-            preparedStatement.setTime(8, stock.getLastRefillTime());
-            preparedStatement.setInt(9, stock.getStockId());
-
-            return preparedStatement.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
-    public boolean deleteStock(int stockId) {
-        String sql = "DELETE FROM stock WHERE stock_id = ?";
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, stockId);
-            return preparedStatement.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
     public double getIncome(String date) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT SUM(sale_amount) - SUM(discount) AS net_sale_amount " +
                 "FROM sells WHERE sale_date = '" + date + "';");
@@ -379,28 +353,6 @@ public class DBConnection {
             return reset.getDouble("net_sale_amount");
         }
         return -1;
-    }
-
-    public boolean addLog(Log log) {
-        String sql = "INSERT INTO log (user_id, log_name, log_date, log_time, amount, log_type, " +
-                "income_and_expenses_type) VALUES (?,?,?,?,?,?,?)";
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            // Set the values for the placeholders
-            preparedStatement.setInt(1, log.getUserId());
-            preparedStatement.setString(2, log.getLogName());
-            preparedStatement.setDate(3, log.getDate());
-            preparedStatement.setTime(4, log.getTime());
-            preparedStatement.setDouble(5, log.getAmount());
-            preparedStatement.setInt(6, log.getLogType());
-            preparedStatement.setInt(7, log.getIncomeOrExpenses());
-
-            // Execute the query
-            return preparedStatement.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            return false;
-        }
     }
 
     public double getAllStockadeValue() throws SQLException {
@@ -480,6 +432,70 @@ public class DBConnection {
         }
         return -1;
     }
+
+
+    // Delete
+
+    public boolean deleteStock(int stockId) {
+        String sql = "DELETE FROM stock WHERE stock_id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, stockId);
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+
+    // Check
+    public boolean checkUserLogin(String userName, String password) {
+        String sql = "SELECT COUNT(*) AS count FROM users WHERE user_name = ? AND password = ?";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, userName);
+            preparedStatement.setString(2, password);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()) {
+                if(resultSet.getInt("count") == 1) {
+                    return true;
+                }
+            }
+
+        } catch (SQLException e) {
+            return false;
+        }
+
+        return false;
+    }
+
+    public boolean checkItemAndPrice(int itemId, double price) {
+        String sql = "SELECT COUNT(*) AS count FROM stock WHERE item_id = ? AND price = ?";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, itemId);
+            preparedStatement.setDouble(2, price);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()) {
+                if(resultSet.getInt("count") == 0) {
+                    return true;
+                }
+            }
+
+        } catch (SQLException e) {
+            return false;
+        }
+
+        return false;
+    }
+
+
+    // Close connection
 
     public void closeConnection() throws SQLException {
         connection.close();

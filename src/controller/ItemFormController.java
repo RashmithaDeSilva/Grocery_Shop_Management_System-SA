@@ -13,6 +13,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.Item;
 import model.Window;
+import model.staticType.TableTypes;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -26,10 +27,17 @@ public class ItemFormController extends Window{
     public TableColumn<Object, String> idCol;
     public TableColumn<Object, String> nameCol;
     public TableColumn<Object, String> deleteCol;
+    public TableColumn<Object, String> userNameCol;
+    public TableColumn<Object, String> dateCol;
+    public TableColumn<Object, String> timeCol;
     public TextField nameTxt;
     public TextField idTxt;
     public Button addOrUpdateTxt;
+    public Button previewItemTableBtn;
+    public Button nextItemTableBtn;
     private ArrayList<model.Item> items;
+    private int loadedRowCountItems = 0;
+    private int itemsTableDataCount;
 
     public void initialize() {
         super.context = contextItemForm;
@@ -38,6 +46,8 @@ public class ItemFormController extends Window{
         deleteCol.setCellValueFactory(new PropertyValueFactory<>("deleteBtn"));
 
         try{
+            itemsTableDataCount = dbConnection.getTableRowCount(TableTypes.ITEM_TABLE);
+
             items = dbConnection.getItemTable();
             if(items != null) {
                 setTableData();

@@ -22,7 +22,11 @@ VALUES ('admin', 'admin@gmail.com', '12345', 0);
 
 CREATE TABLE items (
    item_id INT AUTO_INCREMENT PRIMARY KEY,
-   item_name VARCHAR(255)
+   item_name VARCHAR(255),
+   user_id INT,
+   refill_date DATE,
+   refill_time TIME,
+   FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- CREATE TABLE stock (

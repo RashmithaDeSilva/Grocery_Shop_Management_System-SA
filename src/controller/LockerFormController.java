@@ -1,15 +1,10 @@
 package controller;
 
-import DB_Connection.DBConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import model.Log;
 import model.Window;
 import model.staticType.MoneyType;
@@ -20,7 +15,6 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.text.DecimalFormat;
 import java.util.Calendar;
-import java.util.Objects;
 
 import static model.staticType.IncomeDayTypes.*;
 import static model.staticType.IncomeOrExpensesTypes.*;
