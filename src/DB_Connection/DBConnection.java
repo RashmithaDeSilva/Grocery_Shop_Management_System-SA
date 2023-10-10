@@ -61,11 +61,14 @@ public class DBConnection {
     // Create
 
     public boolean addItem(Item item) {
-        String sql = "INSERT INTO items (item_name) VALUES (?)";
+        String sql = "INSERT INTO items (item_name, user_id, set_or_reset_date, set_or_reset_time) VALUES (?,?,?,?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             // Set the values for the placeholders
             preparedStatement.setString(1, item.getItemName());
+            preparedStatement.setInt(2, item.getUserId());
+            preparedStatement.setDate(3, item.getDate());
+            preparedStatement.setTime(4, item.getTime());
 
             // Execute the query
             return preparedStatement.executeUpdate() > 0;
@@ -124,12 +127,16 @@ public class DBConnection {
     // Update
 
     public boolean updateItem(Item item) {
-        String sql = "UPDATE items SET item_name = ? WHERE item_id = ?";
+        String sql = "UPDATE items SET item_name = ?, user_id = ?, set_or_reset_date = ?, set_or_reset_time = ? " +
+                "WHERE item_id = ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             // Set the values for the placeholders
             preparedStatement.setString(1, item.getItemName());
-            preparedStatement.setInt(2, item.getItemId());
+            preparedStatement.setInt(2, item.getUserId());
+            preparedStatement.setDate(3, item.getDate());
+            preparedStatement.setTime(4, item.getTime());
+            preparedStatement.setInt(5, item.getItemId());
 
             // Execute the query
             return preparedStatement.executeUpdate() > 0;
@@ -233,7 +240,9 @@ public class DBConnection {
         ArrayList<Item> items = new ArrayList<>();
 
         while(reset.next()) {
-            items.add(new Item(reset.getInt("item_id"), reset.getString("item_name")));
+            items.add(new Item(reset.getInt("item_id"), reset.getString("item_name"),
+                    reset.getInt("user_id"), reset.getDate("set_or_reset_date"),
+                    reset.getTime("set_or_reset_time")));
         }
 
         return items;
@@ -448,6 +457,18 @@ public class DBConnection {
         }
     }
 
+    public boolean deleteItem(int itemId) {
+        String sql = "DELETE FROM items WHERE item_id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, itemId);
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
 
     // Check
     public boolean checkUserLogin(String userName, String password) {
@@ -528,4 +549,5 @@ public class DBConnection {
     public static void setPassword(String password) {
         DBConnection.password = password;
     }
+
 }

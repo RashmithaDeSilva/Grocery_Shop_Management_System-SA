@@ -127,7 +127,8 @@ public class StockFormController extends Window {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
 
-        searchStockCbBx.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        searchStockCbBx.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> {
             if(searchStockCbBx.getValue() != null) {
                 String search = searchStockTxt.getText();
                 searchStockTxt.clear();
@@ -258,7 +259,8 @@ public class StockFormController extends Window {
             }
         });
 
-        searchRefillCbBx.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        searchRefillCbBx.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> {
             if(searchRefillCbBx.getValue() != null) {
                 String search = searchRefillTxt.getText();
                 searchRefillTxt.clear();
@@ -443,40 +445,38 @@ public class StockFormController extends Window {
         ObservableList<model.tableRows.stockWindow.Stock> obList = FXCollections.observableArrayList();
         ArrayList<String> userIdAndNames = new ArrayList<>();
 
-        if(stocks != null) {
-            if(!stocks.isEmpty()) {
-                userIdAndNames.add(stocks.get(0).getUserId() + "-");
+        if(stocks != null && !stocks.isEmpty()) {
+            userIdAndNames.add(stocks.get(0).getUserId() + "-");
 
-                for (Stock ss : stocks) {
-                    for (String s : userIdAndNames) {
-                        if(ss.getUserId() != Integer.parseInt(s.split("-")[0])){
-                            userIdAndNames.add(ss.getUserId() + "-");
-                            break;
-                        }
+            for (Stock ss : stocks) {
+                for (String s : userIdAndNames) {
+                    if(ss.getUserId() != Integer.parseInt(s.split("-")[0])){
+                        userIdAndNames.add(ss.getUserId() + "-");
+                        break;
                     }
                 }
-
-                for (int i=0; i<userIdAndNames.size(); i++) {
-                    userIdAndNames.set(i, userIdAndNames.get(i) +
-                            dbConnection.getUserName(Integer.parseInt(userIdAndNames.get(i).split("-")[0])));
-                }
-
-                for (Stock s : stocks) {
-                    String userName = null;
-                    for (String ss : userIdAndNames) {
-                        if(s.getUserId() == Integer.parseInt(ss.split("-")[0])) {
-                            userName = ss.split("-")[1];
-                            break;
-                        }
-                    }
-
-                    obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
-                            s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                            s.getLastRefillTime(), getDeleteButton(s.getStockId())));
-                }
-
-                stockTbl.setItems(obList);
             }
+
+            for (int i=0; i<userIdAndNames.size(); i++) {
+                userIdAndNames.set(i, userIdAndNames.get(i) +
+                        dbConnection.getUserName(Integer.parseInt(userIdAndNames.get(i).split("-")[0])));
+            }
+
+            for (Stock s : stocks) {
+                String userName = null;
+                for (String ss : userIdAndNames) {
+                    if(s.getUserId() == Integer.parseInt(ss.split("-")[0])) {
+                        userName = ss.split("-")[1];
+                        break;
+                    }
+                }
+
+                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
+            }
+
+            stockTbl.setItems(obList);
         }
     }
 
@@ -528,8 +528,8 @@ public class StockFormController extends Window {
                         }
 
                     } else {
-                        alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
-                                "Cant delete data in database throw some error");
+                        alert(Alert.AlertType.ERROR, "ERROR", "Can't Delete",
+                                "This item have stocks");
                     }
                 }
             });

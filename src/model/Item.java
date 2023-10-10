@@ -1,10 +1,15 @@
 package model;
 
+import java.sql.Date;
+import java.sql.Time;
 import java.util.ArrayList;
 
 public class Item {
     private int itemId;
     private String itemName;
+    private int userId;
+    private Date date;
+    private Time time;
     private ArrayList<Stock> stocks;
 
 
@@ -20,10 +25,12 @@ public class Item {
         this.itemName = itemName;
     }
 
-    public Item(int itemId, String itemName, ArrayList<Stock> stocks) {
+    public Item(int itemId, String itemName, int userId, Date date, Time time) {
         this.itemId = itemId;
         this.itemName = itemName;
-        this.stocks = stocks;
+        this.userId = userId;
+        this.date = date;
+        this.time = time;
     }
 
 
@@ -46,6 +53,30 @@ public class Item {
     public ArrayList<Stock> getStocks() {return stocks;}
 
     public void setStocks(ArrayList<Stock> stocks) {this.stocks = stocks;}
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Time getTime() {
+        return time;
+    }
+
+    public void setTime(Time time) {
+        this.time = time;
+    }
 
     public void addStock(Stock stock) {
         if(this.stocks != null) {
