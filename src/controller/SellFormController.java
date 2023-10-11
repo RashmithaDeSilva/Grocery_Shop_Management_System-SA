@@ -260,10 +260,44 @@ public class SellFormController extends Window{
         addOrUpdateBtn.setStyle("-fx-background-color: #1dd1a1;");
     }
 
+    private Button getDeleteButton(int itemId) {
+        Button btn = new Button("Delete");
+        btn.setStyle("-fx-background-color:  #ff6b6b;");
+
+        btn.setOnAction((e) -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("CONFIRMATION");
+            alert.setHeaderText("Conform DELETE");
+            alert.setContentText("Are you sure do you want to DELETE this ITEM?");
+            alert.getButtonTypes().set(0, ButtonType.YES);
+            alert.getButtonTypes().set(1, ButtonType.NO);
+
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.YES) {
+
+                    for (InvoiceItem i : quotationTbl.getItems()) {
+                        if(i.getItemId() == itemId) {
+
+                            totalBill.setText(String.valueOf(Double.parseDouble(
+                                    totalBill.getText().split(" ")[1]) - i.getPrice()));
+                            quotationTbl.getItems().remove(i);
+                            break;
+                        }
+                    }
+
+                    alert(Alert.AlertType.INFORMATION, "INFORMATION", "Delete Successful",
+                            "Delete successfully stock id = " + itemId);
+                }
+            });
+        });
+
+        return btn;
+    }
+
     public void addOnAction(ActionEvent actionEvent) {
         if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
             boolean notAddedToInvoice = true;
-            if(quotationTbl != null) {
+            if(quotationTbl != null && !quotationTbl.getItems().isEmpty()) {
                 for (InvoiceItem i : quotationTbl.getItems()) {
                     if(Integer.parseInt(idTxt.getText()) == i.getItemId()) {
                         notAddedToInvoice = false;
@@ -273,8 +307,6 @@ public class SellFormController extends Window{
             }
 
             if(notAddedToInvoice) {
-                Button btn = new Button("Delete");
-
                 try {
                     if(Integer.parseInt(quantityTxt.getText()) > 0 && Integer.parseInt(quantityTxt.getText())
                             <= Integer.parseInt(availableQuantityTxt.getText())){
@@ -282,7 +314,8 @@ public class SellFormController extends Window{
                             if(discountTxt.getText().isEmpty() || Double.parseDouble(discountTxt.getText()) == 0) {
                                 quotationTbl.getItems().add(new InvoiceItem(Integer.parseInt(idTxt.getText()),
                                         nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
-                                        0, Double.parseDouble(totalPriceTxt.getText()), btn));
+                                        0, Double.parseDouble(totalPriceTxt.getText()),
+                                        getDeleteButton(Integer.parseInt(idTxt.getText()))));
                                 resetAllInputs();
                                 searchTxt.clear();
 
@@ -290,7 +323,8 @@ public class SellFormController extends Window{
                                     Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
                                 quotationTbl.getItems().add(new InvoiceItem(Integer.parseInt(idTxt.getText()),
                                         nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
-                                        Double.parseDouble(discountTxt.getText()), Double.parseDouble(totalPriceTxt.getText()), btn));
+                                        Double.parseDouble(discountTxt.getText()), Double.parseDouble(totalPriceTxt.getText()),
+                                        getDeleteButton(Integer.parseInt(idTxt.getText()))));
                                 resetAllInputs();
                                 searchTxt.clear();
 
