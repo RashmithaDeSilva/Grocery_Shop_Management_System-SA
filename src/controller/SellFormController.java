@@ -49,6 +49,7 @@ public class SellFormController extends Window{
     DecimalFormat decimalFormat = new DecimalFormat("0.00");
     private int loadedRowCountItems = 0;
     private int itemsTableDataCount;
+    private int stockId = 0;
 
 
     public void initialize() {
@@ -85,7 +86,12 @@ public class SellFormController extends Window{
                 for (Item i : items) {
                     if (i.getItemName().toLowerCase().contains(searchTxt.getText().toLowerCase()) ||
                             Integer.toString(i.getItemId()).contains(searchTxt.getText())) {
-                        obList.add(new SellItem(i.getItemId(), i.getItemName()));
+                        for (Stock s : i.getStocks()) {
+                            if(s.getQuantity() > 0) {
+                                obList.add(new SellItem(i.getItemId(), s.getStockId(), i.getItemName()));
+                                break;
+                            }
+                        }
                     }
                 }
                 itemTbl.setItems(obList);
@@ -240,11 +246,12 @@ public class SellFormController extends Window{
                     if(quantity > 0) {
                         notAvalabel = false;
                         resetAllInputs();
-                        idTxt.setText(Integer.toString(i.getItemId()));
-                        nameTxt.setText(i.getItemName());
+                        idTxt.setText(Integer.toString(newValue.getItemId()));
+                        nameTxt.setText(newValue.getItemName());
                         availableQuantityTxt.setText(Integer.toString(quantity));
                         quantityTxt.setText("1");
                         priceTxt.setText(Double.toString(i.getStocks().get(0).getSellingPrice()));
+                        stockId = newValue.getStockId();
                         break;
 
                     } else {
@@ -268,6 +275,7 @@ public class SellFormController extends Window{
         discountTxt.clear();
         priceTxt.clear();
         totalPriceTxt.clear();
+        stockId = 0;
         addOrUpdateBtn.setText("Add");
         addOrUpdateBtn.setStyle("-fx-background-color: #1dd1a1;");
     }
@@ -325,7 +333,7 @@ public class SellFormController extends Window{
                         try{
                             if(discountTxt.getText().isEmpty() || Double.parseDouble(discountTxt.getText()) == 0) {
                                 quotationTbl.getItems().add(new InvoiceItem(Integer.parseInt(idTxt.getText()),
-                                        nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
+                                        stockId, nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
                                         0, Double.parseDouble(totalPriceTxt.getText()),
                                         getDeleteButton(Integer.parseInt(idTxt.getText()))));
                                 resetAllInputs();
@@ -334,7 +342,7 @@ public class SellFormController extends Window{
                             } else if(Double.parseDouble(discountTxt.getText()) > 0 &&
                                     Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
                                 quotationTbl.getItems().add(new InvoiceItem(Integer.parseInt(idTxt.getText()),
-                                        nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
+                                        stockId, nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
                                         Double.parseDouble(discountTxt.getText()), Double.parseDouble(totalPriceTxt.getText()),
                                         getDeleteButton(Integer.parseInt(idTxt.getText()))));
                                 resetAllInputs();
@@ -449,20 +457,41 @@ public class SellFormController extends Window{
                     int billNumber = dbConnection.getLastBillNumber();
 
                     for (InvoiceItem i : quotationTbl.getItems()) {
-                        if(!dbConnection.addSell(new Sell(0, super.getUserId(), billNumber,
-                                i.getItemId(), new java.sql.Date(Calendar.getInstance().getTime().getTime()),
-                                new Time(Calendar.getInstance().getTime().getTime()), i.getDiscount(), i.getPrice(),
+
+                        if(!dbConnection.addSell(new Sell(0, billNumber, super.getUserId(),
+                                i.getItemId(), super.getDate(), super.getTime(), i.getDiscount(), i.getPrice(),
                                 i.getQuantity(), false))) {
 
+                            successfulMassage = false;
                             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
                                     "Starting with sell item " + i.getItemName()
                                             + " did not added into database");
-                            successfulMassage = false;
                             break;
+
+                        } else {
+                            for (Item item : items) {
+                                if(i.getItemId() == item.getItemId()) {
+                                    if(dbConnection.updateStock(i.getStockId(), i.getQuantity())) {
+                                        for (Stock s : item.getStocks()) {
+                                            if(s.getQuantity() > 0) {
+                                                s.setQuantity(s.getQuantity() - i.getQuantity());
+                                                break;
+                                            }
+                                        }
+
+                                    } else {
+                                        alert(Alert.AlertType.ERROR, "ERROR", "Stock Didn't Update",
+                                                "Starting with stock id " + i.getStockId()
+                                                        + " stocks didn't update");
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
 
                     if(successfulMassage) {
+                        resetAllOnActon(actionEvent);
                         alert(Alert.AlertType.INFORMATION, "INFORMATION", "Sell Successful",
                                 "Sell successfully added with BILL NUMBER " + billNumber);
                     }
@@ -579,7 +608,12 @@ public class SellFormController extends Window{
         if(items != null && !items.isEmpty()) {
             ObservableList<SellItem> obList = FXCollections.observableArrayList();
             for (Item i : items) {
-                obList.add(new SellItem(i.getItemId(), i.getItemName()));
+                for (Stock s : i.getStocks()) {
+                    if(s.getQuantity() > 0) {
+                        obList.add(new SellItem(i.getItemId(), s.getStockId(), i.getItemName()));
+                        break;
+                    }
+                }
             }
             itemTbl.setItems(obList);
         }

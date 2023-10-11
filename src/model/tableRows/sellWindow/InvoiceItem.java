@@ -4,6 +4,7 @@ import javafx.scene.control.Button;
 
 public class InvoiceItem {
     private int itemId;
+    private int stockid;
     private String itemName;
     private int quantity;
     private double discount;
@@ -12,8 +13,9 @@ public class InvoiceItem {
 
     public InvoiceItem() {}
 
-    public InvoiceItem(int itemId, String itemName, int quantity, double discount, double price, Button delete) {
+    public InvoiceItem(int itemId, int stockId, String itemName, int quantity, double discount, double price, Button delete) {
         this.itemId = itemId;
+        this.stockid = stockId;
         this.itemName = itemName;
         this.quantity = quantity;
         this.discount = discount;
@@ -67,5 +69,13 @@ public class InvoiceItem {
 
     public void setDelete(Button delete) {
         this.delete = delete;
+    }
+
+    public int getStockId() {
+        return stockid;
+    }
+
+    public void setStockId(int stockid) {
+        this.stockid = stockid;
     }
 }

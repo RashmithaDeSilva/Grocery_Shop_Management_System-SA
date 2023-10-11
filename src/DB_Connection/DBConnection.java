@@ -8,6 +8,7 @@ import model.staticType.TableTypes;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DBConnection {
 
@@ -46,7 +47,9 @@ public class DBConnection {
 //            while(reset.next()) {
 //                System.out.println(reset.getRow());
 //            }
-            getInstance().getItemTableWithStockAvailable(25);
+//            int sellId, int billNumber, int userId, int itemId, Date sellDate, Time sellTime,
+//            double discount, double price, int quantity, boolean edited
+//            System.out.println(getInstance());
 
             connection.close();
 
@@ -122,19 +125,20 @@ public class DBConnection {
     }
 
     public boolean addSell(Sell sell) {
-        String sql = "INSERT INTO sells (user_id, item_id, sale_date, sale_time, discount, sale_amount, " +
-                "quantity, edit) VALUES (?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO sells (bill_number, user_id, item_id, sale_date, sale_time, discount, " +
+                "sale_amount, quantity, edit) VALUES (?,?,?,?,?,?,?,?,?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             // Set the values for the placeholders
-            preparedStatement.setInt(1, sell.getUserId());
-            preparedStatement.setInt(2, sell.getItemId());
-            preparedStatement.setDate(3, sell.getSellDate());
-            preparedStatement.setTime(4, sell.getSellTime());
-            preparedStatement.setDouble(5, sell.getDiscount());
-            preparedStatement.setDouble(6, sell.getPrice());
-            preparedStatement.setInt(7, sell.getQuantity());
-            preparedStatement.setBoolean(8, sell.isEdited());
+            preparedStatement.setInt(1, sell.getBillNumber());
+            preparedStatement.setInt(2, sell.getUserId());
+            preparedStatement.setInt(3, sell.getItemId());
+            preparedStatement.setDate(4, sell.getSellDate());
+            preparedStatement.setTime(5, sell.getSellTime());
+            preparedStatement.setDouble(6, sell.getDiscount());
+            preparedStatement.setDouble(7, sell.getPrice());
+            preparedStatement.setInt(8, sell.getQuantity());
+            preparedStatement.setBoolean(9, sell.isEdited());
 
             // Execute the query
             return preparedStatement.executeUpdate() > 0;
@@ -145,7 +149,7 @@ public class DBConnection {
     }
 
     public boolean addBill(Bill bill) {
-        String sql = "INSERT INTO bills (user_id, discount, sale_amount, order_date, order_time) " +
+        String sql = "INSERT INTO bills (user_id, discount, total_price, order_date, order_time) " +
                 "VALUES (?,?,?,?,?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -203,6 +207,20 @@ public class DBConnection {
             preparedStatement.setDate(7, stock.getLastRefillDate());
             preparedStatement.setTime(8, stock.getLastRefillTime());
             preparedStatement.setInt(9, stock.getStockId());
+
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean updateStock(int stockId, int quantity) {
+        String sql = "UPDATE stock SET quantity = quantity - ? WHERE stock_id = ?";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, quantity);
+            preparedStatement.setInt(2, stockId);
 
             return preparedStatement.executeUpdate() > 0;
 
@@ -270,8 +288,10 @@ public class DBConnection {
             ArrayList<Stock> stocks = getStocks(i.getItemId());
 
             for (Stock s : stocks) {
-                i.addStock(new Stock(s.getStockId(), s.getItemId(), s.getQuantity(),
-                        s.getPrice(), s.getSellingPrice()));
+                if(s.getQuantity() > 0) {
+                    i.addStock(new Stock(s.getStockId(), s.getItemId(), s.getQuantity(),
+                            s.getPrice(), s.getSellingPrice()));
+                }
             }
         }
 

@@ -8,6 +8,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.sql.Date;
+import java.sql.Time;
+import java.util.Calendar;
 import java.util.Objects;
 
 
@@ -17,6 +20,8 @@ public class Window {
     private static String userName = "Admin";
     private static int userRoll = 0;
     public DBConnection dbConnection = DBConnection.getInstance();
+    private Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+    private Time time = new Time(Calendar.getInstance().getTime().getTime());
 
 
     protected void setUI(String UI_Name) throws IOException {
@@ -58,4 +63,13 @@ public class Window {
     public void setUserName(String userName) {
         Window.userName = userName;
     }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public Time getTime() {
+        return time;
+    }
+
 }
