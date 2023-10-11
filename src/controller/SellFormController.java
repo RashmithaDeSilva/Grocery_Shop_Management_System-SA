@@ -6,18 +6,18 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import model.Item;
-import model.Stock;
-import model.Window;
+import model.*;
 import model.staticType.TableTypes;
 import model.tableRows.sellWindow.InvoiceItem;
 import model.tableRows.sellWindow.SellItem;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -76,7 +76,7 @@ public class SellFormController extends Window{
             setTable2Data();
 
         } catch (SQLException e) {
-            alert(Alert.AlertType.ERROR, "Error", "Item Table Data Load Error", e.getMessage());
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
 
         searchTxt.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -232,18 +232,30 @@ public class SellFormController extends Window{
     private void setDataIntoInputs(SellItem newValue) {
         for (Item i : items) {
             if(i.getItemId() == newValue.getItemId()) {
-                resetAllInputs();
-                idTxt.setText(Integer.toString(i.getItemId()));
-                nameTxt.setText(i.getItemName());
-                int quantity = 0;
+                boolean notAvalabel = false;
+
                 for (Stock s : i.getStocks()) {
-                    quantity += s.getQuantity();
+                    int quantity = s.getQuantity();
+
+                    if(quantity > 0) {
+                        notAvalabel = false;
+                        resetAllInputs();
+                        idTxt.setText(Integer.toString(i.getItemId()));
+                        nameTxt.setText(i.getItemName());
+                        availableQuantityTxt.setText(Integer.toString(quantity));
+                        quantityTxt.setText("1");
+                        priceTxt.setText(Double.toString(i.getStocks().get(0).getSellingPrice()));
+                        break;
+
+                    } else {
+                        notAvalabel = true;
+                    }
                 }
-                availableQuantityTxt.setText(Integer.toString(quantity));
-                quantityTxt.setText("1");
-                priceTxt.setText(Double.toString(i.getStocks().get(0).getSellingPrice()));
-                addOrUpdateBtn.setText("Add");
-                break;
+
+                if(notAvalabel) {
+                    alert(Alert.AlertType.WARNING, "WARNING", "Stock Empty",
+                            "Refill stock because stock is empty");
+                }
             }
         }
     }
@@ -420,6 +432,54 @@ public class SellFormController extends Window{
     }
 
     public void sellOnAction(ActionEvent actionEvent) {
+        if(quotationTbl != null && quotationTbl.getItems() != null && !quotationTbl.getItems().isEmpty()) {
+
+            double discount = 0;
+            for (InvoiceItem i : quotationTbl.getItems()) {
+                discount += i.getDiscount();
+            }
+
+            if(dbConnection.addBill(new Bill(0, super.getUserId(),
+                    Double.parseDouble(totalBill.getText().split(" ")[1]), discount,
+                    new java.sql.Date(Calendar.getInstance().getTime().getTime()),
+                    new Time(Calendar.getInstance().getTime().getTime())))) {
+
+                try {
+                    boolean successfulMassage = true;
+                    int billNumber = dbConnection.getLastBillNumber();
+
+                    for (InvoiceItem i : quotationTbl.getItems()) {
+                        if(!dbConnection.addSell(new Sell(0, super.getUserId(), billNumber,
+                                i.getItemId(), new java.sql.Date(Calendar.getInstance().getTime().getTime()),
+                                new Time(Calendar.getInstance().getTime().getTime()), i.getDiscount(), i.getPrice(),
+                                i.getQuantity(), false))) {
+
+                            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                                    "Starting with sell item " + i.getItemName()
+                                            + " did not added into database");
+                            successfulMassage = false;
+                            break;
+                        }
+                    }
+
+                    if(successfulMassage) {
+                        alert(Alert.AlertType.INFORMATION, "INFORMATION", "Sell Successful",
+                                "Sell successfully added with BILL NUMBER " + billNumber);
+                    }
+
+                } catch (SQLException e) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                }
+
+            } else {
+                alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                        "Bill did not added into database");
+            }
+
+        } else {
+            alert(Alert.AlertType.WARNING, "WARNING", "Select Items",
+                    "you didn't select items");
+        }
     }
 
     public void printInvoiceOnAction(ActionEvent actionEvent) {

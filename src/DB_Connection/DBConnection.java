@@ -1,9 +1,7 @@
 package DB_Connection;
 
 import javafx.scene.control.Alert;
-import model.Item;
-import model.Log;
-import model.Stock;
+import model.*;
 import model.staticType.IncomeDayTypes;
 import model.staticType.IncomeOrExpensesTypes;
 import model.staticType.TableTypes;
@@ -114,6 +112,49 @@ public class DBConnection {
             preparedStatement.setDouble(5, log.getAmount());
             preparedStatement.setInt(6, log.getLogType());
             preparedStatement.setInt(7, log.getIncomeOrExpenses());
+
+            // Execute the query
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean addSell(Sell sell) {
+        String sql = "INSERT INTO sells (user_id, item_id, sale_date, sale_time, discount, sale_amount, " +
+                "quantity, edit) VALUES (?,?,?,?,?,?,?,?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // Set the values for the placeholders
+            preparedStatement.setInt(1, sell.getUserId());
+            preparedStatement.setInt(2, sell.getItemId());
+            preparedStatement.setDate(3, sell.getSellDate());
+            preparedStatement.setTime(4, sell.getSellTime());
+            preparedStatement.setDouble(5, sell.getDiscount());
+            preparedStatement.setDouble(6, sell.getPrice());
+            preparedStatement.setInt(7, sell.getQuantity());
+            preparedStatement.setBoolean(8, sell.isEdited());
+
+            // Execute the query
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean addBill(Bill bill) {
+        String sql = "INSERT INTO bills (user_id, discount, sale_amount, order_date, order_time) " +
+                "VALUES (?,?,?,?,?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // Set the values for the placeholders
+            preparedStatement.setInt(1, bill.getUserId());
+            preparedStatement.setDouble(2, bill.getDiscount());
+            preparedStatement.setDouble(3, bill.getPrice());
+            preparedStatement.setDate(4, bill.getDate());
+            preparedStatement.setTime(5, bill.getTime());
 
             // Execute the query
             return preparedStatement.executeUpdate() > 0;
@@ -394,6 +435,15 @@ public class DBConnection {
         return -1;
     }
 
+    public int getLastBillNumber() throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT bill_number FROM bills ORDER BY bill_number DESC LIMIT 1;");
+
+        if(reset.next()) {
+            return reset.getInt("bill_number");
+        }
+        return -1;
+    }
+
     public double getIncome(IncomeDayTypes incomeDayTypes, IncomeOrExpensesTypes incomeOrExpensesTypes) throws SQLException {
         String sql = "SELECT ";
 
@@ -558,5 +608,4 @@ public class DBConnection {
     public static void setPassword(String password) {
         DBConnection.password = password;
     }
-
 }

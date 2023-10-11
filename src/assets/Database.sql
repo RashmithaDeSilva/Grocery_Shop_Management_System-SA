@@ -53,6 +53,7 @@ CREATE TABLE stock (
 
 CREATE TABLE sells (
    sale_id INT AUTO_INCREMENT PRIMARY KEY,
+   bill_number INT,
    user_id INT,
    item_id INT,
    sale_date DATE,
@@ -61,6 +62,7 @@ CREATE TABLE sells (
    sale_amount DECIMAL(10, 2),
    quantity INT,
    edit BIT,
+   FOREIGN KEY (bill_number) REFERENCES bills(bill_number),
    FOREIGN KEY (user_id) REFERENCES users(user_id),
    FOREIGN KEY (item_id) REFERENCES items(item_id)
 );
@@ -87,4 +89,14 @@ CREATE TABLE log (
    amount DECIMAL(10, 2),
    income_and_expenses_type INT, # 1) sell income   2) add money    3) Buy items    4) Withdraw money   5) Pay bills
    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE bill (
+  bill_number INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  discount DECIMAL(10, 2),
+  total_price DECIMAL(10, 2),
+  order_date DATE,
+  order_time TIME,
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
