@@ -42,10 +42,10 @@ public class ItemFormController extends Window{
     public TableColumn<Object, String> timeCol;
     public TextField nameTxt;
     public TextField idTxt;
-    public Button addOrUpdateTxt;
     public Button previewItemTableBtn;
     public Button nextItemTableBtn;
     public ComboBox<String> searchItemsCbBx;
+    public Button addOrUpdateBtn;
     private ArrayList<model.Item> items;
     private int loadedRowCountItems = 0;
     private int itemsTableDataCount;
@@ -221,8 +221,8 @@ public class ItemFormController extends Window{
     private void setDataIntoInputs(model.tableRows.itemWindow.Item newValue) {
         idTxt.setText(String.valueOf(newValue.getId()));
         nameTxt.setText(newValue.getName());
-        addOrUpdateTxt.setText("Update");
-        addOrUpdateTxt.setStyle("-fx-background-color: #feca57;");
+        addOrUpdateBtn.setText("Update");
+        addOrUpdateBtn.setStyle("-fx-background-color: #feca57;");
     }
 
     private Button getDeleteButton(int itemId) {
@@ -289,13 +289,13 @@ public class ItemFormController extends Window{
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
 
-        if(addOrUpdateTxt.getText().equalsIgnoreCase("add")) {
+        if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
             idTxt.setText(items != null ? String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
         }
     }
 
     public void addOrUpdateOnAction(ActionEvent actionEvent) {
-        if(addOrUpdateTxt.getText().equalsIgnoreCase("add")) {
+        if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
             if(!nameTxt.getText().isEmpty()) {
 
                 String name = nameTxt.getText().toLowerCase().trim();
@@ -318,7 +318,7 @@ public class ItemFormController extends Window{
                         "Set item name correctly");
             }
 
-        } else if (addOrUpdateTxt.getText().equalsIgnoreCase("update")) {
+        } else if (addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
             if(!nameTxt.getText().isEmpty()) {
 
                 String name = nameTxt.getText().toLowerCase().trim();
@@ -348,8 +348,8 @@ public class ItemFormController extends Window{
         refreshOnAction(actionEvent);
         idTxt.setText(items != null ? String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
         nameTxt.clear();
-        addOrUpdateTxt.setText("Add");
-        addOrUpdateTxt.setStyle("-fx-background-color: #1dd1a1;");
+        addOrUpdateBtn.setText("Add");
+        addOrUpdateBtn.setStyle("-fx-background-color: #1dd1a1;");
     }
 
     public void previewOnAction(ActionEvent actionEvent) throws SQLException {

@@ -1,19 +1,15 @@
 package controller;
 
-import DB_Connection.DBConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import model.Item;
 import model.Stock;
 import model.Window;
+import model.staticType.TableTypes;
 import model.tableRows.sellWindow.InvoiceItem;
 import model.tableRows.sellWindow.SellItem;
 
@@ -21,9 +17,9 @@ import java.io.*;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 
 public class SellFormController extends Window{
     public AnchorPane contextSellForm;
@@ -47,8 +43,12 @@ public class SellFormController extends Window{
     public TextField totalPriceTxt;
     public Label totalBill;
     public Button addOrUpdateBtn;
+    public Button previewItemTableBtn;
+    public Button nextItemTableBtn;
     private ArrayList<Item> items;
     DecimalFormat decimalFormat = new DecimalFormat("0.00");
+    private int loadedRowCountItems = 0;
+    private int itemsTableDataCount;
 
 
     public void initialize() {
@@ -64,30 +64,32 @@ public class SellFormController extends Window{
         deleteCol.setCellValueFactory(new PropertyValueFactory<>("delete"));
 
         try{
-            items = dbConnection.getItemTable();
-            if(items != null) {
-                for (int i=0; i<items.size(); i++) {
-                    if(items.get(i).getStocks() == null) {
-                        items.remove(i);
-                        i--;
-                    }
-                }
-                setTable2Data();
+            itemsTableDataCount = dbConnection.getTableRowCount(TableTypes.STOCK_AVAILABLE_ITEM_TABLE);
+
+            // Set item table
+            if(itemsTableDataCount < 25 && itemsTableDataCount > 0) {
+                nextItemTableBtn.setDisable(true);
             }
+            items = dbConnection.getItemTableWithStockAvailable(loadedRowCountItems);
+            previewItemTableBtn.setDisable(true);
+
+            setTable2Data();
 
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "Error", "Item Table Data Load Error", e.getMessage());
         }
 
         searchTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            ObservableList<SellItem> obList = FXCollections.observableArrayList();
-            for (Item i : items) {
-                if (i.getItemName().toLowerCase().contains(searchTxt.getText().toLowerCase()) ||
-                        Integer.toString(i.getItemId()).contains(searchTxt.getText())) {
-                    obList.add(new SellItem(i.getItemId(), i.getItemName()));
+            if(newValue != null && items != null && !items.isEmpty()) {
+                ObservableList<SellItem> obList = FXCollections.observableArrayList();
+                for (Item i : items) {
+                    if (i.getItemName().toLowerCase().contains(searchTxt.getText().toLowerCase()) ||
+                            Integer.toString(i.getItemId()).contains(searchTxt.getText())) {
+                        obList.add(new SellItem(i.getItemId(), i.getItemName()));
+                    }
                 }
+                itemTbl.setItems(obList);
             }
-            itemTbl.setItems(obList);
         });
 
         quantityTxt.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -224,6 +226,7 @@ public class SellFormController extends Window{
         discountTxt.setText(Double.toString(newValue.getDiscount()));
         totalPriceTxt.setText(Double.toString(newValue.getPrice()));
         addOrUpdateBtn.setText("Update");
+        addOrUpdateBtn.setStyle("-fx-background-color: #feca57;");
     }
 
     private void setDataIntoInputs(SellItem newValue) {
@@ -253,6 +256,8 @@ public class SellFormController extends Window{
         discountTxt.clear();
         priceTxt.clear();
         totalPriceTxt.clear();
+        addOrUpdateBtn.setText("Add");
+        addOrUpdateBtn.setStyle("-fx-background-color: #1dd1a1;");
     }
 
     public void addOnAction(ActionEvent actionEvent) {
@@ -477,14 +482,59 @@ public class SellFormController extends Window{
     }
 
     private void setTable2Data() throws SQLException {
-        ObservableList<SellItem> obList = FXCollections.observableArrayList();
-        for (Item i : items) {
-            obList.add(new SellItem(i.getItemId(), i.getItemName()));
+        if(items != null && !items.isEmpty()) {
+            ObservableList<SellItem> obList = FXCollections.observableArrayList();
+            for (Item i : items) {
+                obList.add(new SellItem(i.getItemId(), i.getItemName()));
+            }
+            itemTbl.setItems(obList);
         }
-        itemTbl.setItems(obList);
     }
 
     public void sellLogOnAction(ActionEvent actionEvent) throws IOException {
         setUI("SellLogForm");
     }
+
+    public void previewItemsOnAction(ActionEvent actionEvent) throws SQLException {
+        previewItemTableBtn.setDisable(true);
+        if(items != null && !items.isEmpty()) {
+            if((loadedRowCountItems - 25) >= 0) {
+                loadedRowCountItems -= 25;
+                items = dbConnection.getItemTableWithStockAvailable(loadedRowCountItems);
+                setTable2Data();
+                nextItemTableBtn.setDisable(false);
+
+                if((loadedRowCountItems - 25) >= 0) {
+                    previewItemTableBtn.setDisable(false);
+                }
+            }
+        }
+        if(!searchTxt.getText().isEmpty()) {
+            String search = searchTxt.getText();
+            searchTxt.clear();
+            searchTxt.setText(search);
+        }
+    }
+
+    public void nextItemsOnAction(ActionEvent actionEvent) throws SQLException {
+        nextItemTableBtn.setDisable(true);
+        if(items != null && !items.isEmpty()) {
+            if((loadedRowCountItems + 25) < itemsTableDataCount) {
+                loadedRowCountItems += 25;
+                items = dbConnection.getItemTableWithStockAvailable(loadedRowCountItems);
+                setTable2Data();
+                previewItemTableBtn.setDisable(false);
+
+                if((loadedRowCountItems + 25) < itemsTableDataCount) {
+                    nextItemTableBtn.setDisable(false);
+                }
+            }
+        }
+        if(!searchTxt.getText().isEmpty()) {
+            String search = searchTxt.getText();
+            searchTxt.clear();
+            searchTxt.setText(search);
+        }
+    }
+
 }

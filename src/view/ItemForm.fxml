@@ -45,7 +45,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="addOrUpdateTxt" layoutX="934.0" layoutY="391.0" mnemonicParsing="false" onAction="#addOrUpdateOnAction" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #1dd1a1;" text="Add">
+      <Button fx:id="addOrUpdateBtn" layoutX="934.0" layoutY="391.0" mnemonicParsing="false" onAction="#addOrUpdateOnAction" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #1dd1a1;" text="Add">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>

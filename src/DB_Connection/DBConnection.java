@@ -48,7 +48,7 @@ public class DBConnection {
 //            while(reset.next()) {
 //                System.out.println(reset.getRow());
 //            }
-            getInstance().getItemTable(0);
+            getInstance().getItemTableWithStockAvailable(25);
 
             connection.close();
 
@@ -200,32 +200,54 @@ public class DBConnection {
             case ITEM_TABLE:
                 reset = stm.executeQuery("SELECT COUNT(*) FROM items;");
                 break;
+
+            case STOCK_AVAILABLE_ITEM_TABLE:
+                reset = stm.executeQuery("SELECT COUNT(DISTINCT item_id) AS unique_item_count FROM stock;");
+                break;
         }
 
         return (reset != null && reset.next()) ? reset.getInt(1) : -1;
     }
 
-    public ArrayList<Item> getItemTable() throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT * FROM items;");
+    public ArrayList<Item> getItemTableWithStockAvailable(int itemCount) throws SQLException {
+        ResultSet reset;
+
+        if(itemCount > 0) {
+            reset = stm.executeQuery("SELECT DISTINCT item_id FROM stock LIMIT 25 OFFSET " + itemCount +";");
+        } else {
+            reset = stm.executeQuery("SELECT DISTINCT item_id FROM stock LIMIT 25;");
+        }
 
         ArrayList<Item> items = new ArrayList<>();
 
         while(reset.next()) {
-            items.add(new Item(reset.getInt("item_id"), reset.getString("item_name")));
+            items.add(new Item(reset.getInt("item_id")));
         }
 
-        ArrayList<Stock> stocks = getStockTable();
-
         for (Item i : items) {
+            i.setItemName(getItemName(i.getItemId()));
+            ArrayList<Stock> stocks = getStocks(i.getItemId());
+
             for (Stock s : stocks) {
-                if(i.getItemId() == s.getItemId()) {
-                    i.addStock(new Stock(s.getStockId(), s.getItemId(), s.getQuantity(), s.getPrice(), s.getSellingPrice()));
-                }
+                i.addStock(new Stock(s.getStockId(), s.getItemId(), s.getQuantity(),
+                        s.getPrice(), s.getSellingPrice()));
             }
         }
 
-        // reset = stm.executeQuery("SELECT quantity FROM stock WHERE item_id;");
         return items;
+    }
+
+    private ArrayList<Stock> getStocks(int itemId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT * FROM stock WHERE item_id = " + itemId +";");
+
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while (reset.next()) {
+            stocks.add(new Stock(reset.getInt("stock_id"), reset.getInt("item_id"),
+                    reset.getInt("quantity"), reset.getDouble("price"),
+                    reset.getDouble("selling_price")));
+        }
+        return stocks;
     }
 
     public ArrayList<Item> getItemTable(int itemCount) throws SQLException {
@@ -246,20 +268,6 @@ public class DBConnection {
         }
 
         return items;
-    }
-
-    public ArrayList<Stock> getStockTable() throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT * FROM stock;");
-
-        ArrayList<Stock> stocks = new ArrayList<>();
-
-        while(reset.next()) {
-            stocks.add(new Stock(reset.getInt("stock_id"), reset.getInt("item_id"),
-                    reset.getInt("quantity"), reset.getDouble("price"),
-                    reset.getDouble("selling_price")));
-        }
-
-        return stocks;
     }
 
     public ArrayList<Stock> getStockTable(int stockCount) throws SQLException {
@@ -326,6 +334,7 @@ public class DBConnection {
         }
         return null;
     }
+
     public int getUserId(String userName) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT user_id FROM users WHERE user_name = '" + userName +"';");
 

@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contextSellForm" prefHeight="550.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SellFormController">
+<AnchorPane fx:id="contextSellForm" prefHeight="588.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SellFormController">
    <children>
       <Label layoutX="30.0" layoutY="25.0" text="Sell">
          <font>
@@ -31,7 +31,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </TableView>
-      <TextField fx:id="idTxt" alignment="CENTER" editable="false" layoutX="690.0" layoutY="161.0" prefHeight="27.0" prefWidth="113.0" promptText="Item ID" AnchorPane.bottomAnchor="359.4">
+      <TextField fx:id="idTxt" alignment="CENTER" editable="false" layoutX="690.0" layoutY="161.0" prefHeight="27.0" prefWidth="113.0" promptText="Item ID" AnchorPane.bottomAnchor="397.4">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
@@ -51,7 +51,7 @@
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <Label fx:id="totalBill" layoutX="480.0" layoutY="487.0" prefHeight="38.0" prefWidth="190.0" text="Total : ">
+      <Label fx:id="totalBill" layoutX="480.0" layoutY="525.0" prefHeight="38.0" prefWidth="190.0" text="Total : ">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
@@ -80,7 +80,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button layoutX="322.0" layoutY="488.0" mnemonicParsing="false" onAction="#printInvoiceOnAction" style="-fx-background-color: #1dd1a1;" text="Print Invoice ">
+      <Button layoutX="322.0" layoutY="526.0" mnemonicParsing="false" onAction="#printInvoiceOnAction" style="-fx-background-color: #1dd1a1;" text="Print Invoice ">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -97,7 +97,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </TableView>
-      <Button layoutX="162.0" layoutY="488.0" mnemonicParsing="false" onAction="#resetInvoiceOnAction" style="-fx-background-color: #ff6b6b;" text="Reset Invoice">
+      <Button layoutX="162.0" layoutY="526.0" mnemonicParsing="false" onAction="#resetInvoiceOnAction" style="-fx-background-color: #ff6b6b;" text="Reset Invoice">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -117,12 +117,12 @@
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <Button layoutX="30.0" layoutY="488.0" mnemonicParsing="false" onAction="#resetAllOnActon" style="-fx-background-color: #ff6b6b;" text="Rreset All">
+      <Button layoutX="30.0" layoutY="526.0" mnemonicParsing="false" onAction="#resetAllOnActon" style="-fx-background-color: #ff6b6b;" text="Rreset All">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Button>
-      <TextField fx:id="searchTxt" layoutX="933.0" layoutY="115.0" prefHeight="27.0" prefWidth="287.0" promptText="Search" />
+      <TextField fx:id="searchTxt" layoutX="934.0" layoutY="115.0" prefHeight="27.0" prefWidth="287.0" promptText="Search" />
       <TextField fx:id="totalPriceTxt" alignment="CENTER" editable="false" layoutX="801.0" layoutY="416.0" prefHeight="27.0" prefWidth="114.0" promptText="Total Price">
          <font>
             <Font name="System Bold" size="14.0" />
@@ -134,6 +134,16 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
+      </Button>
+      <Button fx:id="previewItemTableBtn" layoutX="1040.0" layoutY="544.0" mnemonicParsing="false" onAction="#previewItemsOnAction" style="-fx-background-color: #48dbfb;" text="&lt;">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Button>
+      <Button fx:id="nextItemTableBtn" layoutX="1086.0" layoutY="544.0" mnemonicParsing="false" onAction="#nextItemsOnAction" style="-fx-background-color: #48dbfb;" text="&gt;">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
       </Button>
    </children>
 </AnchorPane>
