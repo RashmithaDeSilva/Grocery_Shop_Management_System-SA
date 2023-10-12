@@ -1,18 +1,12 @@
 package controller;
 
-import DB_Connection.DBConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import model.Item;
-import model.Stock;
 import model.User;
 import model.Window;
 import model.staticType.TableTypes;
@@ -27,8 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static model.staticType.RefillTableTypes.ITEMS;
-import static model.staticType.RefillTableTypes.REFILL_STOCK;
 
 public class ItemFormController extends Window{
     public AnchorPane contextItemForm;
@@ -323,16 +315,14 @@ public class ItemFormController extends Window{
 
                 String name = nameTxt.getText().toLowerCase().trim();
 
-                if (dbConnection.updateItem(new Item(Integer.parseInt(idTxt.getText()), name, super.getUserId(),
-                        new Date(Calendar.getInstance().getTime().getTime()),
-                        new Time(Calendar.getInstance().getTime().getTime())))) {
+                if (dbConnection.updateItem(new Item(Integer.parseInt(idTxt.getText()), name,
+                        super.getUserId(), super.getDate(), super.getTime()))) {
 
                     resetOnAction(actionEvent);
                     alert(Alert.AlertType.INFORMATION, "Successful", "Successfully Update Item",
                             "Successfully update item " + name);
 
                 } else {
-                    // alert(Alert.AlertType type, String title, String headerText, String contentText)
                     alert(Alert.AlertType.ERROR, "Error", "Try again",
                             "DB Connection error try again");
                 }

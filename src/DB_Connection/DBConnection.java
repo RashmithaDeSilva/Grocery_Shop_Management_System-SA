@@ -8,7 +8,6 @@ import model.staticType.TableTypes;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class DBConnection {
 
@@ -59,8 +58,7 @@ public class DBConnection {
     }
 
 
-    // Create
-
+    // Create ----------------------------------------------------------------------------------------------------------
     public boolean addItem(Item item) {
         String sql = "INSERT INTO items (item_name, user_id, set_or_reset_date, set_or_reset_time) VALUES (?,?,?,?)";
 
@@ -169,8 +167,7 @@ public class DBConnection {
     }
 
 
-    // Update
-
+    // Update ----------------------------------------------------------------------------------------------------------
     public boolean updateItem(Item item) {
         String sql = "UPDATE items SET item_name = ?, user_id = ?, set_or_reset_date = ?, set_or_reset_time = ? " +
                 "WHERE item_id = ?";
@@ -230,8 +227,7 @@ public class DBConnection {
     }
 
 
-    // Retrieve
-
+    // Retrieve --------------------------------------------------------------------------------------------------------
     public static DBConnection getInstance() {
         if (instance == null) {
             instance = new DBConnection();
@@ -522,8 +518,7 @@ public class DBConnection {
     }
 
 
-    // Delete
-
+    // Delete ----------------------------------------------------------------------------------------------------------
     public boolean deleteStock(int stockId) {
         String sql = "DELETE FROM stock WHERE stock_id = ?";
 
@@ -549,7 +544,7 @@ public class DBConnection {
     }
 
 
-    // Check
+    // Check -----------------------------------------------------------------------------------------------------------
     public boolean checkUserLogin(String userName, String password) {
         String sql = "SELECT COUNT(*) AS count FROM users WHERE user_name = ? AND password = ?";
 
@@ -595,14 +590,13 @@ public class DBConnection {
     }
 
 
-    // Close connection
-
+    // Close connection ------------------------------------------------------------------------------------------------
     public void closeConnection() throws SQLException {
         connection.close();
     }
 
 
-    // Getters
+    // Getters ---------------------------------------------------------------------------------------------------------
     public static String getUrl() {
         return url;
     }
@@ -616,7 +610,7 @@ public class DBConnection {
     }
 
 
-    // Setters
+    // Setters ---------------------------------------------------------------------------------------------------------
     public static void setUrl(String url) {
         DBConnection.url = url;
     }

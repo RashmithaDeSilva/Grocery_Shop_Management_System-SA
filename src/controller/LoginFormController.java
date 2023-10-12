@@ -2,19 +2,15 @@ package controller;
 
 import DB_Connection.DBConnection;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import model.Window;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Objects;
+
 
 public class LoginFormController extends Window{
     public TextField userNameTxt;
