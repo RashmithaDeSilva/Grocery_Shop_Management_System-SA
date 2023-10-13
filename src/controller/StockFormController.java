@@ -493,10 +493,13 @@ public class StockFormController extends Window {
                 if (response == ButtonType.YES) {
                     if(dbConnection.deleteStock(stockId)) {
                         try {
-
                             for (Stock s : stocks) {
                                 if(s.getStockId() == stockId) {
                                     stocks.remove(s);
+                                    dbConnection.addLog(new Log(super.getUserId(), "Remove damage stock in STOCK ID: " +
+                                            stockId +" and ITEM NAME: " + dbConnection.getItemName(s.getItemId()) +
+                                            ", QUANTITY:" + s.getQuantity(), 3, super.getDate(), super.getTime(),
+                                            (s.getQuantity() * s.getPrice()), 6));
                                     break;
                                 }
                             }

@@ -495,6 +495,7 @@ public class DBConnection {
         return -1;
     }
 
+
     public double getIncome(IncomeDayTypes incomeDayTypes, IncomeOrExpensesTypes incomeOrExpensesTypes) throws SQLException {
         String sql = "SELECT ";
 
@@ -665,6 +666,5 @@ public class DBConnection {
     public static void setPassword(String password) {
         DBConnection.password = password;
     }
-
 
 }
