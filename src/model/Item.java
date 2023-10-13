@@ -87,5 +87,4 @@ public class Item {
             this.stocks.add(stock);
         }
     }
-
 }

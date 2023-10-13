@@ -15,10 +15,8 @@ import java.io.*;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 
 public class SellFormController extends Window{
@@ -74,6 +72,7 @@ public class SellFormController extends Window{
             items = dbConnection.getItemTableWithStockAvailable(loadedRowCountItems);
             previewItemTableBtn.setDisable(true);
 
+            sortItem();
             setTable2Data();
 
         } catch (SQLException e) {
@@ -208,10 +207,15 @@ public class SellFormController extends Window{
         quotationTbl.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
             if (null != newValue) {
-                refresh();
+                refreshTables();
                 setDataIntoInputs(newValue);
             }
         });
+    }
+
+    private void sortItem() {
+        Comparator<Item> itemComparator = Comparator.comparing(Item::getItemId);
+        items.sort(itemComparator);
     }
 
     private void setDataIntoInputs(InvoiceItem newValue) {
@@ -251,8 +255,8 @@ public class SellFormController extends Window{
                         nameTxt.setText(newValue.getItemName());
                         availableQuantityTxt.setText(Integer.toString(quantity));
                         quantityTxt.setText("1");
-                        priceTxt.setText(Double.toString(i.getStocks().get(0).getSellingPrice()));
-                        stockId = newValue.getStockId();
+                        priceTxt.setText(Double.toString(s.getSellingPrice()));
+                        stockId = s.getStockId();
                         break;
 
                     } else {
@@ -315,7 +319,7 @@ public class SellFormController extends Window{
         return btn;
     }
 
-    private void refresh()  {
+    private void refreshTables()  {
         try {
             setTable2Data();
 
@@ -349,7 +353,7 @@ public class SellFormController extends Window{
                                             getDeleteButton(Integer.parseInt(idTxt.getText()))));
                                     resetAllInputs();
                                     searchTxt.clear();
-                                    refresh();
+                                    refreshTables();
 
                                 } else if(Double.parseDouble(discountTxt.getText()) > 0 &&
                                         Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
@@ -359,7 +363,7 @@ public class SellFormController extends Window{
                                             getDeleteButton(Integer.parseInt(idTxt.getText()))));
                                     resetAllInputs();
                                     searchTxt.clear();
-                                    refresh();
+                                    refreshTables();
 
                                 } else {
                                     alert(Alert.AlertType.WARNING, "Invalid Input",
@@ -414,7 +418,7 @@ public class SellFormController extends Window{
                                     i.setPrice(Double.parseDouble(totalPriceTxt.getText()));
                                     resetAllInputs();
                                     searchTxt.clear();
-                                    refresh();
+                                    refreshTables();
                                     addOrUpdateBtn.setText("Add");
 
                                 } catch (NumberFormatException e) {
@@ -606,6 +610,7 @@ public class SellFormController extends Window{
 
     public void resetInvoiceOnAction(ActionEvent actionEvent) {
         quotationTbl.getItems().clear();
+        totalBill.setText("Total: ");
     }
 
     public void resetInputOnAction(ActionEvent actionEvent) {
@@ -614,8 +619,10 @@ public class SellFormController extends Window{
 
     public void resetAllOnActon(ActionEvent actionEvent) {
         resetAllInputs();
+        refreshTables();
         searchTxt.clear();
         quotationTbl.getItems().clear();
+        totalBill.setText("Total: ");
     }
 
     private void setTable2Data() throws SQLException {
@@ -643,6 +650,7 @@ public class SellFormController extends Window{
             if((loadedRowCountItems - 25) >= 0) {
                 loadedRowCountItems -= 25;
                 items = dbConnection.getItemTableWithStockAvailable(loadedRowCountItems);
+                sortItem();
                 setTable2Data();
                 nextItemTableBtn.setDisable(false);
 
@@ -664,6 +672,7 @@ public class SellFormController extends Window{
             if((loadedRowCountItems + 25) < itemsTableDataCount) {
                 loadedRowCountItems += 25;
                 items = dbConnection.getItemTableWithStockAvailable(loadedRowCountItems);
+                sortItem();
                 setTable2Data();
                 previewItemTableBtn.setDisable(false);
 

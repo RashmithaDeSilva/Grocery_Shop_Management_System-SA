@@ -8,6 +8,8 @@ import model.staticType.TableTypes;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DBConnection {
 
@@ -49,6 +51,8 @@ public class DBConnection {
 //            int sellId, int billNumber, int userId, int itemId, Date sellDate, Time sellTime,
 //            double discount, double price, int quantity, boolean edited
 //            System.out.println(getInstance());
+
+            getInstance().getItemTableWithStockAvailable(0);
 
             connection.close();
 
@@ -257,7 +261,8 @@ public class DBConnection {
                 break;
 
             case STOCK_AVAILABLE_ITEM_TABLE:
-                reset = stm.executeQuery("SELECT COUNT(DISTINCT item_id) AS unique_item_count FROM stock;");
+                reset = stm.executeQuery("SELECT COUNT(DISTINCT item_id) AS unique_item_count FROM stock " +
+                        "WHERE quantity > 0;");
                 break;
         }
 
@@ -268,9 +273,10 @@ public class DBConnection {
         ResultSet reset;
 
         if(itemCount > 0) {
-            reset = stm.executeQuery("SELECT DISTINCT item_id FROM stock LIMIT 25 OFFSET " + itemCount +";");
+            reset = stm.executeQuery("SELECT DISTINCT item_id FROM stock WHERE quantity > 0 LIMIT 25 OFFSET "
+                    + itemCount +";");
         } else {
-            reset = stm.executeQuery("SELECT DISTINCT item_id FROM stock LIMIT 25;");
+            reset = stm.executeQuery("SELECT DISTINCT item_id FROM stock WHERE quantity > 0 LIMIT 25;");
         }
 
         ArrayList<Item> items = new ArrayList<>();
