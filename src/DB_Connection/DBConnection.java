@@ -8,8 +8,6 @@ import model.staticType.TableTypes;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class DBConnection {
 
@@ -230,17 +228,16 @@ public class DBConnection {
         }
     }
 
-    public boolean updateAddStock(int stockId, int quantity) {
+    public void updateAddStock(int stockId, int quantity) {
         String sql = "UPDATE stock SET quantity = quantity + ? WHERE stock_id = ?";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, quantity);
             preparedStatement.setInt(2, stockId);
 
-            return preparedStatement.executeUpdate() > 0;
+            preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            return false;
         }
     }
 

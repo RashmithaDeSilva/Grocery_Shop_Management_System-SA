@@ -465,10 +465,9 @@ public class SellFormController extends Window{
                 discount += i.getDiscount();
             }
 
+            double totalBillPrice = Double.parseDouble(totalBill.getText().split(" ")[1]);
             if(dbConnection.addBill(new Bill(0, super.getUserId(),
-                    Double.parseDouble(totalBill.getText().split(" ")[1]), discount,
-                    new java.sql.Date(Calendar.getInstance().getTime().getTime()),
-                    new Time(Calendar.getInstance().getTime().getTime())))) {
+                    totalBillPrice, discount, super.getDate(), super.getTime()))) {
 
                 try {
                     boolean successfulMassage = true;
@@ -505,7 +504,13 @@ public class SellFormController extends Window{
                                             }
                                         }
 
+                                        dbConnection.addLog(new Log(super.getUserId(), "Sell items: " +
+                                                quotationTbl.getItems().size() + " with BILL NUMBER: " +
+                                                billNumber, 3, super.getDate(), super.getTime(),
+                                                totalBillPrice, 1));
+
                                     } else {
+                                        successfulMassage = false;
                                         for (InvoiceItem itemRemove : quotationTbl.getItems()) {
                                             if(itemRemove.getStockId() == i.getStockId()) {
                                                 break;
