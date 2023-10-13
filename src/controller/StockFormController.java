@@ -6,10 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import model.Item;
-import model.Stock;
-import model.User;
-import model.Window;
+import model.*;
 import model.staticType.RefillTableTypes;
 import model.staticType.TableTypes;
 import model.tableRows.stockWindow.RefillAndItem;
@@ -724,11 +721,17 @@ public class StockFormController extends Window {
 
                             if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
                                 if(dbConnection.checkItemAndPrice(itemId, price)) {
-                                    if (dbConnection.addStock(new Stock(0, super.getUserId(), itemId, quantity,
-                                            refillQuantity, price, sellingPrice,
-                                            new Date(Calendar.getInstance().getTime().getTime()),
-                                            new Time(Calendar.getInstance().getTime().getTime())))) {
 
+                                    boolean addIntoStock = dbConnection.addStock(new Stock(0,
+                                            super.getUserId(), itemId, quantity, refillQuantity, price,
+                                            sellingPrice, super.getDate(), super.getTime()));
+                                    boolean addIntoLog = dbConnection.addLog(new Log(super.getUserId(),
+                                            "Add new stock into STOCK ID: " + dbConnection.getLastStockID() +
+                                                    " and ITEM NAME: " + dbConnection.getItemName(itemId) +
+                                                    ", QUANTITY: " + quantity, 3, super.getDate(),
+                                            super.getTime(), (price * quantity), 3));
+
+                                    if (addIntoStock && addIntoLog) {
                                         reloadTables();
                                         alert(Alert.AlertType.INFORMATION, "INFORMATION",
                                                 "Successfully Added Stock",
@@ -743,11 +746,40 @@ public class StockFormController extends Window {
                                 }
 
                             } else if (addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
+                                boolean update = false;
+
                                 if(dbConnection.checkItemAndPrice(itemId, price)) {
-                                    if(dbConnection.updateStock(new Stock(selectedStockId, super.getUserId(), itemId,
-                                            quantity, refillQuantity, price, sellingPrice,
-                                            new Date(Calendar.getInstance().getTime().getTime()),
-                                            new Time(Calendar.getInstance().getTime().getTime())))) {
+                                    update = true;
+
+                                } else if (dbConnection.getStockId(itemId, price) == selectedStockId) {
+                                    update = true;
+                                }
+
+                                if(update) {
+                                    int lastQuantity = dbConnection.getStockQuantity(selectedStockId);
+                                    int finaleQuantity;
+
+                                    if(lastQuantity > quantity) {
+                                        finaleQuantity = lastQuantity - quantity;
+                                        dbConnection.addLog(new Log(super.getUserId(),
+                                                "Remove damage stock in STOCK ID: " +
+                                                        selectedStockId + " and ITEM NAME: " +
+                                                        dbConnection.getItemName(itemId) + ", QUANTITY: " +
+                                                        finaleQuantity, 3, super.getDate(),
+                                                super.getTime(), (price * finaleQuantity), 6));
+
+                                    } else {
+                                        finaleQuantity = quantity - lastQuantity;
+                                        dbConnection.addLog(new Log(super.getUserId(),
+                                                "Update stock in STOCK ID: " + selectedStockId +
+                                                        " and ITEM NAME: " + dbConnection.getItemName(itemId) +
+                                                        ", QUANTITY: " + finaleQuantity, 3, super.getDate(),
+                                                super.getTime(), (price * finaleQuantity), 3));
+                                    }
+
+                                    if(dbConnection.updateStock(new Stock(selectedStockId, super.getUserId(),
+                                            itemId, quantity, refillQuantity, price, sellingPrice,
+                                            super.getDate(), super.getTime()))) {
 
                                         reloadTables();
                                         alert(Alert.AlertType.INFORMATION, "INFORMATION",
@@ -759,24 +791,7 @@ public class StockFormController extends Window {
                                     }
 
                                 } else {
-                                    if(dbConnection.getStockId(itemId, price) == selectedStockId) {
-                                        if(dbConnection.updateStock(new Stock(selectedStockId, super.getUserId(), itemId,
-                                                quantity, refillQuantity, price, sellingPrice,
-                                                new Date(Calendar.getInstance().getTime().getTime()),
-                                                new Time(Calendar.getInstance().getTime().getTime())))) {
-
-                                            reloadTables();
-                                            alert(Alert.AlertType.INFORMATION, "INFORMATION",
-                                                    "Successfully Update Stock",
-                                                    "Successfully Update stock into database");
-
-                                        } else {
-                                            throw new SQLException("Cant save data in database throw some error");
-                                        }
-
-                                    }else {
-                                        throw new NumberFormatException("Already exist this item stock in this price");
-                                    }
+                                    throw new NumberFormatException("Already exist this item stock in this price");
                                 }
                             }
 

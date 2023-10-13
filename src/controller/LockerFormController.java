@@ -259,7 +259,7 @@ public class LockerFormController extends Window {
                     if(amount > 0) {
                         if(amount <= lockerMoney) {
                             if( dbConnection.addLog(new Log(super.getUserId(), "Withdraw money Rs: " + amount
-                                    + "( " + forWhatTxt.getText().trim().toLowerCase() + " )",
+                                    + " ( " + forWhatTxt.getText().trim().toLowerCase() + " )",
                                     3, new Date(Calendar.getInstance().getTime().getTime()),
                                     new Time(Calendar.getInstance().getTime().getTime()), amount,
                                     payBillChBx.isSelected() ? 5 : 4))) {

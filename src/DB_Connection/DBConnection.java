@@ -460,13 +460,31 @@ public class DBConnection {
         return -1;
     }
 
+    public int getLastStockID() throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT stock_id FROM stock ORDER BY stock_id DESC LIMIT 1;");
+
+        if(reset.next()) {
+            return reset.getInt("stock_id");
+        }
+        return -1;
+    }
+
+    public int getStockQuantity(int stockId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT quantity FROM stock WHERE stock_id=" + stockId + ";");
+
+        if(reset.next()) {
+            return reset.getInt("quantity");
+        }
+        return -1;
+    }
+
     public double getIncome(IncomeDayTypes incomeDayTypes, IncomeOrExpensesTypes incomeOrExpensesTypes) throws SQLException {
         String sql = "SELECT ";
 
         switch (incomeOrExpensesTypes) {
             case ALL:
                 sql += "    (SUM(CASE WHEN income_and_expenses_type IN (1, 2) THEN amount ELSE 0 END) - " +
-                        "     SUM(CASE WHEN income_and_expenses_type IN (3, 4, 5) THEN amount ELSE 0 END))";
+                        "     SUM(CASE WHEN income_and_expenses_type IN (3, 4, 5, 6) THEN amount ELSE 0 END))";
                 break;
 
             case INCOME:
@@ -474,7 +492,7 @@ public class DBConnection {
                 break;
 
             case EXPENSES:
-                sql += "SUM(CASE WHEN income_and_expenses_type IN (3, 4, 5) THEN amount ELSE 0 END)";
+                sql += "SUM(CASE WHEN income_and_expenses_type IN (3, 4, 5, 6) THEN amount ELSE 0 END)";
                 break;
         }
 
@@ -622,4 +640,5 @@ public class DBConnection {
     public static void setPassword(String password) {
         DBConnection.password = password;
     }
+
 }

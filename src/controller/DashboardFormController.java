@@ -72,9 +72,8 @@ public class DashboardFormController extends Window {
         }
     }
 
-    public void logoutOnAction(ActionEvent actionEvent) throws SQLException {
-        DBConnection.getInstance().closeConnection();
-        System.exit(0);
+    public void logoutOnAction(ActionEvent actionEvent) throws SQLException, IOException {
+        setUI("LoginForm");
     }
 
 }
