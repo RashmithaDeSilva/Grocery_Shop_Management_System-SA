@@ -652,6 +652,7 @@ public class StockFormController extends Window {
     }
 
     public void refreshRefillOnAction(ActionEvent actionEvent) {
+        searchRefillCbBx.setValue("All");
         searchRefillTxt.clear();
 
         try {
@@ -781,6 +782,8 @@ public class StockFormController extends Window {
                                             itemId, quantity, refillQuantity, price, sellingPrice,
                                             super.getDate(), super.getTime()))) {
 
+                                        refreshStockOnAction(actionEvent);
+                                        refreshRefillOnAction(actionEvent);
                                         reloadTables();
                                         alert(Alert.AlertType.INFORMATION, "INFORMATION",
                                                 "Successfully Update Stock",
