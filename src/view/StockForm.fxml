@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contextStock" prefHeight="837.0" prefWidth="1166.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.StockFormController">
+<AnchorPane fx:id="contextStock" prefHeight="863.0" prefWidth="1166.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.StockFormController">
    <children>
       <Label layoutX="40.0" layoutY="35.0" text="Stock">
          <font>
@@ -82,32 +82,32 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <TextField fx:id="itemIDTxt" editable="false" layoutX="726.0" layoutY="527.0" prefHeight="37.0" prefWidth="106.0">
+      <TextField fx:id="itemIDTxt" editable="false" layoutX="725.0" layoutY="580.0" prefHeight="37.0" prefWidth="106.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="itemNameTxt" editable="false" layoutX="866.0" layoutY="527.0" prefHeight="38.0" prefWidth="246.0">
+      <TextField fx:id="itemNameTxt" editable="false" layoutX="865.0" layoutY="580.0" prefHeight="38.0" prefWidth="246.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="quantityTxt" layoutX="726.0" layoutY="608.0" prefHeight="37.0" prefWidth="106.0">
+      <TextField fx:id="quantityTxt" layoutX="725.0" layoutY="661.0" prefHeight="37.0" prefWidth="106.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="priceTxt" layoutX="726.0" layoutY="686.0" prefHeight="37.0" prefWidth="106.0">
+      <TextField fx:id="priceTxt" layoutX="725.0" layoutY="739.0" prefHeight="37.0" prefWidth="106.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <TextField fx:id="sellingPriceTxt" layoutX="866.0" layoutY="685.0" prefHeight="38.0" prefWidth="106.0">
+      <TextField fx:id="sellingPriceTxt" layoutX="865.0" layoutY="738.0" prefHeight="38.0" prefWidth="106.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
-      <Button layoutX="726.0" layoutY="749.0" mnemonicParsing="false" onAction="#resetOnAction" style="-fx-background-color: #ff6b6b;" text="Reset">
+      <Button layoutX="725.0" layoutY="802.0" mnemonicParsing="false" onAction="#resetOnAction" style="-fx-background-color: #ff6b6b;" text="Reset">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -115,7 +115,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="addOrUpdateBtn" layoutX="1033.0" layoutY="748.0" mnemonicParsing="false" onAction="#addOrUpdateOnAction" prefHeight="37.0" prefWidth="78.0" style="-fx-background-color: #1dd1a1;" text="Add">
+      <Button fx:id="addOrUpdateBtn" layoutX="1032.0" layoutY="801.0" mnemonicParsing="false" onAction="#addOrUpdateOnAction" prefHeight="37.0" prefWidth="78.0" style="-fx-background-color: #1dd1a1;" text="Add">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -123,7 +123,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <TextField fx:id="refillQuantityTxt" layoutX="866.0" layoutY="608.0" prefHeight="37.0" prefWidth="106.0">
+      <TextField fx:id="refillQuantityTxt" layoutX="865.0" layoutY="661.0" prefHeight="37.0" prefWidth="106.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -149,7 +149,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="previewRefillTableBtn" layoutX="330.0" layoutY="793.0" mnemonicParsing="false" onAction="#previewRefillTableOnAction" style="-fx-background-color: #48dbfb;" text="&lt;">
+      <Button fx:id="previewRefillTableBtn" layoutX="328.0" layoutY="807.0" mnemonicParsing="false" onAction="#previewRefillTableOnAction" style="-fx-background-color: #48dbfb;" text="&lt;">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -157,7 +157,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="nextRefillTableBtn" layoutX="383.0" layoutY="793.0" mnemonicParsing="false" onAction="#nextRefillTableOnAction" style="-fx-background-color: #48dbfb;" text="&gt;">
+      <Button fx:id="nextRefillTableBtn" layoutX="381.0" layoutY="807.0" mnemonicParsing="false" onAction="#nextRefillTableOnAction" style="-fx-background-color: #48dbfb;" text="&gt;">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -167,35 +167,43 @@
       </Button>
       <ComboBox fx:id="searchStockCbBx" layoutX="30.0" layoutY="116.0" prefHeight="38.0" prefWidth="190.0" />
       <ComboBox fx:id="searchRefillCbBx" layoutX="30.0" layoutY="532.0" prefHeight="38.0" prefWidth="190.0" />
-      <Label layoutX="729.0" layoutY="498.0" text="Item ID">
+      <Label layoutX="728.0" layoutY="551.0" text="Item ID">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label layoutX="866.0" layoutY="498.0" text="Item Name">
+      <Label layoutX="865.0" layoutY="551.0" text="Item Name">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label layoutX="729.0" layoutY="577.0" text="Quantity">
+      <Label layoutX="728.0" layoutY="630.0" text="Quantity">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label layoutX="866.0" layoutY="577.0" text="Refill Quantity">
+      <Label layoutX="865.0" layoutY="630.0" text="Refill Quantity">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label layoutX="729.0" layoutY="660.0" text="Price">
+      <Label layoutX="728.0" layoutY="713.0" text="Price">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label layoutX="866.0" layoutY="660.0" text="Selling Price">
+      <Label layoutX="865.0" layoutY="713.0" text="Selling Price">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
+      <Button layoutX="31.0" layoutY="804.0" mnemonicParsing="false" onAction="#printRefillsCnAction" style="-fx-background-color: #48dbfb;" text="Print Refills">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
    </children>
 </AnchorPane>

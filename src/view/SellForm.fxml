@@ -121,6 +121,9 @@
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Button>
       <TextField fx:id="searchTxt" layoutX="934.0" layoutY="115.0" prefHeight="27.0" prefWidth="287.0" promptText="Search" />
       <TextField fx:id="totalPriceTxt" alignment="CENTER" editable="false" layoutX="801.0" layoutY="416.0" prefHeight="27.0" prefWidth="114.0" promptText="Total Price">
@@ -139,11 +142,17 @@
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Button>
       <Button fx:id="nextItemTableBtn" layoutX="1086.0" layoutY="544.0" mnemonicParsing="false" onAction="#nextItemsOnAction" style="-fx-background-color: #48dbfb;" text="&gt;">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Button>
    </children>
 </AnchorPane>

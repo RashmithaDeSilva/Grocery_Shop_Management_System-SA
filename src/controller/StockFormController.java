@@ -952,4 +952,8 @@ public class StockFormController extends Window {
             }
         }
     }
+
+    public void printRefillsCnAction(ActionEvent actionEvent) {
+
+    }
 }
