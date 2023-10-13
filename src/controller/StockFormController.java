@@ -9,17 +9,17 @@ import javafx.scene.layout.AnchorPane;
 import model.*;
 import model.staticType.RefillTableTypes;
 import model.staticType.TableTypes;
+import model.tableRows.sellWindow.InvoiceItem;
 import model.tableRows.stockWindow.RefillAndItem;
 import model.tableRows.stockWindow.StockRefill;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static model.staticType.RefillTableTypes.*;
@@ -954,6 +954,74 @@ public class StockFormController extends Window {
     }
 
     public void printRefillsCnAction(ActionEvent actionEvent) {
+        if(!refillTbl.getItems().isEmpty() && stockId2Col.isVisible()) {
 
+            // Get the user's home directory
+            String userHome = System.getProperty("user.home");
+
+            // Determine the "Downloads" folder path based on the operating system
+            String downloadsFolder;
+            String os = System.getProperty("os.name").toLowerCase();
+            if (os.contains("win")) {
+                downloadsFolder = userHome + "\\Downloads";
+
+            } else if (os.contains("mac")) {
+                downloadsFolder = userHome + "/Downloads";
+
+            } else {
+                downloadsFolder = userHome + "/Downloads";
+            }
+
+            // Create an "Refill Stocks" folder inside the "Downloads" folder
+            String invoiceFolderPath = downloadsFolder + "/Refill-Stocks";
+            File invoiceFolder = new File(invoiceFolderPath);
+            if (!invoiceFolder.exists()) {
+                if (invoiceFolder.mkdirs()) {
+                    alert(Alert.AlertType.CONFIRMATION, "Successful",
+                            "Refill Stocks folder created successfully",
+                            invoiceFolderPath);
+
+                } else {
+                    alert(Alert.AlertType.ERROR, "ERROR",
+                            "Folder Create Error",
+                            "Failed to create the Invoice folder");
+                    return;
+                }
+            }
+
+            // Generate a timestamp for the file name
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
+            String timestamp = dateFormat.format(new Date());
+
+            // Create the "Refill-Stocks.txt" file with a timestamp within the "Refill-Stocks" folder
+            String fileName = "Refill-Stocks_" + timestamp + ".txt";
+            File file = new File(invoiceFolderPath, fileName);
+
+            try (FileWriter writer = new FileWriter(file)) {
+                // Write content to the file
+                String formattedTital = String.format("%-30s%n", "Item name");
+                writer.write(formattedTital);
+
+                for (RefillAndItem i : refillTbl.getItems()) {
+                    // Use String.format to format each field with the specified width
+                    StockRefill instance = (StockRefill) i;
+                    String formattedLine = String.format("%-30s%n", instance.getItemName());
+                    writer.write(formattedLine);
+                }
+
+                alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                        "Successfully Print Refill-Stocks",
+                        "Check: " + invoiceFolder.getPath() + "\n" + "File name: " + fileName);
+
+            } catch (IOException e) {
+                alert(Alert.AlertType.ERROR, "ERROR",
+                        "Folder Error ", e.getMessage());
+            }
+
+        } else {
+            alert(Alert.AlertType.WARNING, "WARNING",
+                    "There Have No Items To Print",
+                    "Sorry their have no items to print so add items");
+        }
     }
 }

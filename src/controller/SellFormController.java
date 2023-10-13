@@ -579,16 +579,14 @@ public class SellFormController extends Window{
             File invoiceFolder = new File(invoiceFolderPath);
             if (!invoiceFolder.exists()) {
                 if (invoiceFolder.mkdirs()) {
-                    alert(Alert.AlertType.CONFIRMATION, "Successful",
+                    alert(Alert.AlertType.INFORMATION, "INFORMATION",
                             "Invoice folder created successfully",
                             invoiceFolderPath);
-//                    System.out.println("Invoice folder created successfully at: " + invoiceFolderPath);
 
                 } else {
-                    alert(Alert.AlertType.ERROR, "Folder Error",
-                            "Folder Error",
+                    alert(Alert.AlertType.ERROR, "ERROR",
+                            "Folder Create Error",
                             "Failed to create the Invoice folder");
-//                    System.err.println("Failed to create the Invoice folder");
                     return;
                 }
             }
