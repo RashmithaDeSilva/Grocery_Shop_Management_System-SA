@@ -457,7 +457,7 @@ public class SellFormController extends Window{
         setUI("DashboardForm");
     }
 
-    public void sellOnAction(ActionEvent actionEvent) {
+    public void sellOnAction(ActionEvent actionEvent) throws IOException {
         if(quotationTbl != null && quotationTbl.getItems() != null && !quotationTbl.getItems().isEmpty()) {
 
             double discount = 0;
@@ -473,6 +473,7 @@ public class SellFormController extends Window{
                 try {
                     boolean successfulMassage = true;
                     int billNumber = dbConnection.getLastBillNumber();
+                    int addeditemCount = 0;
 
                     for (InvoiceItem i : quotationTbl.getItems()) {
 
@@ -481,15 +482,22 @@ public class SellFormController extends Window{
                                 i.getQuantity(), false))) {
 
                             successfulMassage = false;
+                            for (InvoiceItem itemRemove : quotationTbl.getItems()) {
+                                if(itemRemove.getStockId() == i.getStockId()) {
+                                    break;
+                                } else {
+                                    addeditemCount += 1;
+                                }
+                            }
+
                             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
-                                    "Starting with sell item " + i.getItemName()
-                                            + " did not added into database");
+                                    "Items are didn't added try again");
                             break;
 
                         } else {
                             for (Item item : items) {
                                 if(i.getItemId() == item.getItemId()) {
-                                    if(dbConnection.updateStock(i.getStockId(), i.getQuantity())) {
+                                    if(dbConnection.updateRemoveStock(i.getStockId(), i.getQuantity())) {
                                         for (Stock s : item.getStocks()) {
                                             if(s.getQuantity() > 0) {
                                                 s.setQuantity(s.getQuantity() - i.getQuantity());
@@ -498,9 +506,18 @@ public class SellFormController extends Window{
                                         }
 
                                     } else {
+                                        for (InvoiceItem itemRemove : quotationTbl.getItems()) {
+                                            if(itemRemove.getStockId() == i.getStockId()) {
+                                                break;
+                                            } else {
+                                                addeditemCount += 1;
+                                                dbConnection.updateAddStock(itemRemove.getStockId(),
+                                                        itemRemove.getQuantity());
+                                            }
+                                        }
+
                                         alert(Alert.AlertType.ERROR, "ERROR", "Stock Didn't Update",
-                                                "Starting with stock id " + i.getStockId()
-                                                        + " stocks didn't update");
+                                                "Stock are didn't update try again");
                                         break;
                                     }
                                 }
@@ -512,6 +529,11 @@ public class SellFormController extends Window{
                         resetAllOnActon(actionEvent);
                         alert(Alert.AlertType.INFORMATION, "INFORMATION", "Sell Successful",
                                 "Sell successfully added with BILL NUMBER " + billNumber);
+
+                    } else {
+                        dbConnection.deleteLastSells(addeditemCount);
+                        dbConnection.deleteLastBill();
+                        setUI("DashboardForm");
                     }
 
                 } catch (SQLException e) {

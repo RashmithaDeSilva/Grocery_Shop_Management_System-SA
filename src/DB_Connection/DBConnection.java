@@ -216,8 +216,22 @@ public class DBConnection {
         }
     }
 
-    public boolean updateStock(int stockId, int quantity) {
+    public boolean updateRemoveStock(int stockId, int quantity) {
         String sql = "UPDATE stock SET quantity = quantity - ? WHERE stock_id = ?";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, quantity);
+            preparedStatement.setInt(2, stockId);
+
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean updateAddStock(int stockId, int quantity) {
+        String sql = "UPDATE stock SET quantity = quantity + ? WHERE stock_id = ?";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, quantity);
@@ -567,6 +581,14 @@ public class DBConnection {
         }
     }
 
+    public void deleteLastSells(int itemCount) throws SQLException {
+        stm.executeUpdate("DELETE FROM sells ORDER BY sale_id DESC LIMIT " + itemCount + ";");
+    }
+
+    public void deleteLastBill() throws SQLException {
+        stm.executeUpdate("DELETE FROM bills ORDER BY bill_number DESC LIMIT 1;");
+    }
+
 
     // Check -----------------------------------------------------------------------------------------------------------
     public boolean checkUserLogin(String userName, String password) {
@@ -646,5 +668,6 @@ public class DBConnection {
     public static void setPassword(String password) {
         DBConnection.password = password;
     }
+
 
 }
