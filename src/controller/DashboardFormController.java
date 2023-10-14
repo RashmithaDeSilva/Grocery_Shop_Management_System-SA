@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import model.Window;
+import model.staticType.TableTypes;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -21,12 +22,25 @@ public class DashboardFormController extends Window {
     public Button userNameBtn;
 
 
-    public void initialize() throws SQLException {
+    public void initialize() throws IOException {
         super.context = contextDashboardForm;
-        userNameBtn.setText(getUserName());
-        double income = dbConnection.getIncome(String.format(new SimpleDateFormat("yyyy-MM-dd")
-                .format(new Date(System.currentTimeMillis()))));
-        incomeLbl.setText("Rs: " + (income >= 0 ? income : 0));
+
+        try {
+            if (dbConnection.getTableRowCount(TableTypes.USER_TABLE) > super.getMaximumUserCount()) {
+                dbConnection.deleteIllegalUsers(super.getMaximumUserCount());
+                if(!dbConnection.userIdIsAvailable(super.getUserId())) {
+                    System.exit(0);
+                }
+            }
+
+            userNameBtn.setText(getUserName());
+            double income = dbConnection.getIncome(String.format(new SimpleDateFormat("yyyy-MM-dd")
+                    .format(new Date(System.currentTimeMillis()))));
+            incomeLbl.setText("Rs: " + (income >= 0 ? income : 0));
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
     }
 
     public void sellOnAction(ActionEvent actionEvent) throws IOException {

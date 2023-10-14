@@ -300,7 +300,7 @@ public class DBConnection {
 
     public int getUserRoll(String userName, String password) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT title FROM users WHERE user_name = '" + userName +"' " +
-                "AND password = " + password +";");
+                "AND password = '" + password +"';");
         return reset.next() ? reset.getInt("title") : -1;
     }
 
@@ -323,6 +323,10 @@ public class DBConnection {
             case STOCK_AVAILABLE_ITEM_TABLE:
                 reset = stm.executeQuery("SELECT COUNT(DISTINCT item_id) AS unique_item_count FROM stock " +
                         "WHERE quantity > 0;");
+                break;
+
+            case USER_TABLE:
+                reset = stm.executeQuery("SELECT COUNT(*) FROM users;");
                 break;
         }
 
@@ -391,6 +395,25 @@ public class DBConnection {
         }
 
         return items;
+    }
+
+    public ArrayList<User> getUsersTable(int userCount) throws SQLException {
+        ResultSet reset;
+
+        if(userCount > 0) {
+            reset = stm.executeQuery("SELECT * FROM users LIMIT 25 OFFSET " + userCount +";");
+        } else {
+            reset = stm.executeQuery("SELECT * FROM users LIMIT 25;");
+        }
+
+        ArrayList<User> users = new ArrayList<>();
+
+        while(reset.next()) {
+            users.add(new User(reset.getInt("user_id"), reset.getString("user_name"),
+                    reset.getString("email"), reset.getInt("title")));
+        }
+
+        return users;
     }
 
     public ArrayList<Stock> getStockTable(int stockCount) throws SQLException {
@@ -477,8 +500,8 @@ public class DBConnection {
     }
 
     public int getStockId(int itemId, double price) throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT stock_id FROM stock WHERE item_id = " + itemId +" " +
-                "&& price = " + price +";");
+        ResultSet reset = stm.executeQuery("SELECT stock_id FROM stock WHERE item_id = " + itemId + " " +
+                "&& price = " + price + ";");
 
         if(reset.next()) {
             return reset.getInt("stock_id");
@@ -653,6 +676,26 @@ public class DBConnection {
         stm.executeUpdate("DELETE FROM bills ORDER BY bill_number DESC LIMIT 1;");
     }
 
+    public boolean deleteUser(int userId) {
+        String sql = "DELETE FROM users WHERE user_id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, userId);
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public void deleteIllegalUsers(int maximumUserCount) throws SQLException {
+        stm.executeUpdate("DELETE FROM users WHERE user_id NOT IN (" +
+                "    SELECT user_id FROM (" +
+                "             SELECT user_id FROM users ORDER BY user_id LIMIT " + maximumUserCount +
+                "    ) AS first_three" +
+                ");");
+    }
+
 
     // Check -----------------------------------------------------------------------------------------------------------
     public boolean checkUserLogin(String userName, String password) {
@@ -741,6 +784,15 @@ public class DBConnection {
         }
 
         return true;
+    }
+
+    public boolean userIdIsAvailable(int userId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT COUNT(*) AS count FROM users WHERE user_id = " + userId +";");
+
+        if(reset.next()) {
+            return reset.getInt("count") > 0;
+        }
+        return false;
     }
 
 

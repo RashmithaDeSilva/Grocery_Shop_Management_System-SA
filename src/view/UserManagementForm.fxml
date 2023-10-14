@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contextUserManagement" prefHeight="513.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.UserManagementFormController">
+<AnchorPane fx:id="contextUserManagement" prefHeight="541.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.UserManagementFormController">
    <children>
       <Button layoutX="837.0" layoutY="41.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
          <font>
@@ -81,5 +81,7 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </Button>
+      <Button fx:id="previewUsersTableBtn" layoutX="581.0" layoutY="493.0" mnemonicParsing="false" onAction="#previewUsersTableOnAction" style="-fx-background-color: #48dbfb;" text="&lt;" />
+      <Button fx:id="nextUsersTableBtn" layoutX="631.0" layoutY="493.0" mnemonicParsing="false" onAction="#nextUsersTableOnAction" style="-fx-background-color: #48dbfb;" text="&gt;" />
    </children>
 </AnchorPane>

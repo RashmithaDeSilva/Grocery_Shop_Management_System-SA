@@ -7,14 +7,18 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import model.staticType.TableTypes;
+import util.features.Features;
+
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.util.Calendar;
 import java.util.Objects;
 
 
-public class Window {
+public class Window extends Features {
     public AnchorPane context;
     private static int userId = 1;
     private static String userName = "Admin";

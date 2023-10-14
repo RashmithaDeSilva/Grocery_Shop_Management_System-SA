@@ -21,16 +21,19 @@ public class LoginFormController extends Window{
         super.context = contextLoginForm;
     }
 
-    public void loginOnActonBtn(ActionEvent actionEvent) {
+    public void loginOnActonBtn(ActionEvent actionEvent) throws IOException {
         DBConnection dbConnection = DBConnection.getInstance();
 
         try {
             if (dbConnection.checkUserLogin(userNameTxt.getText(), passwordTxt.getText())) {
-                int roll = dbConnection.getUserRoll(userNameTxt.getText(), passwordTxt.getText());
+                int roll = dbConnection.getUserRoll(userNameTxt.getText().trim().toLowerCase(),
+                        passwordTxt.getText().trim());
+                System.out.println(roll);
 
                 if(roll > 0 && roll < 4) {
                     new Window().setUserName(userNameTxt.getText());
-                    new Window().setUserId(dbConnection.getUserId(userNameTxt.getText()));
+                    new Window().setUserId(dbConnection.getUserId(userNameTxt.getText().trim().toLowerCase()));
+                    System.out.println(dbConnection.getUserId(userNameTxt.getText().trim().toLowerCase()));
                     new Window().setUserRoll(roll);
                     setUI("DashboardForm");
 
@@ -48,10 +51,8 @@ public class LoginFormController extends Window{
             }
 
         } catch (SQLException e){
+            System.out.println(":");
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
-
-        } catch (IOException e){
-            alert(Alert.AlertType.ERROR, "ERROR", "Dashboard Loading Error", e.getMessage());
         }
     }
 }
