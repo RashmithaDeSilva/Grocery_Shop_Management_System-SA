@@ -50,7 +50,6 @@ public class DBConnection {
 //            double discount, double price, int quantity, boolean edited
 //            System.out.println(getInstance());
 
-            getInstance().getItemTableWithStockAvailable(0);
 
             connection.close();
 
@@ -168,11 +167,29 @@ public class DBConnection {
         }
     }
 
+    public boolean addUser(User user) {
+        String sql = "INSERT INTO users (name, email, password, title) VALUES (?,?,?,?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // Set the values for the placeholders
+            preparedStatement.setString(1, user.getUserName());
+            preparedStatement.setString(2, user.getEmail());
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.setInt(4, user.getTitle());
+
+            // Execute the query
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
 
     // Update ----------------------------------------------------------------------------------------------------------
     public boolean updateItem(Item item) {
         String sql = "UPDATE items SET item_name = ?, user_id = ?, set_or_reset_date = ?, set_or_reset_time = ? " +
-                "WHERE item_id = ?";
+                "WHERE item_id = ?;";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             // Set the values for the placeholders
@@ -194,7 +211,7 @@ public class DBConnection {
         String sql = "UPDATE stock " +
                 "SET user_id = ?, item_id = ?, quantity = ?, refill_quantity = ?, price = ?, " +
                 "selling_price = ?, refill_date = ?, refill_time = ? " +
-                "WHERE stock_id = ?";
+                "WHERE stock_id = ?;";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, stock.getUserId());
@@ -215,7 +232,7 @@ public class DBConnection {
     }
 
     public boolean updateRemoveStock(int stockId, int quantity) {
-        String sql = "UPDATE stock SET quantity = quantity - ? WHERE stock_id = ?";
+        String sql = "UPDATE stock SET quantity = quantity - ? WHERE stock_id = ?;";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, quantity);
@@ -228,16 +245,47 @@ public class DBConnection {
         }
     }
 
-    public void updateAddStock(int stockId, int quantity) {
-        String sql = "UPDATE stock SET quantity = quantity + ? WHERE stock_id = ?";
+    public boolean updateAddStock(int stockId, int quantity) {
+        String sql = "UPDATE stock SET quantity = quantity + ? WHERE stock_id = ?;";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, quantity);
             preparedStatement.setInt(2, stockId);
 
-            preparedStatement.executeUpdate();
+            return preparedStatement.executeUpdate() > 0;
 
         } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean changeUserPassword(int userId, String password) {
+        String sql = "UPDATE users SET password = ? WHERE user_id = ?;";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, password);
+            preparedStatement.setInt(2, userId);
+
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean updateUserDetails(User user) {
+        String sql = "UPDATE users SET user_name = ?, email = ?, password = ? WHERE user_id = ?;";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, user.getUserName());
+            preparedStatement.setString(2, user.getEmail());
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.setInt(4, user.getUserId());
+
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            return false;
         }
     }
 
@@ -250,8 +298,9 @@ public class DBConnection {
         return instance;
     }
 
-    public int getUserRoll(String userName) throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT title FROM users WHERE user_name = '" + userName +"';");
+    public int getUserRoll(String userName, String password) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT title FROM users WHERE user_name = '" + userName +"' " +
+                "AND password = " + password +";");
         return reset.next() ? reset.getInt("title") : -1;
     }
 
@@ -486,6 +535,15 @@ public class DBConnection {
         return -1;
     }
 
+    public String getUserEmail(int userId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT email FROM users WHERE user_id=" + userId +";");
+
+        if(reset.next()) {
+            return reset.getString("email");
+        }
+        return null;
+    }
+
     public int getStockQuantity(int stockId) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT quantity FROM stock WHERE stock_id=" + stockId + ";");
 
@@ -495,6 +553,14 @@ public class DBConnection {
         return -1;
     }
 
+    public String getUserPassword(int userId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT password FROM users WHERE user_id=" + userId + ";");
+
+        if(reset.next()) {
+            return reset.getString("password");
+        }
+        return null;
+    }
 
     public double getIncome(IncomeDayTypes incomeDayTypes, IncomeOrExpensesTypes incomeOrExpensesTypes) throws SQLException {
         String sql = "SELECT ";
@@ -633,6 +699,50 @@ public class DBConnection {
         return false;
     }
 
+    public boolean userNameIsAvailable(String userName, int userId) {
+        String sql = "SELECT COUNT(*) AS count FROM users WHERE user_name = ? AND user_id <> ?;";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, userName);
+            preparedStatement.setInt(2, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()) {
+                if(resultSet.getInt("count") == 0) {
+                    return false;
+                }
+            }
+
+        } catch (SQLException e) {
+            return true;
+        }
+
+        return true;
+    }
+
+    public boolean mailIsAvailable(String mail, int userId) {
+        String sql = "SELECT COUNT(*) AS count FROM users WHERE email = ? AND user_id <> ?;";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, mail);
+            preparedStatement.setInt(2, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()) {
+                if(resultSet.getInt("count") == 0) {
+                    return false;
+                }
+            }
+
+        } catch (SQLException e) {
+            return true;
+        }
+
+        return true;
+    }
+
 
     // Close connection ------------------------------------------------------------------------------------------------
     public void closeConnection() throws SQLException {
@@ -666,5 +776,4 @@ public class DBConnection {
     public static void setPassword(String password) {
         DBConnection.password = password;
     }
-
 }

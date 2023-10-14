@@ -7,7 +7,7 @@ CREATE TABLE users (
     user_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    title INT
+    title INT #     0) Developer    1) Super admin    2) Admin    3) User
 );
 
 INSERT INTO users (user_name, email, password, title)

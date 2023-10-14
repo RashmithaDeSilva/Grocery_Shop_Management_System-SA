@@ -18,7 +18,7 @@ public class Window {
     public AnchorPane context;
     private static int userId = 1;
     private static String userName = "Admin";
-    private static int userRoll = 0;
+    private static int userRoll = 1;
     public DBConnection dbConnection = DBConnection.getInstance();
     private Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
     private Time time = new Time(Calendar.getInstance().getTime().getTime());

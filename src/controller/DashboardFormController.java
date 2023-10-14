@@ -3,6 +3,7 @@ package controller;
 import DB_Connection.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -16,16 +17,16 @@ import java.text.SimpleDateFormat;
 
 public class DashboardFormController extends Window {
     public AnchorPane contextDashboardForm;
-    public Label userNameTxt;
-    public Label incomeTxt;
+    public Label incomeLbl;
+    public Button userNameBtn;
 
 
     public void initialize() throws SQLException {
         super.context = contextDashboardForm;
-        userNameTxt.setText(getUserName());
+        userNameBtn.setText(getUserName());
         double income = dbConnection.getIncome(String.format(new SimpleDateFormat("yyyy-MM-dd")
                 .format(new Date(System.currentTimeMillis()))));
-        incomeTxt.setText(String.valueOf(income >= 0 ? income : 0));
+        incomeLbl.setText("Rs: " + (income >= 0 ? income : 0));
     }
 
     public void sellOnAction(ActionEvent actionEvent) throws IOException {
@@ -33,7 +34,7 @@ public class DashboardFormController extends Window {
     }
 
     public void itemOnAction(ActionEvent actionEvent) throws IOException {
-        if(getUserRoll() == 0 || getUserRoll() == 1) {
+        if(getUserRoll() == 1 || getUserRoll() == 2) {
             setUI("ItemForm");
 
         } else {
@@ -43,7 +44,7 @@ public class DashboardFormController extends Window {
     }
 
     public void stockOnAction(ActionEvent actionEvent) throws IOException {
-        if(getUserRoll() == 0 || getUserRoll() == 1) {
+        if(getUserRoll() == 1 || getUserRoll() == 2) {
                 setUI("StockForm");
 
         } else {
@@ -53,8 +54,8 @@ public class DashboardFormController extends Window {
     }
 
     public void lockerOnAction(ActionEvent actionEvent) throws IOException {
-        if(getUserRoll() == 0) {
-                setUI("LockerForm");
+        if(getUserRoll() == 1) {
+            setUI("LockerForm");
 
         } else {
             alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
@@ -62,14 +63,8 @@ public class DashboardFormController extends Window {
         }
     }
 
-    public void userAccOnAction(MouseEvent mouseEvent) {
-        if(getUserRoll() == 0 || getUserRoll() == 1) {
-
-
-        } else {
-            alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
-                    "Admins accuses only");
-        }
+    public void userAccOnAction(ActionEvent actionEvent) throws IOException {
+        setUI("UserForm");
     }
 
     public void logoutOnAction(ActionEvent actionEvent) throws SQLException, IOException {

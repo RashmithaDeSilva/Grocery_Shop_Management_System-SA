@@ -26,12 +26,21 @@ public class LoginFormController extends Window{
 
         try {
             if (dbConnection.checkUserLogin(userNameTxt.getText(), passwordTxt.getText())) {
-                new Window().setUserName(userNameTxt.getText());
-                new Window().setUserId(dbConnection.getUserId(userNameTxt.getText()));
-                new Window().setUserRoll(dbConnection.getUserRoll(userNameTxt.getText()));
-                setUI("DashboardForm");
-                alert(Alert.AlertType.INFORMATION, "INFORMATION", "Login Successful",
-                        "Welcome " + userNameTxt.getText());
+                int roll = dbConnection.getUserRoll(userNameTxt.getText(), passwordTxt.getText());
+
+                if(roll > 0 && roll < 4) {
+                    new Window().setUserName(userNameTxt.getText());
+                    new Window().setUserId(dbConnection.getUserId(userNameTxt.getText()));
+                    new Window().setUserRoll(roll);
+                    setUI("DashboardForm");
+
+                    alert(Alert.AlertType.INFORMATION, "INFORMATION", "Login Successful",
+                            "Welcome " + userNameTxt.getText());
+
+                } else if (roll == 0) {
+                    System.out.println("DeveloperForm");
+                }
+
 
             } else {
                 alert(Alert.AlertType.ERROR, "ERROR", "Can't Logging",
@@ -41,7 +50,7 @@ public class LoginFormController extends Window{
         } catch (SQLException e){
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
 
-        }  catch (IOException e){
+        } catch (IOException e){
             alert(Alert.AlertType.ERROR, "ERROR", "Dashboard Loading Error", e.getMessage());
         }
     }
