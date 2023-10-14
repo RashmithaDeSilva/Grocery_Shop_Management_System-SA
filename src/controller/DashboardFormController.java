@@ -38,7 +38,7 @@ public class DashboardFormController extends Window {
             setUI("ItemForm");
 
         } else {
-            alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
+            alert(Alert.AlertType.WARNING, "WARNING", "You Can't Accuses",
                     "Admins accuses only");
         }
     }
@@ -48,7 +48,7 @@ public class DashboardFormController extends Window {
                 setUI("StockForm");
 
         } else {
-            alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
+            alert(Alert.AlertType.WARNING, "WARNING", "You Can't Accuses",
                     "Admins accuses only");
         }
     }
@@ -58,7 +58,7 @@ public class DashboardFormController extends Window {
             setUI("LockerForm");
 
         } else {
-            alert(Alert.AlertType.ERROR, "ERROR", "You Can't Accuses",
+            alert(Alert.AlertType.WARNING, "WARNING", "You Can't Accuses",
                     "Super admin can only accuses");
         }
     }

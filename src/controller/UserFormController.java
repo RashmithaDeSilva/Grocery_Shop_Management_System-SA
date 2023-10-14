@@ -109,6 +109,12 @@ public class UserFormController extends Window {
     }
 
     public void userManagementOnAction(ActionEvent actionEvent) throws IOException {
-        setUI("UserManagementForm");
+        if(super.getUserRoll() == 1 || super.getUserRoll() == 2){
+            setUI("UserManagementForm");
+
+        } else {
+            alert(Alert.AlertType.WARNING, "WARNING", "You Can't Accuses",
+                    "Admins accuses only");
+        }
     }
 }
