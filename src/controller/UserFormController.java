@@ -108,6 +108,7 @@ public class UserFormController extends Window {
         }
     }
 
-    public void addUsersOnAction(ActionEvent actionEvent) {
+    public void userManagementOnAction(ActionEvent actionEvent) throws IOException {
+        setUI("UserManagementForm");
     }
 }

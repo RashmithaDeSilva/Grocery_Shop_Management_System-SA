@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.UserManagementFormController">
+   <children>
+      <Button layoutX="687.0" layoutY="61.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Button>
+      <Separator layoutX="50.0" layoutY="121.0" prefHeight="0.0" prefWidth="739.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" />
+      <Label layoutX="50.0" layoutY="52.0" prefHeight="54.0" prefWidth="337.0" text="User Management">
+         <font>
+            <Font name="System Bold" size="36.0" />
+         </font>
+      </Label>
+      <Button layoutX="557.0" layoutY="61.0" mnemonicParsing="false" onAction="#addUsersOnAction" style="-fx-background-color: #48dbfb;" text="User Profile">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>
