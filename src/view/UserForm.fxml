@@ -54,7 +54,7 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Button layoutX="552.0" layoutY="348.0" mnemonicParsing="false" onAction="#saveOnAction" style="-fx-background-color: #1dd1a1;" text="Save">
+      <Button layoutX="532.0" layoutY="348.0" mnemonicParsing="false" onAction="#saveOnAction" style="-fx-background-color: #feca57;" text="Update">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -62,7 +62,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button layoutX="460.0" layoutY="348.0" mnemonicParsing="false" onAction="#resetOnAction" style="-fx-background-color: #ff6b6b;" text="Reset">
+      <Button layoutX="440.0" layoutY="348.0" mnemonicParsing="false" onAction="#resetOnAction" style="-fx-background-color: #ff6b6b;" text="Reset">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
