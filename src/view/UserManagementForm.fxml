@@ -11,9 +11,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contextUserManagement" prefHeight="541.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.UserManagementFormController">
+<AnchorPane fx:id="contextUserManagement" prefHeight="541.0" prefWidth="973.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.UserManagementFormController">
    <children>
-      <Button layoutX="837.0" layoutY="41.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
+      <Button layoutX="860.0" layoutY="40.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -24,7 +24,7 @@
             <Font name="System Bold" size="36.0" />
          </font>
       </Label>
-      <Button layoutX="707.0" layoutY="41.0" mnemonicParsing="false" onAction="#userProfileOnAction" style="-fx-background-color: #48dbfb;" text="User Profile">
+      <Button layoutX="730.0" layoutY="40.0" mnemonicParsing="false" onAction="#userProfileOnAction" style="-fx-background-color: #48dbfb;" text="User Profile">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -49,7 +49,7 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </PasswordField>
-      <Button layoutX="162.0" layoutY="445.0" mnemonicParsing="false" onAction="#addOrUpdateUsersOnAction" style="-fx-background-color: #1dd1a1;" text="Add User">
+      <Button fx:id="addOrUpdateBtn" layoutX="162.0" layoutY="445.0" mnemonicParsing="false" onAction="#addOrUpdateUsersOnAction" style="-fx-background-color: #1dd1a1;" text="Add User">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -61,22 +61,22 @@
       </Button>
       <Separator layoutX="280.0" layoutY="118.0" orientation="VERTICAL" prefHeight="363.0" prefWidth="7.0" />
       <ComboBox fx:id="userAccessesCmb" layoutX="40.0" layoutY="369.0" prefHeight="38.0" prefWidth="213.0" />
-      <TableView fx:id="userTbl" layoutX="300.0" layoutY="193.0" prefHeight="286.0" prefWidth="610.0">
+      <TableView fx:id="userTbl" layoutX="300.0" layoutY="193.0" prefHeight="286.0" prefWidth="634.0">
         <columns>
           <TableColumn fx:id="idCol" prefWidth="84.79998779296875" text="User ID" />
           <TableColumn fx:id="nameCol" prefWidth="129.60003662109375" text="Name" />
             <TableColumn fx:id="emailCol" prefWidth="182.39990234375" text="Email" />
             <TableColumn fx:id="rollCol" prefWidth="100.800048828125" text="Roll" />
-            <TableColumn fx:id="deleteCol" prefWidth="91.2000732421875" text="Delete" />
+            <TableColumn fx:id="deleteCol" prefWidth="108.800048828125" text="Banned" />
         </columns>
       </TableView>
-      <TextField fx:id="searchTxt" layoutX="485.0" layoutY="132.0" prefHeight="38.0" prefWidth="326.0">
+      <TextField fx:id="searchTxt" layoutX="485.0" layoutY="132.0" prefHeight="38.0" prefWidth="349.0">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </TextField>
       <ComboBox fx:id="searchUserAccessesCmb" layoutX="300.0" layoutY="132.0" onAction="#searchUserAccessesOnAction" prefHeight="38.0" prefWidth="166.0" />
-      <Button layoutX="831.0" layoutY="132.0" mnemonicParsing="false" onAction="#refreshOnAction" style="-fx-background-color: #48dbfb;" text="Refresh">
+      <Button layoutX="854.0" layoutY="131.0" mnemonicParsing="false" onAction="#refreshOnAction" style="-fx-background-color: #48dbfb;" text="Refresh">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>

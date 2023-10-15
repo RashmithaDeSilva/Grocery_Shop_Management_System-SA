@@ -48,7 +48,7 @@ public class DBConnection {
 //            }
 //            int sellId, int billNumber, int userId, int itemId, Date sellDate, Time sellTime,
 //            double discount, double price, int quantity, boolean edited
-//            System.out.println(getInstance());
+            getInstance().bandUser(3);
 
 
             connection.close();
@@ -764,6 +764,27 @@ public class DBConnection {
         return true;
     }
 
+    public boolean userNameIsAvailable(String userName) {
+        String sql = "SELECT COUNT(*) AS count FROM users WHERE user_name = ?;";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, userName);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()) {
+                if(resultSet.getInt("count") == 0) {
+                    return false;
+                }
+            }
+
+        } catch (SQLException e) {
+            return true;
+        }
+
+        return true;
+    }
+
     public boolean mailIsAvailable(String mail, int userId) {
         String sql = "SELECT COUNT(*) AS count FROM users WHERE email = ? AND user_id <> ?;";
 
@@ -784,6 +805,45 @@ public class DBConnection {
         }
 
         return true;
+    }
+
+    public boolean mailIsAvailable(String mail) {
+        String sql = "SELECT COUNT(*) AS count FROM users WHERE email = ?;";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, mail);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()) {
+                if(resultSet.getInt("count") == 0) {
+                    return false;
+                }
+            }
+
+        } catch (SQLException e) {
+            return true;
+        }
+
+        return true;
+    }
+
+    public boolean bandUser(int userId) throws SQLException {
+        int reset = stm.executeUpdate("UPDATE users SET title = 4 WHERE user_id = " + userId + ";");
+
+        if(reset > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean unbannedUser(int userId) throws SQLException {
+        int reset = stm.executeUpdate("UPDATE users SET title = 3 WHERE user_id = " + userId + ";");
+
+        if(reset > 0) {
+            return true;
+        }
+        return false;
     }
 
     public boolean userIdIsAvailable(int userId) throws SQLException {
@@ -828,4 +888,5 @@ public class DBConnection {
     public static void setPassword(String password) {
         DBConnection.password = password;
     }
+
 }

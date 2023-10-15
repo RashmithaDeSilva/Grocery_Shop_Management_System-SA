@@ -28,12 +28,10 @@ public class LoginFormController extends Window{
             if (dbConnection.checkUserLogin(userNameTxt.getText(), passwordTxt.getText())) {
                 int roll = dbConnection.getUserRoll(userNameTxt.getText().trim().toLowerCase(),
                         passwordTxt.getText().trim());
-                System.out.println(roll);
 
                 if(roll > 0 && roll < 4) {
                     new Window().setUserName(userNameTxt.getText());
                     new Window().setUserId(dbConnection.getUserId(userNameTxt.getText().trim().toLowerCase()));
-                    System.out.println(dbConnection.getUserId(userNameTxt.getText().trim().toLowerCase()));
                     new Window().setUserRoll(roll);
                     setUI("DashboardForm");
 
@@ -42,6 +40,10 @@ public class LoginFormController extends Window{
 
                 } else if (roll == 0) {
                     System.out.println("DeveloperForm");
+
+                } else {
+                    alert(Alert.AlertType.WARNING, "WARNING", "Can't Accesses",
+                            "You are Banned in this system, you can't accesses");
                 }
 
 
@@ -51,7 +53,6 @@ public class LoginFormController extends Window{
             }
 
         } catch (SQLException e){
-            System.out.println(":");
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
