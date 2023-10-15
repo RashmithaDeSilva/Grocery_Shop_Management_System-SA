@@ -19,6 +19,9 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import static model.staticType.RefillTableTypes.ITEMS;
+import static model.staticType.RefillTableTypes.REFILL_STOCK;
+
 
 public class UserManagementFormController extends Window {
     public AnchorPane contextUserManagement;
@@ -333,7 +336,7 @@ public class UserManagementFormController extends Window {
                                         previewUsersTableBtn.setDisable(true);
 
                                         resetOnAction(actionEvent);
-                                        setDataIntoUsersTable();
+                                        refreshOnAction(actionEvent);
 
                                         alert(Alert.AlertType.INFORMATION, "INFORMATION",
                                                 "Successfully Added User",
@@ -414,17 +417,73 @@ public class UserManagementFormController extends Window {
         setDataIntoUsersTable();
     }
 
-    public void searchUserAccessesOnAction(ActionEvent actionEvent) {
-
-    }
-
     public void refreshOnAction(ActionEvent actionEvent) {
+        try {
+            userTableDataCount = dbConnection.getTableRowCount(TableTypes.USER_TABLE);
+            loadedRowCountUsers = 0;
 
+            if(userTableDataCount < 25 && userTableDataCount > 0) {
+                nextUsersTableBtn.setDisable(true);
+            }
+            users = dbConnection.getUsersTable(loadedRowCountUsers);
+            previewUsersTableBtn.setDisable(true);
+
+            setDataIntoUsersTable();
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
     }
 
     public void previewUsersTableOnAction(ActionEvent actionEvent) {
+        try {
+            previewUsersTableBtn.setDisable(true);
+            if(users != null && !users.isEmpty()) {
+                if((loadedRowCountUsers - 25) >= 0) {
+                    loadedRowCountUsers -= 25;
+                    users = dbConnection.getUsersTable(loadedRowCountUsers);
+                    setDataIntoUsersTable();
+                    nextUsersTableBtn.setDisable(false);
+
+                    if((loadedRowCountUsers - 25) >= 0) {
+                        previewUsersTableBtn.setDisable(false);
+                    }
+                }
+            }
+            if(!searchTxt.getText().isEmpty()) {
+                String search = searchTxt.getText();
+                searchTxt.clear();
+                searchTxt.setText(search);
+            }
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
     }
 
     public void nextUsersTableOnAction(ActionEvent actionEvent) {
+        try {
+            nextUsersTableBtn.setDisable(true);
+            if(users != null && !users.isEmpty()) {
+                if((loadedRowCountUsers + 25) < userTableDataCount) {
+                    loadedRowCountUsers += 25;
+                    users = dbConnection.getUsersTable(loadedRowCountUsers);
+                    setDataIntoUsersTable();
+                    previewUsersTableBtn.setDisable(false);
+
+                    if((loadedRowCountUsers + 25) < userTableDataCount) {
+                        nextUsersTableBtn.setDisable(false);
+                    }
+                }
+            }
+            if(!searchTxt.getText().isEmpty()) {
+                String search = searchTxt.getText();
+                searchTxt.clear();
+                searchTxt.setText(search);
+            }
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
     }
 }
