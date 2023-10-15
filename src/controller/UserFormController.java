@@ -2,6 +2,7 @@ package controller;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -10,6 +11,7 @@ import model.Window;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Optional;
 
 
 public class UserFormController extends Window {
@@ -49,18 +51,29 @@ public class UserFormController extends Window {
                 if(super.getUserRoll() == 1 || super.getUserRoll() == 2) {
                     if(!dbConnection.userNameIsAvailable(nameTxt.getText().trim().toLowerCase(), super.getUserId())) {
                         if(!dbConnection.mailIsAvailable(nameTxt.getText().trim().toLowerCase(), super.getUserId())) {
-                            if(dbConnection.updateUserDetails(new User(super.getUserId(),
-                                    nameTxt.getText().trim().toLowerCase(), mailTxt.getText().trim().toLowerCase(),
-                                    password))) {
 
-                                setUI("LoginForm");
-                                alert(Alert.AlertType.INFORMATION, "INFORMATION",
-                                        "Successfully Update",
-                                        "Your new user details is update");
+                            Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                            confirmationAlert.initOwner(this.contextUserProfile.getScene().getWindow());
+                            confirmationAlert.setTitle("CONFIRMATION");
+                            confirmationAlert.setHeaderText("Are you sure you want to continue?");
+                            confirmationAlert.setContentText("Click OK to proceed or Cancel to abort.");
 
-                            } else {
-                                alert(Alert.AlertType.WARNING, "WARNING", "Database Connection Error",
-                                        "User details is not updated try again");
+                            Optional<ButtonType> result = confirmationAlert.showAndWait();
+
+                            if (result.isPresent() && result.get().equals(ButtonType.OK)) {
+                                if(dbConnection.updateUserDetails(new User(super.getUserId(),
+                                        nameTxt.getText().trim().toLowerCase(), mailTxt.getText().trim().toLowerCase(),
+                                        password))) {
+
+                                    setUI("LoginForm");
+                                    alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                                            "Successfully Update",
+                                            "Your new user details is update");
+
+                                } else {
+                                    alert(Alert.AlertType.WARNING, "WARNING", "Database Connection Error",
+                                            "User details is not updated try again");
+                                }
                             }
 
                         } else {

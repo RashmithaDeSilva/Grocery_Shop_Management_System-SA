@@ -24,7 +24,6 @@ public class AppInitializer extends Application {
         primaryStage.setScene(new Scene(FXMLLoader.load
                 (Objects.requireNonNull(getClass().getResource("./view/DashboardForm.fxml")))
         ));
-        primaryStage.centerOnScreen();
         primaryStage.setResizable(false);
         primaryStage.setTitle("POS System");
         primaryStage.setOnCloseRequest(event -> {
