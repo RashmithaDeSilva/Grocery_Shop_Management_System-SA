@@ -420,24 +420,14 @@ public class StockFormController extends Window {
 
         stockTbl.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null) {
-                try {
-                    setRowDataIntoInputs(newValue);
-                    selectedStockId = newValue.getStockId();
-
-                } catch (SQLException e) {
-                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
-                }
+                setRowDataIntoInputs(newValue);
+                selectedStockId = newValue.getStockId();
             }
         });
 
         refillTbl.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null) {
-                try {
-                    setRowDataIntoInputs(newValue);
-
-                } catch (SQLException e) {
-                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
-                }
+                setRowDataIntoInputs(newValue);
             }
         });
     }

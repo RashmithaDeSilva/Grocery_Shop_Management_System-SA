@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import model.Stock;
 import model.Window;
 import model.staticType.TableTypes;
 import model.tableRows.userManagerWindow.User;
@@ -13,7 +14,10 @@ import model.tableRows.userManagerWindow.User;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 
 public class UserManagementFormController extends Window {
@@ -37,6 +41,7 @@ public class UserManagementFormController extends Window {
     private ArrayList<model.User> users;
     private int loadedRowCountUsers = 0;
     private int userTableDataCount;
+    private String searchText = "";
 
 
     public void initialize() throws IOException {
@@ -68,6 +73,30 @@ public class UserManagementFormController extends Window {
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
+
+        searchUserAccessesCmb.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    if(searchUserAccessesCmb.getValue() != null) {
+                        String search = searchTxt.getText();
+                        searchTxt.clear();
+                        searchTxt.setText(search);
+                    }
+                });
+
+        // Search stock
+        searchTxt.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null && users != null && !users.isEmpty()) {
+                searchText = searchTxt.getText();
+                setDataIntoUsersTable();
+            }
+        });
+
+//        stockTbl.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+//            if(newValue != null) {
+//                setRowDataIntoInputs(newValue);
+//                selectedStockId = newValue.getStockId();
+//            }
+//        });
     }
 
     private void setDataIntoUsersTable() {
@@ -76,22 +105,78 @@ public class UserManagementFormController extends Window {
         if(users != null && !users.isEmpty()) {
             for (model.User u : users) {
                 if(u.getTitle() != 0) {
-                    if(super.getUserRoll() == 2 && u.getTitle() >= 2) {
-                        obList.add(new User(u.getUserId(), u.getUserName(), u.getEmail(),
-                                u.getTitle() == 2 ? "Admin" : u.getTitle() == 3 ? "User": "Banned",
-                                getBannedUnbannedButton(u.getUserId())));
 
-                    } else if (super.getUserRoll() == 1) {
-                        obList.add(new User(u.getUserId(), u.getUserName(), u.getEmail(),
-                                u.getTitle() == 1 ? "Super Admin" : u.getTitle() == 2 ? "Admin" :
-                                        u.getTitle() == 3 ? "User": "Banned",
-                                getBannedUnbannedButton(u.getUserId())));
+                    String title = u.getTitle() == 1 ? "Super Admin" : u.getTitle() == 2 ? "Admin" :
+                            u.getTitle() == 3 ? "User" : "Banned";
+                    User user = getUserForTable(u);
+
+                    switch (searchUserAccessesCmb.getValue()) {
+                        case "User ID":
+                            if(Integer.toString(u.getUserId()).contains(searchText)) {
+                                if(user != null) {
+                                    obList.add(user);
+                                }
+                            }
+                            break;
+
+                        case "Name":
+                            if(Objects.requireNonNull(u.getUserName().toLowerCase()).
+                                    contains(searchText.toLowerCase())) {
+                                if(user != null) {
+                                    obList.add(user);
+                                }
+                            }
+                            break;
+
+                        case "Email":
+                            if(Objects.requireNonNull(u.getEmail()).contains(searchText)) {
+                                if(user != null) {
+                                    obList.add(user);
+                                }
+                            }
+                            break;
+
+                        case "Roll":
+                            if(title.toLowerCase().contains(searchText.toLowerCase())) {
+                                if(user != null) {
+                                    obList.add(user);
+                                }
+                            }
+                            break;
+
+                        default:
+                            if(Integer.toString(u.getUserId()).contains(searchText) ||
+                                    Objects.requireNonNull(u.getUserName().toLowerCase()).
+                                            contains(searchText.toLowerCase()) ||
+                                    Objects.requireNonNull(u.getEmail()).contains(searchText) ||
+                                    title.toLowerCase().contains(searchText.toLowerCase())) {
+                                if(user != null) {
+                                    obList.add(user);
+                                }
+                            }
+                            break;
                     }
                 }
             }
 
             userTbl.setItems(obList);
         }
+    }
+
+    private User getUserForTable(model.User u) {
+        if(super.getUserRoll() == 2 && u.getTitle() >= 2) {
+            return new User(u.getUserId(), u.getUserName(), u.getEmail(),
+                    u.getTitle() == 2 ? "Admin" : u.getTitle() == 3 ? "User": "Banned",
+                    getBannedUnbannedButton(u.getUserId()));
+
+        } else if (super.getUserRoll() == 1) {
+            return new User(u.getUserId(), u.getUserName(), u.getEmail(),
+                    u.getTitle() == 1 ? "Super Admin" : u.getTitle() == 2 ? "Admin" :
+                            u.getTitle() == 3 ? "User": "Banned",
+                    getBannedUnbannedButton(u.getUserId()));
+        }
+
+        return null;
     }
 
     private Button getBannedUnbannedButton(int userId) {
@@ -136,9 +221,10 @@ public class UserManagementFormController extends Window {
                                 alert(Alert.AlertType.ERROR, "ERROR", "Can't Banned",
                                         "This user can not Banned");
                             }
+
                         } catch (SQLException ex) {
-                            alert(Alert.AlertType.ERROR, "ERROR", "Can't Banned",
-                                    "This user can not Banned");
+                            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                                    ex.getMessage());
                         }
                     }
                 });
@@ -175,9 +261,10 @@ public class UserManagementFormController extends Window {
                                 alert(Alert.AlertType.ERROR, "ERROR", "Can't Unbanned",
                                         "This user can not Unbanned");
                             }
+
                         } catch (SQLException ex) {
-                            alert(Alert.AlertType.ERROR, "ERROR", "Can't Unbanned",
-                                    "This user can not Unbanned");
+                            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                                    ex.getMessage());
                         }
                     }
                 });
@@ -212,27 +299,22 @@ public class UserManagementFormController extends Window {
                                         userAccessesCmb.getValue().equalsIgnoreCase("admin") ? 2 : 3))){
 
                                     userTableDataCount +=1;
-                                    try {
-                                        if(userTableDataCount < 25 && userTableDataCount > 0) {
-                                            nextUsersTableBtn.setDisable(true);
-                                        }
-                                        users = dbConnection.getUsersTable(loadedRowCountUsers);
-                                        previewUsersTableBtn.setDisable(true);
-
-                                        resetOnAction(actionEvent);
-                                        setDataIntoUsersTable();
-
-                                    } catch (SQLException e) {
-                                        alert(Alert.AlertType.ERROR, "ERROR",
-                                                "Database Connection Error", e.getMessage());
+                                    if(userTableDataCount < 25 && userTableDataCount > 0) {
+                                        nextUsersTableBtn.setDisable(true);
                                     }
+                                    users = dbConnection.getUsersTable(loadedRowCountUsers);
+                                    previewUsersTableBtn.setDisable(true);
 
-                                    alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successfully Added User",
+                                    resetOnAction(actionEvent);
+                                    setDataIntoUsersTable();
+
+                                    alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                                            "Successfully Added User",
                                             "Successfully added user into database");
 
                                 } else {
-                                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
-                                            "Try again");
+                                    alert(Alert.AlertType.WARNING, "WARNING",
+                                            "User Didn't Added", "Try again");
                                 }
 
                             } else {
@@ -278,9 +360,11 @@ public class UserManagementFormController extends Window {
     }
 
     public void searchUserAccessesOnAction(ActionEvent actionEvent) {
+
     }
 
     public void refreshOnAction(ActionEvent actionEvent) {
+
     }
 
     public void previewUsersTableOnAction(ActionEvent actionEvent) {
