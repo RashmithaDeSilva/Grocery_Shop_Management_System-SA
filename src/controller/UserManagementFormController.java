@@ -42,6 +42,7 @@ public class UserManagementFormController extends Window {
     private int loadedRowCountUsers = 0;
     private int userTableDataCount;
     private String searchText = "";
+    private int selectedUserId = -1;
 
 
     public void initialize() throws IOException {
@@ -91,12 +92,26 @@ public class UserManagementFormController extends Window {
             }
         });
 
-//        stockTbl.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-//            if(newValue != null) {
-//                setRowDataIntoInputs(newValue);
-//                selectedStockId = newValue.getStockId();
-//            }
-//        });
+        userTbl.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null) {
+                selectedUserId = newValue.getUserId();
+                setRowDataIntoInputs(newValue);
+            }
+        });
+    }
+
+    private void setRowDataIntoInputs(User newValue) {
+        if(super.getUserId() != newValue.getUserId() && newValue.getUserId() != 1) {
+            nameTxt.setText(newValue.getName());
+            emailTxt.setText(newValue.getEmail());
+            userAccessesCmb.setValue(newValue.getRoll().equalsIgnoreCase("admin") ? "Admin" : "User");
+            addOrUpdateBtn.setText("Update");
+            addOrUpdateBtn.setStyle("-fx-background-color: #feca57;");
+
+        } else {
+            alert(Alert.AlertType.WARNING, "WARNING", "Use User Profile",
+                    "Use user profile to update your profile");
+        }
     }
 
     private void setDataIntoUsersTable() {
@@ -289,32 +304,71 @@ public class UserManagementFormController extends Window {
     public void addOrUpdateUsersOnAction(ActionEvent actionEvent) {
         try {
             if(userTableDataCount+1 <= super.getMaximumUserCount()) {
-                if(!dbConnection.userNameIsAvailable(nameTxt.getText().trim().toLowerCase())) {
-                    if(!dbConnection.mailIsAvailable(emailTxt.getText().trim().toLowerCase())) {
-                        if(passwordTxt.getText().trim().equals(conformPasswordTxt.getText().trim()) &&
-                                !passwordTxt.getText().isEmpty() && !conformPasswordTxt.getText().isEmpty()) {
-                            if(!userAccessesCmb.getValue().equalsIgnoreCase("User Roll")) {
-                                if(dbConnection.addUser(new model.User(nameTxt.getText().trim().toLowerCase(),
-                                        emailTxt.getText().trim().toLowerCase(), passwordTxt.getText().trim(),
-                                        userAccessesCmb.getValue().equalsIgnoreCase("admin") ? 2 : 3))){
+                String name = nameTxt.getText().trim().toLowerCase();
+                String email = emailTxt.getText().trim().toLowerCase();
+                String password = passwordTxt.getText().trim();
+                String conformPassword = conformPasswordTxt.getText().trim();
+                String roll = userAccessesCmb.getValue();
+                int rollNumber = roll.equalsIgnoreCase("admin") ? 2 : 3;
 
-                                    userTableDataCount +=1;
-                                    if(userTableDataCount < 25 && userTableDataCount > 0) {
-                                        nextUsersTableBtn.setDisable(true);
+                if(!name.isEmpty() && !dbConnection.userNameIsAvailable(name) ||
+                        addOrUpdateBtn.getText().equalsIgnoreCase("update") &&
+                                !dbConnection.userNameIsAvailable(name, selectedUserId)) {
+                    if(!email.isEmpty() &&!dbConnection.mailIsAvailable(email) ||
+                            addOrUpdateBtn.getText().equalsIgnoreCase("update") &&
+                                    !dbConnection.mailIsAvailable(email, selectedUserId)) {
+                        if(!password.isEmpty() && !conformPassword.isEmpty() && password.equals(conformPassword) ||
+                                addOrUpdateBtn.getText().equalsIgnoreCase("update") &&
+                                        password.equals(conformPassword)) {
+                            if(!roll.equalsIgnoreCase("User Roll")) {
+                                if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
+
+                                    if(dbConnection.addUser(new model.User(name, email, password, rollNumber))){
+
+                                        userTableDataCount +=1;
+                                        if(userTableDataCount < 25 && userTableDataCount > 0) {
+                                            nextUsersTableBtn.setDisable(true);
+                                        }
+                                        users = dbConnection.getUsersTable(loadedRowCountUsers);
+                                        previewUsersTableBtn.setDisable(true);
+
+                                        resetOnAction(actionEvent);
+                                        setDataIntoUsersTable();
+
+                                        alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                                                "Successfully Added User",
+                                                "Successfully added user into database");
+
+                                    } else {
+                                        alert(Alert.AlertType.WARNING, "WARNING",
+                                                "User Didn't Added", "Try again");
                                     }
-                                    users = dbConnection.getUsersTable(loadedRowCountUsers);
-                                    previewUsersTableBtn.setDisable(true);
 
-                                    resetOnAction(actionEvent);
-                                    setDataIntoUsersTable();
+                                } else if (addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
 
-                                    alert(Alert.AlertType.INFORMATION, "INFORMATION",
-                                            "Successfully Added User",
-                                            "Successfully added user into database");
+                                    if(dbConnection.updateAllUserDetails(new model.User(selectedUserId, name, email,
+                                            password.isEmpty() ? dbConnection.getUserPassword(selectedUserId) :
+                                                    password, rollNumber))){
 
-                                } else {
-                                    alert(Alert.AlertType.WARNING, "WARNING",
-                                            "User Didn't Added", "Try again");
+                                        users.forEach((u) -> {
+                                            if(u.getUserId() == selectedUserId) {
+                                                u.setUserName(name);
+                                                u.setEmail(email);
+                                                u.setTitle(rollNumber);
+                                            }
+                                        });
+
+                                        resetOnAction(actionEvent);
+                                        setDataIntoUsersTable();
+
+                                        alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                                                "Successfully Update User",
+                                                "Successfully update user in database");
+
+                                    } else {
+                                        alert(Alert.AlertType.WARNING, "WARNING",
+                                                "User Didn't Update", "Try again");
+                                    }
                                 }
 
                             } else {
@@ -329,12 +383,12 @@ public class UserManagementFormController extends Window {
 
                     }else {
                         alert(Alert.AlertType.WARNING, "WARNING", "Email Can't Use",
-                                "This email is already use try again with another email");
+                                "This email is already use or empty try again with another email");
                     }
 
                 } else {
                     alert(Alert.AlertType.WARNING, "WARNING", "User Name Can't Use",
-                            "This user name is already use try again with another name");
+                            "This user name is already use or empty try again with another name");
                 }
 
             } else {
@@ -349,6 +403,7 @@ public class UserManagementFormController extends Window {
     }
 
     public void resetOnAction(ActionEvent actionEvent) {
+        selectedUserId = -1;
         nameTxt.clear();
         emailTxt.clear();
         passwordTxt.clear();
@@ -356,7 +411,7 @@ public class UserManagementFormController extends Window {
         userAccessesCmb.setValue("User Roll");
         addOrUpdateBtn.setText("Add User");
         addOrUpdateBtn.setStyle("-fx-background-color:  #1dd1a1;");
-
+        setDataIntoUsersTable();
     }
 
     public void searchUserAccessesOnAction(ActionEvent actionEvent) {

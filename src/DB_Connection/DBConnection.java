@@ -48,8 +48,6 @@ public class DBConnection {
 //            }
 //            int sellId, int billNumber, int userId, int itemId, Date sellDate, Time sellTime,
 //            double discount, double price, int quantity, boolean edited
-            getInstance().bandUser(3);
-
 
             connection.close();
 
@@ -237,6 +235,19 @@ public class DBConnection {
         preparedStatement.setString(2, user.getEmail());
         preparedStatement.setString(3, user.getPassword());
         preparedStatement.setInt(4, user.getUserId());
+
+        return preparedStatement.executeUpdate() > 0;
+    }
+
+    public boolean updateAllUserDetails(User user) throws SQLException {
+        String sql = "UPDATE users SET user_name = ?, email = ?, password = ?, title = ? WHERE user_id = ?;";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, user.getUserName());
+        preparedStatement.setString(2, user.getEmail());
+        preparedStatement.setString(3, user.getPassword());
+        preparedStatement.setInt(4, user.getTitle());
+        preparedStatement.setInt(5, user.getUserId());
 
         return preparedStatement.executeUpdate() > 0;
     }

@@ -42,8 +42,7 @@ public class UserFormController extends Window {
     public void saveOnAction(ActionEvent actionEvent) throws IOException {
         try {
             if(newPasswordTxt.getText().trim().equals(conformPasswordTxt.getText().trim())) {
-                String password = null;
-                password = newPasswordTxt.getText().trim().isEmpty() ||
+                String password = newPasswordTxt.getText().trim().isEmpty() ||
                         conformPasswordTxt.getText().trim().isEmpty() ?
                         dbConnection.getUserPassword(super.getUserId()) : newPasswordTxt.getText().trim();
 
