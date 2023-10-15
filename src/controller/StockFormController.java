@@ -492,40 +492,28 @@ public class StockFormController extends Window {
                 try {
                     if (response == ButtonType.YES) {
                         if(dbConnection.deleteStock(stockId)) {
-                            try {
-                                for (Stock s : stocks) {
-                                    if(s.getStockId() == stockId) {
-                                        stocks.remove(s);
-                                        dbConnection.addLog(new Log(super.getUserId(), "Remove damage stock in STOCK ID: " +
-                                                stockId +" and ITEM NAME: " + dbConnection.getItemName(s.getItemId()) +
-                                                ", QUANTITY:" + s.getQuantity(), 3, super.getDate(), super.getTime(),
-                                                (s.getQuantity() * s.getPrice()), 6));
-                                        break;
-                                    }
+                            for (Stock s : stocks) {
+                                if(s.getStockId() == stockId) {
+                                    dbConnection.addLog(new Log(super.getUserId(),
+                                            "Remove damage stock in STOCK ID: " + stockId +
+                                                    " and ITEM NAME: " + dbConnection.getItemName(s.getItemId()) +
+                                            ", QUANTITY:" + s.getQuantity(), 3, super.getDate(),
+                                            super.getTime(), (s.getQuantity() * s.getPrice()), 6));
+                                    stocks.remove(s);
+                                    break;
                                 }
-                                setDataIntoStockTable();
-
-                                for (Stock s : refillStocks) {
-                                    if(s.getStockId() == stockId) {
-                                        stocks.remove(s);
-                                        break;
-                                    }
-                                }
-
-                                if(showAllItemsCheckBx.isSelected()) {
-                                    setDataIntoRefillStockTable(ITEMS);
-
-                                } else {
-                                    setDataIntoRefillStockTable(REFILL_STOCK);
-                                }
-
-                                alert(Alert.AlertType.INFORMATION, "INFORMATION", "Delete Successful",
-                                        "Delete successfully stock id = " + stockId);
-
-                            } catch (SQLException ex) {
-                                alert(Alert.AlertType.ERROR, "ERROR", "Data Reload Error",
-                                        "Cant reload data in table");
                             }
+                            setDataIntoStockTable();
+
+                            if(showAllItemsCheckBx.isSelected()) {
+                                setDataIntoRefillStockTable(ITEMS);
+
+                            } else {
+                                setDataIntoRefillStockTable(REFILL_STOCK);
+                            }
+
+                            alert(Alert.AlertType.INFORMATION, "INFORMATION", "Delete Successful",
+                                    "Delete successfully stock id = " + stockId);
 
                         } else {
                             alert(Alert.AlertType.ERROR, "ERROR", "Can't Delete",

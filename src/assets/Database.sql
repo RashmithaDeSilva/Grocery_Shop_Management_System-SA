@@ -54,16 +54,12 @@ CREATE TABLE stock (
 CREATE TABLE sells (
    sale_id INT AUTO_INCREMENT PRIMARY KEY,
    bill_number INT,
-   user_id INT,
    item_id INT,
-   sale_date DATE,
-   sale_time TIME,
    discount DECIMAL(10, 2),
    sale_amount DECIMAL(10, 2),
    quantity INT,
    edit BIT,
    FOREIGN KEY (bill_number) REFERENCES bills(bill_number),
-   FOREIGN KEY (user_id) REFERENCES users(user_id),
    FOREIGN KEY (item_id) REFERENCES items(item_id)
 );
 

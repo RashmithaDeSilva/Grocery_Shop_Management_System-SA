@@ -1,14 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controller.SellLogFormController"
-            prefHeight="400.0" prefWidth="600.0">
-
+<AnchorPane fx:id="contextSellLogForm" prefHeight="937.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SellLogFormController">
+   <children>
+      <Label layoutX="40.0" layoutY="35.0" text="Sell Log">
+         <font>
+            <Font name="System Bold" size="36.0" />
+         </font>
+      </Label>
+      <Separator layoutX="40.0" layoutY="98.0" prefHeight="4.0" prefWidth="709.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" />
+      <Button layoutX="687.0" layoutY="43.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button layoutX="601.0" layoutY="43.0" mnemonicParsing="false" onAction="#sellsOnAction" style="-fx-background-color: #48dbfb;" text="Sells">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <TableView layoutX="34.0" layoutY="183.0" onSort="#billTbl" prefHeight="226.0" prefWidth="730.0">
+        <columns>
+          <TableColumn fx:id="billNumberCol" prefWidth="88.00000381469727" text="Bill number" />
+          <TableColumn fx:id="userNameCol" prefWidth="132.7999725341797" text="User name" />
+            <TableColumn fx:id="discountBillTableCol" prefWidth="93.5999755859375" text="Discount" />
+            <TableColumn fx:id="priceBillTableCol" prefWidth="92.79998779296875" text="Price" />
+            <TableColumn fx:id="dateCol" prefWidth="104.0" text="Date" />
+            <TableColumn fx:id="timeCol" prefWidth="106.4000244140625" text="Time" />
+            <TableColumn fx:id="deleteBillTableCol" prefWidth="88.0" text="Delete" />
+        </columns>
+      </TableView>
+      <TableView fx:id="sellsTbl" layoutX="40.0" layoutY="501.0" prefHeight="226.0" prefWidth="730.0">
+        <columns>
+          <TableColumn fx:id="sellIdCol" prefWidth="80.80001831054688" text="Sell ID" />
+          <TableColumn fx:id="itemNameCol" prefWidth="200.0000457763672" text="Item name" />
+            <TableColumn fx:id="quantityCol" prefWidth="103.199951171875" text="Quantity" />
+            <TableColumn fx:id="discountSellTableCol" prefWidth="116.0" text="Discount" />
+            <TableColumn fx:id="priceSellTableCol" prefWidth="112.0" text="Price" />
+            <TableColumn fx:id="deleteSellTableCol" prefWidth="91.2000732421875" text="Delete" />
+        </columns>
+      </TableView>
+      <Button layoutX="363.0" layoutY="428.0" mnemonicParsing="false" onAction="#previewBillTableOnAction" style="-fx-background-color: #48dbfb;" text="&lt;">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button layoutX="410.0" layoutY="428.0" mnemonicParsing="false" onAction="#nextBillTableOnAction" style="-fx-background-color: #48dbfb;" text="&gt;">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button layoutX="364.0" layoutY="740.0" mnemonicParsing="false" onAction="#previewSellTableOnAction" style="-fx-background-color: #48dbfb;" text="&lt;">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button layoutX="411.0" layoutY="740.0" mnemonicParsing="false" onAction="#nextSellTableOnAction" style="-fx-background-color: #48dbfb;" text="&gt;">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Separator layoutX="40.0" layoutY="479.0" prefHeight="4.0" prefWidth="709.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" />
+      <TextField fx:id="sellIdTxt" alignment="CENTER" editable="false" layoutX="40.0" layoutY="865.0" prefHeight="37.0" prefWidth="186.0" promptText="Sell ID">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font></TextField>
+      <TextField fx:id="discountTxt" alignment="CENTER" layoutX="40.0" layoutY="798.0" prefHeight="37.0" prefWidth="186.0" promptText="Discount">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font></TextField>
+      <TextField fx:id="quantityTxt" alignment="CENTER" layoutX="583.0" layoutY="798.0" prefHeight="37.0" prefWidth="186.0" promptText="Quantity">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font></TextField>
+      <TextField fx:id="priceTxt" alignment="CENTER" layoutX="312.0" layoutY="798.0" prefHeight="37.0" prefWidth="186.0" promptText="Price">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font></TextField>
+      <TextField fx:id="ItemNameTxt" alignment="CENTER" editable="false" layoutX="312.0" layoutY="864.0" prefHeight="38.0" prefWidth="186.0" promptText="Item name">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font></TextField>
+      <Button layoutX="583.0" layoutY="866.0" mnemonicParsing="false" onAction="#resetOnAction" style="-fx-background-color: #ff6b6b;" text="Reset">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Button layoutX="685.0" layoutY="866.0" mnemonicParsing="false" onAction="#updateOnAction" style="-fx-background-color: #feca57;" text="Update">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Button layoutX="684.0" layoutY="422.0" mnemonicParsing="false" onAction="#editBillOnAction" style="-fx-background-color: #1dd1a1;" text="Edit Bill">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <ComboBox fx:id="searchCbBx" layoutX="40.0" layoutY="129.0" prefHeight="38.0" prefWidth="172.0" />
+      <TextField fx:id="searchTxt" layoutX="223.0" layoutY="129.0" prefHeight="38.0" prefWidth="444.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </TextField>
+      <Button layoutX="681.0" layoutY="126.0" mnemonicParsing="false" onAction="#refreshOnAction" style="-fx-background-color: #48dbfb;" text="Refresh">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+   </children>
 </AnchorPane>
