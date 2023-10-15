@@ -28,8 +28,7 @@ public class UserFormController extends Window {
             mailTxt.setText(dbConnection.getUserEmail(super.getUserId()));
 
         } catch (SQLException e) {
-            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
-                    "Try again");
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
 
         nameTxt.setEditable(super.getUserRoll() == 1 || super.getUserRoll() == 2);
@@ -41,59 +40,59 @@ public class UserFormController extends Window {
     }
 
     public void saveOnAction(ActionEvent actionEvent) throws IOException {
-        if(newPasswordTxt.getText().trim().equals(conformPasswordTxt.getText().trim())) {
-            String password = null;
-            try {
+        try {
+            if(newPasswordTxt.getText().trim().equals(conformPasswordTxt.getText().trim())) {
+                String password = null;
                 password = newPasswordTxt.getText().trim().isEmpty() ||
                         conformPasswordTxt.getText().trim().isEmpty() ?
                         dbConnection.getUserPassword(super.getUserId()) : newPasswordTxt.getText().trim();
 
-            } catch (SQLException e) {
-                alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
-                        "Try again");
-            }
+                if(super.getUserRoll() == 1 || super.getUserRoll() == 2) {
+                    if(!dbConnection.userNameIsAvailable(nameTxt.getText().trim().toLowerCase(), super.getUserId())) {
+                        if(!dbConnection.mailIsAvailable(nameTxt.getText().trim().toLowerCase(), super.getUserId())) {
+                            if(dbConnection.updateUserDetails(new User(super.getUserId(),
+                                    nameTxt.getText().trim().toLowerCase(), mailTxt.getText().trim().toLowerCase(),
+                                    password))) {
 
-            if(super.getUserRoll() == 1 || super.getUserRoll() == 2) {
-                if(!dbConnection.userNameIsAvailable(nameTxt.getText().trim().toLowerCase(), super.getUserId())) {
-                    if(!dbConnection.mailIsAvailable(nameTxt.getText().trim().toLowerCase(), super.getUserId())) {
-                        if(dbConnection.updateUserDetails(new User(super.getUserId(),
-                                nameTxt.getText().trim().toLowerCase(), mailTxt.getText().trim().toLowerCase(),
-                                password))) {
+                                setUI("LoginForm");
+                                alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                                        "Successfully Update",
+                                        "Your new user details is update");
 
-                            setUI("LoginForm");
-                            alert(Alert.AlertType.INFORMATION, "INFORMATION",
-                                    "Successfully Update",
-                                    "Your new user details is update");
+                            } else {
+                                alert(Alert.AlertType.WARNING, "WARNING", "Database Connection Error",
+                                        "User details is not updated try again");
+                            }
 
                         } else {
-                            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
-                                    "User details is not updated try again");
+                            alert(Alert.AlertType.WARNING, "WARNING", "Email Already Exist",
+                                    "This email is already used try again with another email");
                         }
 
                     } else {
-                        alert(Alert.AlertType.WARNING, "WARNING", "Email Already Exist",
-                                "This email is already used try again with another email");
+                        alert(Alert.AlertType.WARNING, "WARNING", "User Name Already Exist",
+                                "This user name is already used try again with another user name");
                     }
 
-                } else {
-                    alert(Alert.AlertType.WARNING, "WARNING", "User Name Already Exist",
-                            "This user name is already used try again with another user name");
+                } else if(super.getUserRoll() == 3) {
+                    if (dbConnection.changeUserPassword(super.getUserId(), password)) {
+                        setUI("LoginForm");
+                        alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successfully Update Password",
+                                "Your new password is update");
+
+                    } else {
+                        alert(Alert.AlertType.WARNING, "WARNING", "Database Connection Error",
+                                "Password is not updated try again");
+                    }
                 }
 
-            } else if(super.getUserRoll() == 3) {
-                if (dbConnection.changeUserPassword(super.getUserId(), password)) {
-                    setUI("LoginForm");
-                    alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successfully Update Password",
-                            "Your new password is update");
-                } else {
-                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
-                            "Password is not updated try again");
-                }
+            } else {
+                alert(Alert.AlertType.WARNING, "WARNING", "Password Are Not Mach",
+                        "This new password and conform password is not mach try again");
             }
 
-        } else {
-            alert(Alert.AlertType.WARNING, "WARNING", "Password Are Not Mach",
-                    "This new password and conform password is not mach try again");
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 
@@ -103,8 +102,7 @@ public class UserFormController extends Window {
             mailTxt.setText(dbConnection.getUserEmail(super.getUserId()));
 
         } catch (SQLException e) {
-            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
-                    "Try again");
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 

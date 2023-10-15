@@ -147,6 +147,7 @@ public class StockFormController extends Window {
                 for (User u : users) {
                     try {
                         u.setUserName(dbConnection.getUserName(u.getUserId()));
+
                     } catch (SQLException e) {
                         alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
                     }
@@ -280,6 +281,7 @@ public class StockFormController extends Window {
                     for (Item i : itemsTemp) {
                         try {
                             i.setItemName(dbConnection.getItemName(i.getItemId()));
+
                         } catch (SQLException e) {
                             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
                         }
@@ -421,6 +423,7 @@ public class StockFormController extends Window {
                 try {
                     setRowDataIntoInputs(newValue);
                     selectedStockId = newValue.getStockId();
+
                 } catch (SQLException e) {
                     alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
                 }
@@ -431,6 +434,7 @@ public class StockFormController extends Window {
             if(newValue != null) {
                 try {
                     setRowDataIntoInputs(newValue);
+
                 } catch (SQLException e) {
                     alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
                 }
@@ -438,42 +442,47 @@ public class StockFormController extends Window {
         });
     }
 
-    private void setDataIntoStockTable() throws SQLException {
+    private void setDataIntoStockTable() {
         ObservableList<model.tableRows.stockWindow.Stock> obList = FXCollections.observableArrayList();
         ArrayList<String> userIdAndNames = new ArrayList<>();
 
-        if(stocks != null && !stocks.isEmpty()) {
-            userIdAndNames.add(stocks.get(0).getUserId() + "-");
+        try {
+            if(stocks != null && !stocks.isEmpty()) {
+                userIdAndNames.add(stocks.get(0).getUserId() + "-");
 
-            for (Stock ss : stocks) {
-                for (String s : userIdAndNames) {
-                    if(ss.getUserId() != Integer.parseInt(s.split("-")[0])){
-                        userIdAndNames.add(ss.getUserId() + "-");
-                        break;
-                    }
-                }
-            }
-
-            for (int i=0; i<userIdAndNames.size(); i++) {
-                userIdAndNames.set(i, userIdAndNames.get(i) +
-                        dbConnection.getUserName(Integer.parseInt(userIdAndNames.get(i).split("-")[0])));
-            }
-
-            for (Stock s : stocks) {
-                String userName = null;
-                for (String ss : userIdAndNames) {
-                    if(s.getUserId() == Integer.parseInt(ss.split("-")[0])) {
-                        userName = ss.split("-")[1];
-                        break;
+                for (Stock ss : stocks) {
+                    for (String s : userIdAndNames) {
+                        if(ss.getUserId() != Integer.parseInt(s.split("-")[0])){
+                            userIdAndNames.add(ss.getUserId() + "-");
+                            break;
+                        }
                     }
                 }
 
-                obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
-                        s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
-                        s.getLastRefillTime(), getDeleteButton(s.getStockId())));
+                for (int i=0; i<userIdAndNames.size(); i++) {
+                    userIdAndNames.set(i, userIdAndNames.get(i) +
+                            dbConnection.getUserName(Integer.parseInt(userIdAndNames.get(i).split("-")[0])));
+                }
+
+                for (Stock s : stocks) {
+                    String userName = null;
+                    for (String ss : userIdAndNames) {
+                        if(s.getUserId() == Integer.parseInt(ss.split("-")[0])) {
+                            userName = ss.split("-")[1];
+                            break;
+                        }
+                    }
+
+                    obList.add(new model.tableRows.stockWindow.Stock(s.getStockId(), userName, s.getItemId(), s.getQuantity(),
+                            s.getRefillQuantity(), s.getPrice(), s.getSellingPrice(), s.getLastRefillDate(),
+                            s.getLastRefillTime(), getDeleteButton(s.getStockId())));
+                }
+
+                stockTbl.setItems(obList);
             }
 
-            stockTbl.setItems(obList);
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 
@@ -490,47 +499,52 @@ public class StockFormController extends Window {
             alert.getButtonTypes().set(1, ButtonType.NO);
 
             alert.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.YES) {
-                    if(dbConnection.deleteStock(stockId)) {
-                        try {
-                            for (Stock s : stocks) {
-                                if(s.getStockId() == stockId) {
-                                    stocks.remove(s);
-                                    dbConnection.addLog(new Log(super.getUserId(), "Remove damage stock in STOCK ID: " +
-                                            stockId +" and ITEM NAME: " + dbConnection.getItemName(s.getItemId()) +
-                                            ", QUANTITY:" + s.getQuantity(), 3, super.getDate(), super.getTime(),
-                                            (s.getQuantity() * s.getPrice()), 6));
-                                    break;
+                try {
+                    if (response == ButtonType.YES) {
+                        if(dbConnection.deleteStock(stockId)) {
+                            try {
+                                for (Stock s : stocks) {
+                                    if(s.getStockId() == stockId) {
+                                        stocks.remove(s);
+                                        dbConnection.addLog(new Log(super.getUserId(), "Remove damage stock in STOCK ID: " +
+                                                stockId +" and ITEM NAME: " + dbConnection.getItemName(s.getItemId()) +
+                                                ", QUANTITY:" + s.getQuantity(), 3, super.getDate(), super.getTime(),
+                                                (s.getQuantity() * s.getPrice()), 6));
+                                        break;
+                                    }
                                 }
-                            }
-                            setDataIntoStockTable();
+                                setDataIntoStockTable();
 
-                            for (Stock s : refillStocks) {
-                                if(s.getStockId() == stockId) {
-                                    stocks.remove(s);
-                                    break;
+                                for (Stock s : refillStocks) {
+                                    if(s.getStockId() == stockId) {
+                                        stocks.remove(s);
+                                        break;
+                                    }
                                 }
+
+                                if(showAllItemsCheckBx.isSelected()) {
+                                    setDataIntoRefillStockTable(ITEMS);
+
+                                } else {
+                                    setDataIntoRefillStockTable(REFILL_STOCK);
+                                }
+
+                                alert(Alert.AlertType.INFORMATION, "INFORMATION", "Delete Successful",
+                                        "Delete successfully stock id = " + stockId);
+
+                            } catch (SQLException ex) {
+                                alert(Alert.AlertType.ERROR, "ERROR", "Data Reload Error",
+                                        "Cant reload data in table");
                             }
 
-                            if(showAllItemsCheckBx.isSelected()) {
-                                setDataIntoRefillStockTable(ITEMS);
-
-                            } else {
-                                setDataIntoRefillStockTable(REFILL_STOCK);
-                            }
-
-                            alert(Alert.AlertType.INFORMATION, "INFORMATION", "Delete Successful",
-                                    "Delete successfully stock id = " + stockId);
-
-                        } catch (SQLException ex) {
-                            alert(Alert.AlertType.ERROR, "ERROR", "Data Reload Error",
-                                    "Cant reload data in table");
+                        } else {
+                            alert(Alert.AlertType.ERROR, "ERROR", "Can't Delete",
+                                    "This item have stocks");
                         }
-
-                    } else {
-                        alert(Alert.AlertType.ERROR, "ERROR", "Can't Delete",
-                                "This item have stocks");
                     }
+
+                } catch (SQLException ex) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", ex.getMessage());
                 }
             });
         });
@@ -538,97 +552,112 @@ public class StockFormController extends Window {
         return btn;
     }
 
-    private void setDataIntoRefillStockTable(RefillTableTypes type) throws SQLException {
+    private void setDataIntoRefillStockTable(RefillTableTypes type) {
         ObservableList<RefillAndItem> obList = FXCollections.observableArrayList();
 
-        if(type == REFILL_STOCK) {
-            ArrayList<String> itemIdAndNames = new ArrayList<>();
+        try {
+            if(type == REFILL_STOCK) {
+                ArrayList<String> itemIdAndNames = new ArrayList<>();
 
-            if(refillStocks != null && !refillStocks.isEmpty()) {
-                itemIdAndNames.add(refillStocks.get(0).getItemId() + "-");
+                if(refillStocks != null && !refillStocks.isEmpty()) {
+                    itemIdAndNames.add(refillStocks.get(0).getItemId() + "-");
 
-                for (Stock ss : refillStocks) {
-                    for (String s : itemIdAndNames) {
-                        if (ss.getItemId() != Integer.parseInt(s.split("-")[0])) {
-                            itemIdAndNames.add(ss.getItemId() + "-");
-                            break;
-                        }
-                    }
-                }
-
-                for (int i=0; i<itemIdAndNames.size(); i++) {
-                    itemIdAndNames.set(i, itemIdAndNames.get(i) +
-                            dbConnection.getItemName(Integer.parseInt(itemIdAndNames.get(i).split("-")[0])));
-                }
-
-                for (Stock s : refillStocks) {
-                    String itemName = null;
-                    for (String ss : itemIdAndNames) {
-                        if(s.getItemId() == Integer.parseInt(ss.split("-")[0])) {
-                            itemName = ss.split("-")[1];
-                            break;
+                    for (Stock ss : refillStocks) {
+                        for (String s : itemIdAndNames) {
+                            if (ss.getItemId() != Integer.parseInt(s.split("-")[0])) {
+                                itemIdAndNames.add(ss.getItemId() + "-");
+                                break;
+                            }
                         }
                     }
 
-                    obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
-                            itemName, s.getQuantity(), s.getPrice()));
+                    for (int i=0; i<itemIdAndNames.size(); i++) {
+                        itemIdAndNames.set(i, itemIdAndNames.get(i) +
+                                dbConnection.getItemName(Integer.parseInt(itemIdAndNames.get(i).split("-")[0])));
+                    }
+
+                    for (Stock s : refillStocks) {
+                        String itemName = null;
+                        for (String ss : itemIdAndNames) {
+                            if(s.getItemId() == Integer.parseInt(ss.split("-")[0])) {
+                                itemName = ss.split("-")[1];
+                                break;
+                            }
+                        }
+
+                        obList.add(new model.tableRows.stockWindow.StockRefill(s.getStockId(), s.getItemId(),
+                                itemName, s.getQuantity(), s.getPrice()));
+                    }
+                }
+
+            } else if(type == ITEMS) {
+                if(items != null && !items.isEmpty()){
+                    for (Item i : items) {
+                        obList.add(new model.tableRows.stockWindow.Item(i.getItemId(), i.getItemName()));
+                    }
                 }
             }
 
-        } else if(type == ITEMS) {
-            if(items != null && !items.isEmpty()){
-                for (Item i : items) {
-                    obList.add(new model.tableRows.stockWindow.Item(i.getItemId(), i.getItemName()));
-                }
-            }
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
 
         refillTbl.setItems(obList);
     }
 
-    private void setRowDataIntoInputs(model.tableRows.stockWindow.Stock newValue) throws SQLException {
-        clearInputs();
-        addOrUpdateBtn.setText("Update");
-        addOrUpdateBtn.setStyle("-fx-background-color: #feca57;");
-        itemIDTxt.setText(String.valueOf(newValue.getItemId()));
-        itemNameTxt.setText(dbConnection.getItemName(newValue.getItemId()));
-        quantityTxt.setText(String.valueOf(newValue.getQuantity()));
-        refillQuantityTxt.setText(String.valueOf(newValue.getRefillQuantity()));
-        priceTxt.setText(String.valueOf(newValue.getPrice()));
-        sellingPriceTxt.setText(String.valueOf(newValue.getSellingPrice()));
-    }
-
-    private void setRowDataIntoInputs(model.tableRows.stockWindow.RefillAndItem newValue) throws SQLException {
-        clearInputs();
-
-        if(newValue.toString().split("\\.")[3].split("@")[0].equals("StockRefill")) {
+    private void setRowDataIntoInputs(model.tableRows.stockWindow.Stock newValue) {
+        try {
+            clearInputs();
             addOrUpdateBtn.setText("Update");
             addOrUpdateBtn.setStyle("-fx-background-color: #feca57;");
+            itemIDTxt.setText(String.valueOf(newValue.getItemId()));
+            itemNameTxt.setText(dbConnection.getItemName(newValue.getItemId()));
+            quantityTxt.setText(String.valueOf(newValue.getQuantity()));
+            refillQuantityTxt.setText(String.valueOf(newValue.getRefillQuantity()));
+            priceTxt.setText(String.valueOf(newValue.getPrice()));
+            sellingPriceTxt.setText(String.valueOf(newValue.getSellingPrice()));
 
-            StockRefill stockRefill = (model.tableRows.stockWindow.StockRefill) newValue;
-            selectedStockId = stockRefill.getStockId();
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
+    }
 
-            for (Stock s : refillStocks) {
-                if(stockRefill.getStockId() == s.getStockId()) {
-                    s = dbConnection.getRefillQuantityAndSellingPrice(s);
-                    itemIDTxt.setText(String.valueOf(s.getItemId()));
-                    itemNameTxt.setText(dbConnection.getItemName(s.getItemId()));
-                    quantityTxt.setText(String.valueOf(s.getQuantity()));
-                    refillQuantityTxt.setText(String.valueOf(s.getRefillQuantity()));
-                    priceTxt.setText(String.valueOf(s.getPrice()));
-                    sellingPriceTxt.setText(String.valueOf(s.getSellingPrice()));
+    private void setRowDataIntoInputs(model.tableRows.stockWindow.RefillAndItem newValue) {
+        try {
+            clearInputs();
+
+            if(newValue.toString().split("\\.")[3].split("@")[0].equals("StockRefill")) {
+                addOrUpdateBtn.setText("Update");
+                addOrUpdateBtn.setStyle("-fx-background-color: #feca57;");
+
+                StockRefill stockRefill = (model.tableRows.stockWindow.StockRefill) newValue;
+                selectedStockId = stockRefill.getStockId();
+
+                for (Stock s : refillStocks) {
+                    if(stockRefill.getStockId() == s.getStockId()) {
+                        s = dbConnection.getRefillQuantityAndSellingPrice(s);
+                        itemIDTxt.setText(String.valueOf(s.getItemId()));
+                        itemNameTxt.setText(dbConnection.getItemName(s.getItemId()));
+                        quantityTxt.setText(String.valueOf(s.getQuantity()));
+                        refillQuantityTxt.setText(String.valueOf(s.getRefillQuantity()));
+                        priceTxt.setText(String.valueOf(s.getPrice()));
+                        sellingPriceTxt.setText(String.valueOf(s.getSellingPrice()));
+                    }
+                }
+
+            } else if (newValue.toString().split("\\.")[3].split("@")[0].equals("Item")) {
+                model.tableRows.stockWindow.Item item = (model.tableRows.stockWindow.Item) newValue;
+
+                for (Item i : items) {
+                    if(item.getItemId() == i.getItemId()) {
+                        itemIDTxt.setText(String.valueOf(i.getItemId()));
+                        itemNameTxt.setText(i.getItemName());
+                    }
                 }
             }
 
-        } else if (newValue.toString().split("\\.")[3].split("@")[0].equals("Item")) {
-            model.tableRows.stockWindow.Item item = (model.tableRows.stockWindow.Item) newValue;
-
-            for (Item i : items) {
-                if(item.getItemId() == i.getItemId()) {
-                    itemIDTxt.setText(String.valueOf(i.getItemId()));
-                    itemNameTxt.setText(i.getItemName());
-                }
-            }
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 
@@ -828,128 +857,153 @@ public class StockFormController extends Window {
         }
     }
 
-    private void reloadTables() throws SQLException {
-        clearInputs();
-        stocks = dbConnection.getStockTable(loadedRowCountStock);
-        refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
-        setDataIntoStockTable();
-        if(showAllItemsCheckBx.isSelected()) {
-            setDataIntoRefillStockTable(ITEMS);
-        } else {
-            setDataIntoRefillStockTable(REFILL_STOCK);
+    private void reloadTables() {
+        try {
+            clearInputs();
+            stocks = dbConnection.getStockTable(loadedRowCountStock);
+            refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
+            setDataIntoStockTable();
+            if(showAllItemsCheckBx.isSelected()) {
+                setDataIntoRefillStockTable(ITEMS);
+
+            } else {
+                setDataIntoRefillStockTable(REFILL_STOCK);
+            }
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 
-    public void previewStockTableOnAction(ActionEvent actionEvent) throws SQLException {
-        previewStockTableBtn.setDisable(true);
-        if(stocks != null) {
-            if(!stocks.isEmpty()) {
-                if((loadedRowCountStock - 25) >= 0) {
-                    loadedRowCountStock -= 25;
-                    stocks = dbConnection.getStockTable(loadedRowCountStock);
-                    setDataIntoStockTable();
-                    nextStockTableBtn.setDisable(false);
-
+    public void previewStockTableOnAction(ActionEvent actionEvent) {
+        try {
+            previewStockTableBtn.setDisable(true);
+            if(stocks != null) {
+                if(!stocks.isEmpty()) {
                     if((loadedRowCountStock - 25) >= 0) {
-                        previewStockTableBtn.setDisable(false);
-                    }
-                }
-            }
-        }
-        if(!searchStockTxt.getText().isEmpty()) {
-            String search = searchStockTxt.getText();
-            searchStockTxt.clear();
-            searchStockTxt.setText(search);
-        }
-    }
-
-    public void nextStockTableOnAction(ActionEvent actionEvent) throws SQLException {
-        nextStockTableBtn.setDisable(true);
-        if(stocks != null) {
-            if(!stocks.isEmpty()) {
-                if((loadedRowCountStock + 25) < stockTableDataCount) {
-                    loadedRowCountStock += 25;
-                    stocks = dbConnection.getStockTable(loadedRowCountStock);
-                    setDataIntoStockTable();
-                    previewStockTableBtn.setDisable(false);
-
-                    if((loadedRowCountStock + 25) < stockTableDataCount) {
+                        loadedRowCountStock -= 25;
+                        stocks = dbConnection.getStockTable(loadedRowCountStock);
+                        setDataIntoStockTable();
                         nextStockTableBtn.setDisable(false);
+
+                        if((loadedRowCountStock - 25) >= 0) {
+                            previewStockTableBtn.setDisable(false);
+                        }
                     }
                 }
             }
-        }
-        if(!searchStockTxt.getText().isEmpty()) {
-            String search = searchStockTxt.getText();
-            searchStockTxt.clear();
-            searchStockTxt.setText(search);
+            if(!searchStockTxt.getText().isEmpty()) {
+                String search = searchStockTxt.getText();
+                searchStockTxt.clear();
+                searchStockTxt.setText(search);
+            }
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 
-    public void previewRefillTableOnAction(ActionEvent actionEvent) throws SQLException {
-        previewRefillTableBtn.setDisable(true);
+    public void nextStockTableOnAction(ActionEvent actionEvent) {
+        try {
+            nextStockTableBtn.setDisable(true);
+            if(stocks != null) {
+                if(!stocks.isEmpty()) {
+                    if((loadedRowCountStock + 25) < stockTableDataCount) {
+                        loadedRowCountStock += 25;
+                        stocks = dbConnection.getStockTable(loadedRowCountStock);
+                        setDataIntoStockTable();
+                        previewStockTableBtn.setDisable(false);
 
-        if(stockId2Col.isVisible()) {
-            if(refillStocks != null && !refillStocks.isEmpty()) {
-                if((loadedRowCountStockRefill - 25) >= 0) {
-                    loadedRowCountStockRefill -= 25;
-                    refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
-                    setDataIntoRefillStockTable(REFILL_STOCK);
-                    nextRefillTableBtn.setDisable(false);
+                        if((loadedRowCountStock + 25) < stockTableDataCount) {
+                            nextStockTableBtn.setDisable(false);
+                        }
+                    }
+                }
+            }
+            if(!searchStockTxt.getText().isEmpty()) {
+                String search = searchStockTxt.getText();
+                searchStockTxt.clear();
+                searchStockTxt.setText(search);
+            }
 
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
+    }
+
+    public void previewRefillTableOnAction(ActionEvent actionEvent) {
+        try {
+            previewRefillTableBtn.setDisable(true);
+
+            if(stockId2Col.isVisible()) {
+                if(refillStocks != null && !refillStocks.isEmpty()) {
                     if((loadedRowCountStockRefill - 25) >= 0) {
-                        previewRefillTableBtn.setDisable(false);
+                        loadedRowCountStockRefill -= 25;
+                        refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
+                        setDataIntoRefillStockTable(REFILL_STOCK);
+                        nextRefillTableBtn.setDisable(false);
+
+                        if((loadedRowCountStockRefill - 25) >= 0) {
+                            previewRefillTableBtn.setDisable(false);
+                        }
                     }
                 }
-            }
 
-        } else {
-            if(items != null && !items.isEmpty()) {
-                if((loadedRowCountItems - 25) >= 0) {
-                    loadedRowCountItems -= 25;
-                    items = dbConnection.getItemTable(loadedRowCountItems);
-                    setDataIntoRefillStockTable(ITEMS);
-                    nextRefillTableBtn.setDisable(false);
-
+            } else {
+                if(items != null && !items.isEmpty()) {
                     if((loadedRowCountItems - 25) >= 0) {
-                        previewRefillTableBtn.setDisable(false);
+                        loadedRowCountItems -= 25;
+                        items = dbConnection.getItemTable(loadedRowCountItems);
+                        setDataIntoRefillStockTable(ITEMS);
+                        nextRefillTableBtn.setDisable(false);
+
+                        if((loadedRowCountItems - 25) >= 0) {
+                            previewRefillTableBtn.setDisable(false);
+                        }
                     }
                 }
             }
-        }
 
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
     }
 
-    public void nextRefillTableOnAction(ActionEvent actionEvent) throws SQLException {
-        nextRefillTableBtn.setDisable(true);
+    public void nextRefillTableOnAction(ActionEvent actionEvent) {
+        try {
+            nextRefillTableBtn.setDisable(true);
 
-        if(stockId2Col.isVisible()) {
-            if(refillStocks != null && !refillStocks.isEmpty()) {
-                if((loadedRowCountStockRefill + 25) < stockRefillTableDataCount) {
-                    loadedRowCountStockRefill += 25;
-                    refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
-                    setDataIntoRefillStockTable(REFILL_STOCK);
-                    previewRefillTableBtn.setDisable(false);
-
+            if(stockId2Col.isVisible()) {
+                if(refillStocks != null && !refillStocks.isEmpty()) {
                     if((loadedRowCountStockRefill + 25) < stockRefillTableDataCount) {
-                        nextRefillTableBtn.setDisable(false);
+                        loadedRowCountStockRefill += 25;
+                        refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
+                        setDataIntoRefillStockTable(REFILL_STOCK);
+                        previewRefillTableBtn.setDisable(false);
+
+                        if((loadedRowCountStockRefill + 25) < stockRefillTableDataCount) {
+                            nextRefillTableBtn.setDisable(false);
+                        }
                     }
                 }
-            }
 
-        } else {
-            if(items != null && !items.isEmpty()) {
-                if((loadedRowCountItems + 25) < itemTableDataCount) {
-                    loadedRowCountItems += 25;
-                    items = dbConnection.getItemTable(loadedRowCountItems);
-                    setDataIntoRefillStockTable(ITEMS);
-                    previewRefillTableBtn.setDisable(false);
-
+            } else {
+                if(items != null && !items.isEmpty()) {
                     if((loadedRowCountItems + 25) < itemTableDataCount) {
-                        nextRefillTableBtn.setDisable(false);
+                        loadedRowCountItems += 25;
+                        items = dbConnection.getItemTable(loadedRowCountItems);
+                        setDataIntoRefillStockTable(ITEMS);
+                        previewRefillTableBtn.setDisable(false);
+
+                        if((loadedRowCountItems + 25) < itemTableDataCount) {
+                            nextRefillTableBtn.setDisable(false);
+                        }
                     }
                 }
             }
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 
@@ -977,13 +1031,12 @@ public class StockFormController extends Window {
             File invoiceFolder = new File(invoiceFolderPath);
             if (!invoiceFolder.exists()) {
                 if (invoiceFolder.mkdirs()) {
-                    alert(Alert.AlertType.CONFIRMATION, "Successful",
+                    alert(Alert.AlertType.INFORMATION, "INFORMATION",
                             "Refill Stocks folder created successfully",
                             invoiceFolderPath);
 
                 } else {
-                    alert(Alert.AlertType.ERROR, "ERROR",
-                            "Folder Create Error",
+                    alert(Alert.AlertType.ERROR, "ERROR", "Folder Create Error",
                             "Failed to create the Invoice folder");
                     return;
                 }
@@ -1014,13 +1067,11 @@ public class StockFormController extends Window {
                         "Check: " + invoiceFolder.getPath() + "\n" + "File name: " + fileName);
 
             } catch (IOException e) {
-                alert(Alert.AlertType.ERROR, "ERROR",
-                        "Folder Error ", e.getMessage());
+                alert(Alert.AlertType.ERROR, "ERROR", "Folder Error", e.getMessage());
             }
 
         } else {
-            alert(Alert.AlertType.WARNING, "WARNING",
-                    "There Have No Items To Print",
+            alert(Alert.AlertType.WARNING, "WARNING", "There Have No Items To Print",
                     "Sorry their have no items to print so add items");
         }
     }

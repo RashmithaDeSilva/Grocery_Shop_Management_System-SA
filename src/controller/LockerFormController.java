@@ -258,7 +258,7 @@ public class LockerFormController extends Window {
                 if(withdrawTxt != null && !withdrawTxt.getText().isEmpty()) {
                     if(amount > 0) {
                         if(amount <= lockerMoney) {
-                            if( dbConnection.addLog(new Log(super.getUserId(), "Withdraw money Rs: " + amount
+                            if(dbConnection.addLog(new Log(super.getUserId(), "Withdraw money Rs: " + amount
                                     + " ( " + forWhatTxt.getText().trim().toLowerCase() + " )",
                                     3, new Date(Calendar.getInstance().getTime().getTime()),
                                     new Time(Calendar.getInstance().getTime().getTime()), amount,
@@ -273,31 +273,35 @@ public class LockerFormController extends Window {
                                         "Successfully withdraw money in locker");
 
                             } else {
-                                alert(Alert.AlertType.ERROR, "Error", "Database Connection Error",
+                                alert(Alert.AlertType.WARNING, "WARNING", "Database Connection Error",
                                         "Try again");
                             }
 
                         } else {
-                            alert(Alert.AlertType.ERROR, "ERROR", "There have No Money",
+                            alert(Alert.AlertType.WARNING, "WARNING", "There have No Money",
                                     "There have no money enough");
                         }
 
                     } else {
-                        alert(Alert.AlertType.ERROR, "Error", "Invalid Input",
+                        alert(Alert.AlertType.WARNING, "WARNING", "Invalid Input",
                                 "Try again");
                     }
 
                 } else {
-                    alert(Alert.AlertType.ERROR, "Error", "Invalid Input",
+                    alert(Alert.AlertType.WARNING, "WARNING", "Invalid Input",
                             "Try again");
                 }
 
             } else {
-                alert(Alert.AlertType.ERROR, "Error", "Enter Input", "Enter withdraw reason");
+                alert(Alert.AlertType.WARNING, "WARNING", "Enter Input",
+                        "Enter withdraw reason");
             }
 
         } catch (NumberFormatException e) {
             alert(Alert.AlertType.ERROR, "Error", "Invalid Input", e.getMessage());
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 
@@ -341,12 +345,12 @@ public class LockerFormController extends Window {
     }
 
     public void addMoneyOnAction(ActionEvent actionEvent) {
-        if(addMoneyTxt != null && !addMoneyTxt.getText().isEmpty()) {
-            try {
+        try {
+            if(addMoneyTxt != null && !addMoneyTxt.getText().isEmpty()) {
                 double amount = Double.parseDouble(addMoneyTxt.getText().trim());
 
                 if(amount > 0) {
-                    if( dbConnection.addLog(new Log(super.getUserId(), "Add money Rs: " + amount,
+                    if(dbConnection.addLog(new Log(super.getUserId(), "Add money Rs: " + amount,
                             3, new Date(Calendar.getInstance().getTime().getTime()),
                             new Time(Calendar.getInstance().getTime().getTime()), amount, 2))) {
 
@@ -357,20 +361,23 @@ public class LockerFormController extends Window {
                                 "Successfully added money into locker");
 
                     } else {
-                        alert(Alert.AlertType.ERROR, "Error", "Database Connection Error",
+                        alert(Alert.AlertType.WARNING, "WARNING", "Database Connection Error",
                                 "Try again");
                     }
 
                 } else {
-                    alert(Alert.AlertType.ERROR, "Error", "Invalid Input", "Try again");
+                    alert(Alert.AlertType.WARNING, "WARNING", "Invalid Input", "Try again");
                 }
 
-            } catch (NumberFormatException e) {
-                alert(Alert.AlertType.ERROR, "Error", "Invalid Input", e.getMessage());
+            } else {
+                alert(Alert.AlertType.WARNING, "WARNING", "Enter Input", "Try again");
             }
 
-        } else {
-            alert(Alert.AlertType.ERROR, "Error", "Enter Input", "Try again");
+        } catch (NumberFormatException e) {
+            alert(Alert.AlertType.ERROR, "Error", "Invalid Input", e.getMessage());
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 

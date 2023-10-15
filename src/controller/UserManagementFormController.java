@@ -89,9 +89,9 @@ public class UserManagementFormController extends Window {
                     }
                 }
             }
-        }
 
-        userTbl.setItems(obList);
+            userTbl.setItems(obList);
+        }
     }
 
     private Button getBannedUnbannedButton(int userId) {
@@ -199,64 +199,70 @@ public class UserManagementFormController extends Window {
         setUI("UserForm");
     }
 
-    public void addOrUpdateUsersOnAction(ActionEvent actionEvent) throws SQLException {
-        if(userTableDataCount+1 <= super.getMaximumUserCount()) {
-            if(!dbConnection.userNameIsAvailable(nameTxt.getText().trim().toLowerCase())) {
-                if(!dbConnection.mailIsAvailable(emailTxt.getText().trim().toLowerCase())) {
-                    if(passwordTxt.getText().trim().equals(conformPasswordTxt.getText().trim()) &&
-                            !passwordTxt.getText().isEmpty() && !conformPasswordTxt.getText().isEmpty()) {
-                        if(!userAccessesCmb.getValue().equalsIgnoreCase("User Roll")) {
-                            if(dbConnection.addUser(new model.User(nameTxt.getText().trim().toLowerCase(),
-                                    emailTxt.getText().trim().toLowerCase(), passwordTxt.getText().trim(),
-                                    userAccessesCmb.getValue().equalsIgnoreCase("admin") ? 2 : 3))){
+    public void addOrUpdateUsersOnAction(ActionEvent actionEvent) {
+        try {
+            if(userTableDataCount+1 <= super.getMaximumUserCount()) {
+                if(!dbConnection.userNameIsAvailable(nameTxt.getText().trim().toLowerCase())) {
+                    if(!dbConnection.mailIsAvailable(emailTxt.getText().trim().toLowerCase())) {
+                        if(passwordTxt.getText().trim().equals(conformPasswordTxt.getText().trim()) &&
+                                !passwordTxt.getText().isEmpty() && !conformPasswordTxt.getText().isEmpty()) {
+                            if(!userAccessesCmb.getValue().equalsIgnoreCase("User Roll")) {
+                                if(dbConnection.addUser(new model.User(nameTxt.getText().trim().toLowerCase(),
+                                        emailTxt.getText().trim().toLowerCase(), passwordTxt.getText().trim(),
+                                        userAccessesCmb.getValue().equalsIgnoreCase("admin") ? 2 : 3))){
 
-                                userTableDataCount +=1;
-                                try {
-                                    if(userTableDataCount < 25 && userTableDataCount > 0) {
-                                        nextUsersTableBtn.setDisable(true);
+                                    userTableDataCount +=1;
+                                    try {
+                                        if(userTableDataCount < 25 && userTableDataCount > 0) {
+                                            nextUsersTableBtn.setDisable(true);
+                                        }
+                                        users = dbConnection.getUsersTable(loadedRowCountUsers);
+                                        previewUsersTableBtn.setDisable(true);
+
+                                        resetOnAction(actionEvent);
+                                        setDataIntoUsersTable();
+
+                                    } catch (SQLException e) {
+                                        alert(Alert.AlertType.ERROR, "ERROR",
+                                                "Database Connection Error", e.getMessage());
                                     }
-                                    users = dbConnection.getUsersTable(loadedRowCountUsers);
-                                    previewUsersTableBtn.setDisable(true);
 
-                                    resetOnAction(actionEvent);
-                                    setDataIntoUsersTable();
+                                    alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successfully Added User",
+                                            "Successfully added user into database");
 
-                                } catch (SQLException e) {
-                                    alert(Alert.AlertType.ERROR, "ERROR",
-                                            "Database Connection Error", e.getMessage());
+                                } else {
+                                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                                            "Try again");
                                 }
 
-                                alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successfully Added User",
-                                        "Successfully added user into database");
-
                             } else {
-                                alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
-                                        "Try again");
+                                alert(Alert.AlertType.WARNING, "WARNING", "Select User Roll",
+                                        "Select users access and try again");
                             }
 
                         } else {
-                            alert(Alert.AlertType.WARNING, "WARNING", "Select User Roll",
-                                    "Select users access and try again");
+                            alert(Alert.AlertType.WARNING, "WARNING", "Password Not Mach",
+                                    "This password is not mach try again");
                         }
 
-                    } else {
-                        alert(Alert.AlertType.WARNING, "WARNING", "Password Not Mach",
-                                "This password is not mach try again");
+                    }else {
+                        alert(Alert.AlertType.WARNING, "WARNING", "Email Can't Use",
+                                "This email is already use try again with another email");
                     }
 
-                }else {
-                    alert(Alert.AlertType.WARNING, "WARNING", "Email Can't Use",
-                            "This email is already use try again with another email");
+                } else {
+                    alert(Alert.AlertType.WARNING, "WARNING", "User Name Can't Use",
+                            "This user name is already use try again with another name");
                 }
 
             } else {
-                alert(Alert.AlertType.WARNING, "WARNING", "User Name Can't Use",
-                        "This user name is already use try again with another name");
+                alert(Alert.AlertType.WARNING, "WARNING", "Maximum User Limit Is Up",
+                        "Maximum user limit is full, if you want to add more users contact " +
+                                "developer and buy more specie");
             }
 
-        } else {
-            alert(Alert.AlertType.WARNING, "WARNING", "User Name Can't Use",
-                    "This user name is already use try again with another name");
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 
@@ -266,7 +272,7 @@ public class UserManagementFormController extends Window {
         passwordTxt.clear();
         conformPasswordTxt.clear();
         userAccessesCmb.setValue("User Roll");
-        addOrUpdateBtn.setText("Add UUser");
+        addOrUpdateBtn.setText("Add User");
         addOrUpdateBtn.setStyle("-fx-background-color:  #1dd1a1;");
 
     }

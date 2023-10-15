@@ -131,7 +131,7 @@ public class SellFormController extends Window{
                     }
 
                 } catch (NumberFormatException e) {
-                    alert(Alert.AlertType.ERROR, "Invalid Input",
+                    alert(Alert.AlertType.WARNING, "WARNING",
                             "Set Integer Value Into Quantity", e.getMessage());
                 }
 
@@ -187,8 +187,8 @@ public class SellFormController extends Window{
                     }
 
                 } catch (NumberFormatException e) {
-                    alert(Alert.AlertType.ERROR, "Invalid Input",
-                            "Set Integer Value Into Discount", e.getMessage());
+                    alert(Alert.AlertType.WARNING, "WARNING", "Set Integer Value Into Discount",
+                            e.getMessage());
                 }
             } else {
                 assert newValue != null;
@@ -320,12 +320,7 @@ public class SellFormController extends Window{
     }
 
     private void refreshTables()  {
-        try {
-            setTable2Data();
-
-        } catch (SQLException e) {
-            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
-        }
+        setTable2Data();
     }
 
     public void addOnAction(ActionEvent actionEvent) {
@@ -382,7 +377,7 @@ public class SellFormController extends Window{
                         }
 
                     } catch (NumberFormatException e) {
-                        alert(Alert.AlertType.ERROR, "Invalid Input",
+                        alert(Alert.AlertType.WARNING, "WARNING",
                                 "Set Integer Value Into Quantity", e.getMessage());
                     }
 
@@ -432,7 +427,7 @@ public class SellFormController extends Window{
                             }
 
                         } catch (NumberFormatException e) {
-                            alert(Alert.AlertType.ERROR, "Invalid Input",
+                            alert(Alert.AlertType.WARNING, "WARNING",
                                     "Set Integer Value Into Quantity", e.getMessage());
                         }
                         break;
@@ -458,18 +453,18 @@ public class SellFormController extends Window{
     }
 
     public void sellOnAction(ActionEvent actionEvent) throws IOException {
-        if(quotationTbl != null && quotationTbl.getItems() != null && !quotationTbl.getItems().isEmpty()) {
+        try {
+            if(quotationTbl != null && quotationTbl.getItems() != null && !quotationTbl.getItems().isEmpty()) {
 
-            double discount = 0;
-            for (InvoiceItem i : quotationTbl.getItems()) {
-                discount += i.getDiscount();
-            }
+                double discount = 0;
+                for (InvoiceItem i : quotationTbl.getItems()) {
+                    discount += i.getDiscount();
+                }
 
-            double totalBillPrice = Double.parseDouble(totalBill.getText().split(" ")[1]);
-            if(dbConnection.addBill(new Bill(0, super.getUserId(),
-                    totalBillPrice, discount, super.getDate(), super.getTime()))) {
+                double totalBillPrice = Double.parseDouble(totalBill.getText().split(" ")[1]);
+                if(dbConnection.addBill(new Bill(0, super.getUserId(),
+                        totalBillPrice, discount, super.getDate(), super.getTime()))) {
 
-                try {
                     boolean successfulMassage = true;
                     int billNumber = dbConnection.getLastBillNumber();
                     int addeditemCount = 0;
@@ -489,7 +484,7 @@ public class SellFormController extends Window{
                                 }
                             }
 
-                            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                            alert(Alert.AlertType.WARNING, "WARNING", "Database Connection Error",
                                     "Items are didn't added try again");
                             break;
 
@@ -521,7 +516,7 @@ public class SellFormController extends Window{
                                             }
                                         }
 
-                                        alert(Alert.AlertType.ERROR, "ERROR", "Stock Didn't Update",
+                                        alert(Alert.AlertType.WARNING, "WARNING", "Stock Didn't Update",
                                                 "Stock are didn't update try again");
                                         break;
                                     }
@@ -541,18 +536,18 @@ public class SellFormController extends Window{
                         setUI("DashboardForm");
                     }
 
-                } catch (SQLException e) {
-                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                } else {
+                    alert(Alert.AlertType.WARNING, "WARNING", "Database Connection Error",
+                            "Bill did not added into database");
                 }
 
             } else {
-                alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
-                        "Bill did not added into database");
+                alert(Alert.AlertType.WARNING, "WARNING", "Select Items",
+                        "you didn't select items");
             }
 
-        } else {
-            alert(Alert.AlertType.WARNING, "WARNING", "Select Items",
-                    "you didn't select items");
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 
@@ -615,19 +610,16 @@ public class SellFormController extends Window{
 
                 writer.write("\nTotal Bill " + totalBill.getText());
 
-                alert(Alert.AlertType.CONFIRMATION, "Successful",
+                alert(Alert.AlertType.INFORMATION, "INFORMATION",
                         "Successfully Print Invoice",
                         "Check: " + invoiceFolder.getPath() + "\n" + "File name: " + fileName);
-//                System.out.println("File created successfully at: " + file.getAbsolutePath());
 
             } catch (IOException e) {
-                alert(Alert.AlertType.ERROR, "An Error Occurred",
-                        "Folder Error", e.getMessage());
-//                System.err.println("An error occurred: " + e.getMessage());
+                alert(Alert.AlertType.ERROR, "ERROR", "Folder Error", e.getMessage());
             }
 
         } else {
-            alert(Alert.AlertType.WARNING, "Can Not Try",
+            alert(Alert.AlertType.WARNING, "WARNING",
                     "There Have No Items To Print",
                     "Sorry their have no items to print so add items");
         }
@@ -650,7 +642,7 @@ public class SellFormController extends Window{
         totalBill.setText("Total: ");
     }
 
-    private void setTable2Data() throws SQLException {
+    private void setTable2Data() {
         if(items != null && !items.isEmpty()) {
             ObservableList<SellItem> obList = FXCollections.observableArrayList();
             for (Item i : items) {
@@ -669,12 +661,17 @@ public class SellFormController extends Window{
         setUI("SellLogForm");
     }
 
-    public void previewItemsOnAction(ActionEvent actionEvent) throws SQLException {
+    public void previewItemsOnAction(ActionEvent actionEvent) {
         previewItemTableBtn.setDisable(true);
         if(items != null && !items.isEmpty()) {
             if((loadedRowCountItems - 25) >= 0) {
                 loadedRowCountItems -= 25;
-                items = dbConnection.getItemTableWithStockAvailable(loadedRowCountItems);
+                try {
+                    items = dbConnection.getItemTableWithStockAvailable(loadedRowCountItems);
+
+                } catch (SQLException e) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                }
                 sortItem();
                 setTable2Data();
                 nextItemTableBtn.setDisable(false);
@@ -691,12 +688,17 @@ public class SellFormController extends Window{
         }
     }
 
-    public void nextItemsOnAction(ActionEvent actionEvent) throws SQLException {
+    public void nextItemsOnAction(ActionEvent actionEvent) {
         nextItemTableBtn.setDisable(true);
         if(items != null && !items.isEmpty()) {
             if((loadedRowCountItems + 25) < itemsTableDataCount) {
                 loadedRowCountItems += 25;
-                items = dbConnection.getItemTableWithStockAvailable(loadedRowCountItems);
+                try {
+                    items = dbConnection.getItemTableWithStockAvailable(loadedRowCountItems);
+
+                } catch (SQLException e) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                }
                 sortItem();
                 setTable2Data();
                 previewItemTableBtn.setDisable(false);

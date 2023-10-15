@@ -69,7 +69,7 @@ public class ItemFormController extends Window{
             setDataIntoItemTable();
 
         } catch (SQLException e) {
-            alert(Alert.AlertType.ERROR, "Error", "Item Table Data Load Error", e.getMessage());
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
 
         idTxt.setText(items != null ? String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
@@ -171,43 +171,47 @@ public class ItemFormController extends Window{
         });
     }
 
-    private void setDataIntoItemTable() throws SQLException {
-        ObservableList<model.tableRows.itemWindow.Item> obList = FXCollections.observableArrayList();
-        ArrayList<String> userIdAndNames = new ArrayList<>();
+    private void setDataIntoItemTable() {
+        try {
+            ObservableList<model.tableRows.itemWindow.Item> obList = FXCollections.observableArrayList();
+            ArrayList<String> userIdAndNames = new ArrayList<>();
 
-        if(items != null && !items.isEmpty()) {
-            userIdAndNames.add(items.get(0).getUserId() + "-");
+            if(items != null && !items.isEmpty()) {
+                userIdAndNames.add(items.get(0).getUserId() + "-");
 
-            for (Item i : items) {
-                for (String s : userIdAndNames) {
-                    if(i.getUserId() != Integer.parseInt(s.split("-")[0])){
-                        userIdAndNames.add(i.getUserId() + "-");
-                        break;
-                    }
-                }
-            }
-
-            for (int i=0; i<userIdAndNames.size(); i++) {
-                userIdAndNames.set(i, userIdAndNames.get(i) +
-                        dbConnection.getUserName(Integer.parseInt(userIdAndNames.get(i).split("-")[0])));
-            }
-
-            for (Item i : items) {
-                String userName = null;
-                for (String ss : userIdAndNames) {
-                    if(i.getUserId() == Integer.parseInt(ss.split("-")[0])) {
-                        userName = ss.split("-")[1];
-                        break;
+                for (Item i : items) {
+                    for (String s : userIdAndNames) {
+                        if(i.getUserId() != Integer.parseInt(s.split("-")[0])){
+                            userIdAndNames.add(i.getUserId() + "-");
+                            break;
+                        }
                     }
                 }
 
-                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(), userName,
-                        i.getDate(), i.getTime(), getDeleteButton(i.getItemId())));
+                for (int i=0; i<userIdAndNames.size(); i++) {
+                    userIdAndNames.set(i, userIdAndNames.get(i) +
+                            dbConnection.getUserName(Integer.parseInt(userIdAndNames.get(i).split("-")[0])));
+                }
+
+                for (Item i : items) {
+                    String userName = null;
+                    for (String ss : userIdAndNames) {
+                        if(i.getUserId() == Integer.parseInt(ss.split("-")[0])) {
+                            userName = ss.split("-")[1];
+                            break;
+                        }
+                    }
+
+                    obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(), userName,
+                            i.getDate(), i.getTime(), getDeleteButton(i.getItemId())));
+                }
+
+                itemTbl.setItems(obList);
             }
 
-            itemTbl.setItems(obList);
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
-
     }
 
     private void setDataIntoInputs(model.tableRows.itemWindow.Item newValue) {
@@ -231,8 +235,8 @@ public class ItemFormController extends Window{
 
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.YES) {
-                    if(dbConnection.deleteItem(itemId)) {
-                        try {
+                    try {
+                        if(dbConnection.deleteItem(itemId)) {
                             for (Item i : items) {
                                 if(i.getItemId() == itemId) {
                                     items.remove(i);
@@ -244,14 +248,13 @@ public class ItemFormController extends Window{
                             alert(Alert.AlertType.INFORMATION, "INFORMATION", "Delete Successful",
                                     "Delete successfully stock id = " + itemId);
 
-                        } catch (SQLException ex) {
-                            alert(Alert.AlertType.ERROR, "ERROR", "Data Reload Error",
-                                    "Cant reload data in table");
+                        } else {
+                            alert(Alert.AlertType.WARNING, "WARNING", "Can't Delete",
+                                    "This item have stocks");
                         }
-
-                    } else {
-                        alert(Alert.AlertType.ERROR, "ERROR", "Can't Delete",
-                                "This item have stocks");
+                    } catch (SQLException ex) {
+                        alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                                ex.getMessage());
                     }
                 }
             });
@@ -287,50 +290,55 @@ public class ItemFormController extends Window{
     }
 
     public void addOrUpdateOnAction(ActionEvent actionEvent) {
-        if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
-            if(!nameTxt.getText().isEmpty()) {
+        try {
+            if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
+                if(!nameTxt.getText().isEmpty()) {
 
-                String name = nameTxt.getText().toLowerCase().trim();
+                    String name = nameTxt.getText().toLowerCase().trim();
 
-                if (dbConnection.addItem(new Item(0, name, super.getUserId(),
-                        new Date(Calendar.getInstance().getTime().getTime()),
-                        new Time(Calendar.getInstance().getTime().getTime())))) {
+                    if (dbConnection.addItem(new Item(0, name, super.getUserId(),
+                            new Date(Calendar.getInstance().getTime().getTime()),
+                            new Time(Calendar.getInstance().getTime().getTime())))) {
 
-                    resetOnAction(actionEvent);
-                    alert(Alert.AlertType.INFORMATION, "Successful", "Successfully Added Item",
-                            "Successfully added item " + name + " With Item ID " + idTxt.getText());
+                        resetOnAction(actionEvent);
+                        alert(Alert.AlertType.INFORMATION, "Successful", "Successfully Added Item",
+                                "Successfully added item " + name + " With Item ID " + idTxt.getText());
 
-                } else {
-                    alert(Alert.AlertType.ERROR, "Error", "Try again",
-                            "DB Connection error try again");
-                }
-
-            } else {
-                alert(Alert.AlertType.WARNING, "Warning", "Incorrect Input",
-                        "Set item name correctly");
-            }
-
-        } else if (addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
-            if(!nameTxt.getText().isEmpty()) {
-
-                String name = nameTxt.getText().toLowerCase().trim();
-
-                if (dbConnection.updateItem(new Item(Integer.parseInt(idTxt.getText()), name,
-                        super.getUserId(), super.getDate(), super.getTime()))) {
-
-                    resetOnAction(actionEvent);
-                    alert(Alert.AlertType.INFORMATION, "Successful", "Successfully Update Item",
-                            "Successfully update item " + name);
+                    } else {
+                        alert(Alert.AlertType.WARNING, "WARNING", "Try again",
+                                "DB Connection error try again");
+                    }
 
                 } else {
-                    alert(Alert.AlertType.ERROR, "Error", "Try again",
-                            "DB Connection error try again");
+                    alert(Alert.AlertType.WARNING, "Warning", "Incorrect Input",
+                            "Set item name correctly");
                 }
 
-            } else {
-                alert(Alert.AlertType.WARNING, "Warning", "Incorrect Input",
-                        "Set item name correctly");
+            } else if (addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
+                if(!nameTxt.getText().isEmpty()) {
+
+                    String name = nameTxt.getText().toLowerCase().trim();
+
+                    if (dbConnection.updateItem(new Item(Integer.parseInt(idTxt.getText()), name,
+                            super.getUserId(), super.getDate(), super.getTime()))) {
+
+                        resetOnAction(actionEvent);
+                        alert(Alert.AlertType.INFORMATION, "Successful", "Successfully Update Item",
+                                "Successfully update item " + name);
+
+                    } else {
+                        alert(Alert.AlertType.WARNING, "WARNING", "Try again",
+                                "DB Connection error try again");
+                    }
+
+                } else {
+                    alert(Alert.AlertType.WARNING, "Warning", "Incorrect Input",
+                            "Set item name correctly");
+                }
             }
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
     }
 
@@ -342,12 +350,18 @@ public class ItemFormController extends Window{
         addOrUpdateBtn.setStyle("-fx-background-color: #1dd1a1;");
     }
 
-    public void previewOnAction(ActionEvent actionEvent) throws SQLException {
+    public void previewOnAction(ActionEvent actionEvent) {
         previewItemTableBtn.setDisable(true);
         if(items != null && !items.isEmpty()) {
             if((loadedRowCountItems - 25) >= 0) {
                 loadedRowCountItems -= 25;
-                items = dbConnection.getItemTable(loadedRowCountItems);
+                try {
+                    items = dbConnection.getItemTable(loadedRowCountItems);
+
+                } catch (SQLException e) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                            e.getMessage());
+                }
                 setDataIntoItemTable();
                 nextItemTableBtn.setDisable(false);
 
@@ -363,12 +377,18 @@ public class ItemFormController extends Window{
         }
     }
 
-    public void nextOnAction(ActionEvent actionEvent) throws SQLException {
+    public void nextOnAction(ActionEvent actionEvent) {
         nextItemTableBtn.setDisable(true);
         if(items != null && !items.isEmpty()) {
             if((loadedRowCountItems + 25) < itemsTableDataCount) {
                 loadedRowCountItems += 25;
-                items = dbConnection.getItemTable(loadedRowCountItems);
+                try {
+                    items = dbConnection.getItemTable(loadedRowCountItems);
+
+                } catch (SQLException e) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                            e.getMessage());
+                }
                 setDataIntoItemTable();
                 previewItemTableBtn.setDisable(false);
 
