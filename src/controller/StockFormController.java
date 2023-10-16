@@ -7,6 +7,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import model.*;
+import model.staticType.IncomeOrExpenseLogTypes;
+import model.staticType.LogTypes;
 import model.staticType.RefillTableTypes;
 import model.staticType.TableTypes;
 import model.tableRows.sellWindow.InvoiceItem;
@@ -497,8 +499,9 @@ public class StockFormController extends Window {
                                     dbConnection.addLog(new Log(super.getUserId(),
                                             "Remove damage stock in STOCK ID: " + stockId +
                                                     " and ITEM NAME: " + dbConnection.getItemName(s.getItemId()) +
-                                            ", QUANTITY:" + s.getQuantity(), 3, super.getDate(),
-                                            super.getTime(), (s.getQuantity() * s.getPrice()), 6));
+                                            ", QUANTITY:" + s.getQuantity(), LogTypes.INFORMATION, super.getDate(),
+                                            super.getTime(), (s.getQuantity() * s.getPrice()),
+                                            IncomeOrExpenseLogTypes.DAMAGE));
                                     stocks.remove(s);
                                     break;
                                 }
@@ -739,8 +742,8 @@ public class StockFormController extends Window {
                                     boolean addIntoLog = dbConnection.addLog(new Log(super.getUserId(),
                                             "Add new stock into STOCK ID: " + dbConnection.getLastStockID() +
                                                     " and ITEM NAME: " + dbConnection.getItemName(itemId) +
-                                                    ", QUANTITY: " + quantity, 3, super.getDate(),
-                                            super.getTime(), (price * quantity), 3));
+                                                    ", QUANTITY: " + quantity, LogTypes.INFORMATION, super.getDate(),
+                                            super.getTime(), (price * quantity), IncomeOrExpenseLogTypes.BUY_ITEMS));
 
                                     if (addIntoStock && addIntoLog) {
                                         reloadTables();
@@ -776,16 +779,18 @@ public class StockFormController extends Window {
                                                 "Remove damage stock in STOCK ID: " +
                                                         selectedStockId + " and ITEM NAME: " +
                                                         dbConnection.getItemName(itemId) + ", QUANTITY: " +
-                                                        finaleQuantity, 3, super.getDate(),
-                                                super.getTime(), (price * finaleQuantity), 6));
+                                                        finaleQuantity, LogTypes.INFORMATION, super.getDate(),
+                                                super.getTime(), (price * finaleQuantity),
+                                                IncomeOrExpenseLogTypes.DAMAGE));
 
                                     } else {
                                         finaleQuantity = quantity - lastQuantity;
                                         dbConnection.addLog(new Log(super.getUserId(),
                                                 "Update stock in STOCK ID: " + selectedStockId +
                                                         " and ITEM NAME: " + dbConnection.getItemName(itemId) +
-                                                        ", QUANTITY: " + finaleQuantity, 3, super.getDate(),
-                                                super.getTime(), (price * finaleQuantity), 3));
+                                                        ", QUANTITY: " + finaleQuantity, LogTypes.INFORMATION,
+                                                super.getDate(), super.getTime(), (price * finaleQuantity),
+                                                IncomeOrExpenseLogTypes.BUY_ITEMS));
                                     }
 
                                     if(dbConnection.updateStock(new Stock(selectedStockId, super.getUserId(),

@@ -7,6 +7,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import model.Log;
 import model.Window;
+import model.staticType.IncomeOrExpenseLogTypes;
+import model.staticType.LogTypes;
 import model.staticType.MoneyType;
 
 import java.io.IOException;
@@ -260,9 +262,10 @@ public class LockerFormController extends Window {
                         if(amount <= lockerMoney) {
                             if(dbConnection.addLog(new Log(super.getUserId(), "Withdraw money Rs: " + amount
                                     + " ( " + forWhatTxt.getText().trim().toLowerCase() + " )",
-                                    3, new Date(Calendar.getInstance().getTime().getTime()),
+                                    LogTypes.INFORMATION, new Date(Calendar.getInstance().getTime().getTime()),
                                     new Time(Calendar.getInstance().getTime().getTime()), amount,
-                                    payBillChBx.isSelected() ? 5 : 4))) {
+                                    payBillChBx.isSelected() ? IncomeOrExpenseLogTypes.PAY_BILLS :
+                                            IncomeOrExpenseLogTypes.WITHDRAW_MONEY))) {
 
                                 setMoney(WITHDRAW, amount);
                                 forWhatTxt.clear();
@@ -351,8 +354,9 @@ public class LockerFormController extends Window {
 
                 if(amount > 0) {
                     if(dbConnection.addLog(new Log(super.getUserId(), "Add money Rs: " + amount,
-                            3, new Date(Calendar.getInstance().getTime().getTime()),
-                            new Time(Calendar.getInstance().getTime().getTime()), amount, 2))) {
+                            LogTypes.INFORMATION, new Date(Calendar.getInstance().getTime().getTime()),
+                            new Time(Calendar.getInstance().getTime().getTime()), amount,
+                            IncomeOrExpenseLogTypes.ADD_MONEY))) {
 
                         setMoney(ADD_INCOME, amount);
                         addMoneyTxt.clear();

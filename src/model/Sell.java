@@ -1,28 +1,34 @@
 package model;
 
-import java.sql.Date;
-import java.sql.Time;
-
 public class Sell {
     private int sellId;
     private int billNumber;
     private int itemId;
     private double discount;
     private double price;
+    private double profit;
     private int quantity;
     private boolean edited;
 
 
-    public Sell() {
+    public Sell() {}
+
+    public Sell(int sellId, int itemId, double price, double profit, int quantity) {
+        this.sellId = sellId;
+        this.itemId = itemId;
+        this.price = price;
+        this.profit = profit;
+        this.quantity = quantity;
     }
 
-    public Sell(int sellId, int billNumber, int itemId, double discount, double price,
+    public Sell(int sellId, int billNumber, int itemId, double discount, double price, double profit,
                 int quantity, boolean edited) {
         this.sellId = sellId;
         this.billNumber = billNumber;
         this.itemId = itemId;
         this.discount = discount;
         this.price = price;
+        this.profit = profit;
         this.quantity = quantity;
         this.edited = edited;
     }
@@ -82,5 +88,13 @@ public class Sell {
 
     public void setBillNumber(int billNumber) {
         this.billNumber = billNumber;
+    }
+
+    public double getProfit() {
+        return profit;
+    }
+
+    public void setProfit(double profit) {
+        this.profit = profit;
     }
 }

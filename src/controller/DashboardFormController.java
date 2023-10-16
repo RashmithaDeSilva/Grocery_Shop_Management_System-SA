@@ -34,9 +34,9 @@ public class DashboardFormController extends Window {
             }
 
             userNameBtn.setText(getUserName());
-            double income = dbConnection.getIncome(String.format(new SimpleDateFormat("yyyy-MM-dd")
-                    .format(new Date(System.currentTimeMillis()))));
-            incomeLbl.setText("Rs: " + (income >= 0 ? income : 0));
+//            double income = dbConnection.getIncome(String.format(new SimpleDateFormat("yyyy-MM-dd")
+//                    .format(new Date(System.currentTimeMillis()))));
+//            incomeLbl.setText("Rs: " + (income >= 0 ? income : 0));
 
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());

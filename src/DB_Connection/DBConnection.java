@@ -2,9 +2,7 @@ package DB_Connection;
 
 import javafx.scene.control.Alert;
 import model.*;
-import model.staticType.IncomeDayTypes;
-import model.staticType.IncomeOrExpensesTypes;
-import model.staticType.TableTypes;
+import model.staticType.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -102,8 +100,8 @@ public class DBConnection {
         preparedStatement.setDate(3, log.getDate());
         preparedStatement.setTime(4, log.getTime());
         preparedStatement.setDouble(5, log.getAmount());
-        preparedStatement.setInt(6, log.getLogType());
-        preparedStatement.setInt(7, log.getIncomeOrExpenses());
+        preparedStatement.setInt(6, getLogTypes(log.getLogType()));
+        preparedStatement.setInt(7, getIncomeOrExpense(log.getIncomeOrExpensesType()));
 
         // Execute the query
         return preparedStatement.executeUpdate() > 0;
@@ -192,6 +190,23 @@ public class DBConnection {
         preparedStatement.setInt(9, stock.getStockId());
 
         return preparedStatement.executeUpdate() > 0;
+    }
+
+    public boolean updateStock(Sell sell) throws SQLException {
+        int stockId = getStockId(sell);
+
+        if(stockId > 0) {
+            String sql = "UPDATE stock SET quantity = quantity + ?, WHERE stock_id = ?;";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, sell.getQuantity());
+            preparedStatement.setInt(2, stockId);
+
+            return preparedStatement.executeUpdate() > 0;
+
+        } else {
+            return addStock(new Stock(stockId, ));
+        }
     }
 
     public boolean updateRemoveStock(int stockId, int quantity) throws SQLException {
@@ -398,6 +413,26 @@ public class DBConnection {
         return stocks;
     }
 
+    public ArrayList<Bill> getBillTable(int billCount) throws SQLException {
+        ResultSet reset;
+
+        if(billCount > 0) {
+            reset = stm.executeQuery("SELECT * FROM bills LIMIT 25 OFFSET " + billCount +";");
+        } else {
+            reset = stm.executeQuery("SELECT * FROM bills LIMIT 25;");
+        }
+
+        ArrayList<Bill> bills = new ArrayList<>();
+
+        while(reset.next()) {
+            bills.add(new Bill(reset.getInt("bill_number"), reset.getInt("user_id"),
+                    reset.getDouble("discount"), reset.getDouble("total_price"),
+                    reset.getDate("order_date"), reset.getTime("order_time")));
+        }
+
+        return bills;
+    }
+
     public ArrayList<Stock> getRefillStockTable(int stockCount) throws SQLException {
         ResultSet reset;
 
@@ -545,6 +580,31 @@ public class DBConnection {
         return null;
     }
 
+    private ArrayList<Sell> getSells(int billNumber) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT * FROM sells WHERE bill_number = " + billNumber + ";");
+        ArrayList<Sell> sells = new ArrayList<>();
+
+        while(reset.next()) {
+            sells.add(new Sell(reset.getInt("sale_id"), reset.getInt("item_id"),
+                    reset.getDouble("sale_amount"), reset.getDouble("profit"),
+                    reset.getInt("quantity")));
+        }
+
+        return sells;
+    }
+
+    private int getStockId(Sell sell) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT stock_id FROM stock WHERE item_id = " + sell.getItemId() +
+                " AND price = " + (sell.getProfit() - (sell.getPrice() + sell.getDiscount())) +
+                " AND selling_price = " + (sell.getPrice() + sell.getDiscount()) + ";");
+
+        while(reset.next()) {
+            return reset.getInt("stock_id");
+        }
+
+        return -1;
+    }
+
     public double getIncome(IncomeDayTypes incomeDayTypes, IncomeOrExpensesTypes incomeOrExpensesTypes) throws SQLException {
         String sql = "SELECT ";
 
@@ -626,6 +686,40 @@ public class DBConnection {
 
     public void deleteLastBill() throws SQLException {
         stm.executeUpdate("DELETE FROM bills ORDER BY bill_number DESC LIMIT 1;");
+    }
+
+    public boolean deleteBill(int billNumber) throws SQLException {
+        if(deleteSell(billNumber)) {
+            String sql = "DELETE FROM bills WHERE bill_number = ?";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, billNumber);
+            return preparedStatement.executeUpdate() > 0;
+        }
+
+        return false;
+    }
+
+    public boolean deleteSell(int billNumber) throws SQLException {
+        ArrayList<Sell> sells = getSells(billNumber);
+
+        for (Sell s : sells) {
+            deleteSellEdit(s.getSellId());
+            updateStock(s);
+        }
+
+        String sql = "DELETE FROM sells WHERE bill_number = ?";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, billNumber);
+        return preparedStatement.executeUpdate() > 0;
+    }
+
+    public void deleteSellEdit(Integer sellId) throws SQLException {
+        String sql = "DELETE FROM sell_edits WHERE sale_id = ?;";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, sellId);
     }
 
     public boolean deleteUser(int userId) throws SQLException {
@@ -773,6 +867,48 @@ public class DBConnection {
 
     public static String getPassword() {
         return password;
+    }
+
+    public int getLogTypes(LogTypes log) {
+        switch (log) {
+            case ERROR:
+                return 1;
+
+            case WARNING:
+                return 2;
+
+            case INFORMATION:
+                return 3;
+        }
+
+        return -1;
+    }
+
+    public int getIncomeOrExpense(IncomeOrExpenseLogTypes type) {
+        switch (type) {
+            case SELL_INCOME:
+                return 1;
+
+            case ADD_MONEY:
+                return 2;
+
+            case RETURNS:
+                return 3;
+
+            case BUY_ITEMS:
+                return 4;
+
+            case WITHDRAW_MONEY:
+                return 5;
+
+            case PAY_BILLS:
+                return 6;
+
+            case DAMAGE:
+                return 7;
+        }
+
+        return -1;
     }
 
 

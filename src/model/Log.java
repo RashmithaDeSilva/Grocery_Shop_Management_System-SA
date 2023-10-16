@@ -1,22 +1,26 @@
 package model;
 
+import model.staticType.IncomeOrExpenseLogTypes;
+import model.staticType.LogTypes;
+
 import java.sql.Date;
 import java.sql.Time;
 
 public class Log {
     private int userId;
     private String logName;
-    private int logType;
+    private LogTypes logType;
     private Date date;
     private Time time;
     private double amount;
-    private int incomeOrExpensesType;
+    private IncomeOrExpenseLogTypes incomeOrExpensesType;
 
 
     public Log() {
     }
 
-    public Log(int userId, String logName, int logType, Date date, Time time, double amount, int incomeOrExpensesType) {
+    public Log(int userId, String logName, LogTypes logType, Date date, Time time, double amount,
+               IncomeOrExpenseLogTypes incomeOrExpensesType) {
         this.userId = userId;
         this.logName = logName;
         this.logType = logType;
@@ -67,19 +71,19 @@ public class Log {
         this.amount = amount;
     }
 
-    public int getLogType() {
+    public LogTypes getLogType() {
         return logType;
     }
 
-    public void setLogType(int logType) {
+    public void setLogType(LogTypes logType) {
         this.logType = logType;
     }
 
-    public int getIncomeOrExpenses() {
+    public IncomeOrExpenseLogTypes getIncomeOrExpensesType() {
         return incomeOrExpensesType;
     }
 
-    public void setIncomeOrExpenses(int incomeOrExpensesType) {
+    public void setIncomeOrExpensesType(IncomeOrExpenseLogTypes incomeOrExpensesType) {
         this.incomeOrExpensesType = incomeOrExpensesType;
     }
 }

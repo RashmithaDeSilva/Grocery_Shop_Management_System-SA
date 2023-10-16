@@ -118,9 +118,9 @@ public class UserManagementFormController extends Window {
     }
 
     private void setDataIntoUsersTable() {
-        ObservableList<User> obList = FXCollections.observableArrayList();
-
         if(users != null && !users.isEmpty()) {
+            ObservableList<User> obList = FXCollections.observableArrayList();
+
             for (model.User u : users) {
                 if(u.getTitle() != 0) {
 
@@ -236,7 +236,7 @@ public class UserManagementFormController extends Window {
                                         "Banned successfully user " + dbConnection.getUserName(userId));
 
                             } else {
-                                alert(Alert.AlertType.ERROR, "ERROR", "Can't Banned",
+                                alert(Alert.AlertType.WARNING, "WARNING", "Can't Banned",
                                         "This user can not Banned");
                             }
 
@@ -276,7 +276,7 @@ public class UserManagementFormController extends Window {
                                         "BAND successfully user " + dbConnection.getUserName(userId));
 
                             } else {
-                                alert(Alert.AlertType.ERROR, "ERROR", "Can't Unbanned",
+                                alert(Alert.AlertType.WARNING, "WARNING", "Can't Unbanned",
                                         "This user can not Unbanned");
                             }
 

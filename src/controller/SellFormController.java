@@ -7,6 +7,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import model.*;
+import model.staticType.IncomeOrExpenseLogTypes;
+import model.staticType.LogTypes;
 import model.staticType.TableTypes;
 import model.tableRows.sellWindow.InvoiceItem;
 import model.tableRows.sellWindow.SellItem;
@@ -48,6 +50,7 @@ public class SellFormController extends Window{
     private int loadedRowCountItems = 0;
     private int itemsTableDataCount;
     private int stockId = 0;
+    private double price = 0;
 
 
     public void initialize() {
@@ -59,7 +62,7 @@ public class SellFormController extends Window{
         nameCol.setCellValueFactory(new PropertyValueFactory<>("itemName"));
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         discountCol.setCellValueFactory(new PropertyValueFactory<>("discount"));
-        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+        priceCol.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
         deleteCol.setCellValueFactory(new PropertyValueFactory<>("delete"));
 
         try{
@@ -257,6 +260,7 @@ public class SellFormController extends Window{
                         quantityTxt.setText("1");
                         priceTxt.setText(Double.toString(s.getSellingPrice()));
                         stockId = s.getStockId();
+                        price = s.getPrice();
                         break;
 
                     } else {
@@ -281,6 +285,7 @@ public class SellFormController extends Window{
         priceTxt.clear();
         totalPriceTxt.clear();
         stockId = 0;
+        price = 0;
         addOrUpdateBtn.setText("Add");
         addOrUpdateBtn.setStyle("-fx-background-color: #1dd1a1;");
     }
@@ -344,17 +349,19 @@ public class SellFormController extends Window{
                                 if(discountTxt.getText().isEmpty() || Double.parseDouble(discountTxt.getText()) == 0) {
                                     quotationTbl.getItems().add(new InvoiceItem(Integer.parseInt(idTxt.getText()),
                                             stockId, nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
-                                            0, Double.parseDouble(totalPriceTxt.getText()),
+                                            0, price, Double.parseDouble(totalPriceTxt.getText()),
                                             getDeleteButton(Integer.parseInt(idTxt.getText()))));
                                     resetAllInputs();
                                     searchTxt.clear();
                                     refreshTables();
 
                                 } else if(Double.parseDouble(discountTxt.getText()) > 0 &&
-                                        Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
+                                        Double.parseDouble(discountTxt.getText()) <=
+                                                Double.parseDouble(priceTxt.getText())) {
                                     quotationTbl.getItems().add(new InvoiceItem(Integer.parseInt(idTxt.getText()),
                                             stockId, nameTxt.getText(), Integer.parseInt(quantityTxt.getText()),
-                                            Double.parseDouble(discountTxt.getText()), Double.parseDouble(totalPriceTxt.getText()),
+                                            Double.parseDouble(discountTxt.getText()), price,
+                                            Double.parseDouble(totalPriceTxt.getText()),
                                             getDeleteButton(Integer.parseInt(idTxt.getText()))));
                                     resetAllInputs();
                                     searchTxt.clear();
@@ -367,13 +374,14 @@ public class SellFormController extends Window{
                                 }
 
                             } catch (NumberFormatException e) {
-                                alert(Alert.AlertType.ERROR, "Invalid Input",
+                                alert(Alert.AlertType.WARNING, "WARNING",
                                         "Set Integer or Float Value Into Discount", e.getMessage());
                             }
 
                         } else {
                             alert(Alert.AlertType.WARNING, "Invalid Input",
-                                    "Set Quantity Correctly", "Sorry this quantity is not available");
+                                    "Set Quantity Correctly",
+                                    "Sorry this quantity is not available");
                         }
 
                     } catch (NumberFormatException e) {
@@ -384,7 +392,8 @@ public class SellFormController extends Window{
                 } else {
                     alert(Alert.AlertType.WARNING, "Check Invoice",
                             "This Item Is Already Added",
-                            "This item is already added into invoice if you want to update it try to update");
+                            "This item is already added into invoice if you want " +
+                                    "to update it try to update");
                 }
 
             } else if(addOrUpdateBtn.getText().equalsIgnoreCase("update")) {
@@ -394,12 +403,14 @@ public class SellFormController extends Window{
                             if(Integer.parseInt(quantityTxt.getText()) > 0 && Integer.parseInt(quantityTxt.getText())
                                     <= Integer.parseInt(availableQuantityTxt.getText())){
                                 try{
-                                    if(discountTxt.getText().isEmpty() || Double.parseDouble(discountTxt.getText()) == 0) {
+                                    if(discountTxt.getText().isEmpty() ||
+                                            Double.parseDouble(discountTxt.getText()) == 0) {
 
                                         i.setDiscount(Double.parseDouble("0.00"));
 
                                     } else if(Double.parseDouble(discountTxt.getText()) > 0 &&
-                                            Double.parseDouble(discountTxt.getText()) <= Double.parseDouble(priceTxt.getText())) {
+                                            Double.parseDouble(discountTxt.getText()) <=
+                                                    Double.parseDouble(priceTxt.getText())) {
 
                                         i.setDiscount(Double.parseDouble(discountTxt.getText()));
 
@@ -423,7 +434,8 @@ public class SellFormController extends Window{
 
                             } else {
                                 alert(Alert.AlertType.WARNING, "Invalid Input",
-                                        "Set Quantity Correctly", "Sorry this quantity is not available");
+                                        "Set Quantity Correctly",
+                                        "Sorry this quantity is not available");
                             }
 
                         } catch (NumberFormatException e) {
@@ -472,7 +484,7 @@ public class SellFormController extends Window{
                     for (InvoiceItem i : quotationTbl.getItems()) {
 
                         if(!dbConnection.addSell(new Sell(0, billNumber, i.getItemId(), i.getDiscount(),
-                                i.getPrice(), i.getQuantity(), false))) {
+                                (i.getSellingPrice() - i.getPrice()), i.getPrice(), i.getQuantity(), false))) {
 
                             successfulMassage = false;
                             for (InvoiceItem itemRemove : quotationTbl.getItems()) {
@@ -500,8 +512,8 @@ public class SellFormController extends Window{
 
                                         dbConnection.addLog(new Log(super.getUserId(), "Sell items: " +
                                                 quotationTbl.getItems().size() + " with BILL NUMBER: " +
-                                                billNumber, 3, super.getDate(), super.getTime(),
-                                                totalBillPrice, 1));
+                                                billNumber, LogTypes.INFORMATION, super.getDate(), super.getTime(),
+                                                totalBillPrice, IncomeOrExpenseLogTypes.SELL_INCOME));
 
                                     } else {
                                         successfulMassage = false;

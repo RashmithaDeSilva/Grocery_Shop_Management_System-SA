@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import model.staticType.LogTypes;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ import java.util.Objects;
 public class AppInitializer extends Application {
 
     public static void main(String[] args) {
+        System.out.println(LogTypes.WARNING);
         launch(args);
     }
 
