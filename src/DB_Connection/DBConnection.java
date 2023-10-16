@@ -110,20 +110,17 @@ public class DBConnection {
     }
 
     public boolean addSell(Sell sell) throws SQLException {
-        String sql = "INSERT INTO sells (bill_number, user_id, item_id, sale_date, sale_time, discount, " +
-                "sale_amount, quantity, edit) VALUES (?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO sells (bill_number, item_id, discount, " +
+                "sale_amount, quantity, edit) VALUES (?,?,?,?,?,?)";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         // Set the values for the placeholders
         preparedStatement.setInt(1, sell.getBillNumber());
-        preparedStatement.setInt(2, sell.getUserId());
-        preparedStatement.setInt(3, sell.getItemId());
-        preparedStatement.setDate(4, sell.getSellDate());
-        preparedStatement.setTime(5, sell.getSellTime());
-        preparedStatement.setDouble(6, sell.getDiscount());
-        preparedStatement.setDouble(7, sell.getPrice());
-        preparedStatement.setInt(8, sell.getQuantity());
-        preparedStatement.setBoolean(9, sell.isEdited());
+        preparedStatement.setInt(2, sell.getItemId());
+        preparedStatement.setDouble(3, sell.getDiscount());
+        preparedStatement.setDouble(4, sell.getPrice());
+        preparedStatement.setInt(5, sell.getQuantity());
+        preparedStatement.setBoolean(6, sell.isEdited());
 
         // Execute the query
         return preparedStatement.executeUpdate() > 0;

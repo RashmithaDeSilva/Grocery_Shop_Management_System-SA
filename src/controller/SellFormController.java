@@ -471,9 +471,8 @@ public class SellFormController extends Window{
 
                     for (InvoiceItem i : quotationTbl.getItems()) {
 
-                        if(!dbConnection.addSell(new Sell(0, billNumber, super.getUserId(),
-                                i.getItemId(), super.getDate(), super.getTime(), i.getDiscount(), i.getPrice(),
-                                i.getQuantity(), false))) {
+                        if(!dbConnection.addSell(new Sell(0, billNumber, i.getItemId(), i.getDiscount(),
+                                i.getPrice(), i.getQuantity(), false))) {
 
                             successfulMassage = false;
                             for (InvoiceItem itemRemove : quotationTbl.getItems()) {

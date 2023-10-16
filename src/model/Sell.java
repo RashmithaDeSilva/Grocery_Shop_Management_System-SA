@@ -6,10 +6,7 @@ import java.sql.Time;
 public class Sell {
     private int sellId;
     private int billNumber;
-    private int userId;
     private int itemId;
-    private Date sellDate;
-    private Time sellTime;
     private double discount;
     private double price;
     private int quantity;
@@ -19,14 +16,11 @@ public class Sell {
     public Sell() {
     }
 
-    public Sell(int sellId, int billNumber, int userId, int itemId, Date sellDate, Time sellTime,
-                double discount, double price, int quantity, boolean edited) {
+    public Sell(int sellId, int billNumber, int itemId, double discount, double price,
+                int quantity, boolean edited) {
         this.sellId = sellId;
         this.billNumber = billNumber;
-        this.userId = userId;
         this.itemId = itemId;
-        this.sellDate = sellDate;
-        this.sellTime = sellTime;
         this.discount = discount;
         this.price = price;
         this.quantity = quantity;
@@ -42,36 +36,12 @@ public class Sell {
         this.sellId = sellId;
     }
 
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
     public int getItemId() {
         return itemId;
     }
 
     public void setItemId(int itemId) {
         this.itemId = itemId;
-    }
-
-    public Date getSellDate() {
-        return sellDate;
-    }
-
-    public void setSellDate(Date sellDate) {
-        this.sellDate = sellDate;
-    }
-
-    public Time getSellTime() {
-        return sellTime;
-    }
-
-    public void setSellTime(Time sellTime) {
-        this.sellTime = sellTime;
     }
 
     public double getDiscount() {
