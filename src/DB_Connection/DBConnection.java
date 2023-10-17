@@ -6,6 +6,7 @@ import model.staticType.*;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DBConnection {
 
@@ -89,6 +90,26 @@ public class DBConnection {
         return preparedStatement.executeUpdate() > 0;
     }
 
+    public boolean addReturnStock(Stock stock) throws SQLException {
+        String sql = "INSERT INTO stock (stock_id, user_id, item_id, quantity, refill_quantity, " +
+                "price, selling_price, refill_date, refill_time) VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        // Set the values for the placeholders
+        preparedStatement.setInt(1, stock.getStockId());
+        preparedStatement.setInt(2, stock.getUserId());
+        preparedStatement.setInt(3, stock.getItemId());
+        preparedStatement.setInt(4, stock.getQuantity());
+        preparedStatement.setInt(5, stock.getRefillQuantity());
+        preparedStatement.setDouble(6, stock.getPrice());
+        preparedStatement.setDouble(7, stock.getSellingPrice());
+        preparedStatement.setDate(8, stock.getLastRefillDate());
+        preparedStatement.setTime(9, stock.getLastRefillTime());
+
+        // Execute the query
+        return preparedStatement.executeUpdate() > 0;
+    }
+
     public boolean addLog(Log log) throws SQLException {
         String sql = "INSERT INTO log (user_id, log_name, log_date, log_time, amount, log_type, " +
                 "income_and_expenses_type) VALUES (?,?,?,?,?,?,?)";
@@ -108,17 +129,19 @@ public class DBConnection {
     }
 
     public boolean addSell(Sell sell) throws SQLException {
-        String sql = "INSERT INTO sells (bill_number, item_id, discount, " +
-                "sale_amount, quantity, edit) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO sells (bill_number, item_id, stock_id, discount, " +
+                "sale_amount, profit, quantity, edit, returns) VALUES (?,?,?,?,?,?,?,?,?)";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        // Set the values for the placeholders
         preparedStatement.setInt(1, sell.getBillNumber());
         preparedStatement.setInt(2, sell.getItemId());
-        preparedStatement.setDouble(3, sell.getDiscount());
-        preparedStatement.setDouble(4, sell.getPrice());
-        preparedStatement.setInt(5, sell.getQuantity());
-        preparedStatement.setBoolean(6, sell.isEdited());
+        preparedStatement.setInt(3, sell.getStockId());
+        preparedStatement.setDouble(4, sell.getDiscount());
+        preparedStatement.setDouble(5, sell.getPrice());
+        preparedStatement.setDouble(6, sell.getProfit());
+        preparedStatement.setInt(7, sell.getQuantity());
+        preparedStatement.setBoolean(8, sell.isEdited());
+        preparedStatement.setBoolean(9, sell.isReturns());
 
         // Execute the query
         return preparedStatement.executeUpdate() > 0;
@@ -192,20 +215,35 @@ public class DBConnection {
         return preparedStatement.executeUpdate() > 0;
     }
 
-    public boolean updateStock(Sell sell) throws SQLException {
-        int stockId = getStockId(sell);
+    public boolean updateStock(Sell sell, int bill_number) throws SQLException {
+        String sql = "UPDATE stock SET quantity = quantity + ?, WHERE stock_id = ? " +
+                "AND item_id = ? AND price = ?;";
 
-        if(stockId > 0) {
-            String sql = "UPDATE stock SET quantity = quantity + ?, WHERE stock_id = ?;";
+        double price = (sell.getProfit() - (sell.getPrice() + sell.getDiscount()));
 
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, sell.getQuantity());
-            preparedStatement.setInt(2, stockId);
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, sell.getQuantity());
+        preparedStatement.setInt(2, sell.getStockId());
+        preparedStatement.setInt(3, sell.getItemId());
+        preparedStatement.setDouble(4, price);
 
-            return preparedStatement.executeUpdate() > 0;
+        if(preparedStatement.executeUpdate() > 0) {
+            return true;
 
         } else {
-            return addStock(new Stock(stockId, ));
+            Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+            Time time = new Time(Calendar.getInstance().getTime().getTime());
+
+            if(addReturnStock(new Stock(sell.getStockId(), getBillAddedUserId(bill_number), sell.getItemId(),
+                    sell.getQuantity(), 0, price, sell.getPrice() +
+                    sell.getDiscount(), date, time))) {
+                return true;
+
+            } else {
+                return addStock(new Stock(0, getBillAddedUserId(bill_number), sell.getItemId(),
+                        sell.getQuantity(), 0, price, sell.getPrice() +
+                        sell.getDiscount(), date, time));
+            }
         }
     }
 
@@ -273,6 +311,15 @@ public class DBConnection {
         return instance;
     }
 
+    private int getBillAddedUserId(int billNumber) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT user_id FROM bills WHERE bill_number = " + billNumber +";");
+
+        if(reset.next()) {
+            return reset.getInt("user_id");
+        }
+        return -1;
+    }
+
     public int getUserRoll(String userName, String password) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT title FROM users WHERE user_name = '" + userName +"' " +
                 "AND password = '" + password +"';");
@@ -302,6 +349,10 @@ public class DBConnection {
 
             case USER_TABLE:
                 reset = stm.executeQuery("SELECT COUNT(*) FROM users;");
+                break;
+
+            case BILL_TABLE:
+                reset = stm.executeQuery("SELECT COUNT(*) FROM bills;");
                 break;
         }
 
@@ -426,8 +477,9 @@ public class DBConnection {
 
         while(reset.next()) {
             bills.add(new Bill(reset.getInt("bill_number"), reset.getInt("user_id"),
-                    reset.getDouble("discount"), reset.getDouble("total_price"),
-                    reset.getDate("order_date"), reset.getTime("order_time")));
+                    reset.getDouble("total_price"), reset.getDouble("discount"),
+                    reset.getDate("order_date"), reset.getTime("order_time"),
+                    reset.getBoolean("returns")));
         }
 
         return bills;
@@ -586,23 +638,12 @@ public class DBConnection {
 
         while(reset.next()) {
             sells.add(new Sell(reset.getInt("sale_id"), reset.getInt("item_id"),
-                    reset.getDouble("sale_amount"), reset.getDouble("profit"),
-                    reset.getInt("quantity")));
+                    reset.getInt("stock_id"), reset.getDouble("sale_amount"),
+                    reset.getDouble("profit"), reset.getInt("quantity"),
+                    reset.getBoolean("return")));
         }
 
         return sells;
-    }
-
-    private int getStockId(Sell sell) throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT stock_id FROM stock WHERE item_id = " + sell.getItemId() +
-                " AND price = " + (sell.getProfit() - (sell.getPrice() + sell.getDiscount())) +
-                " AND selling_price = " + (sell.getPrice() + sell.getDiscount()) + ";");
-
-        while(reset.next()) {
-            return reset.getInt("stock_id");
-        }
-
-        return -1;
     }
 
     public double getIncome(IncomeDayTypes incomeDayTypes, IncomeOrExpensesTypes incomeOrExpensesTypes) throws SQLException {
@@ -688,9 +729,27 @@ public class DBConnection {
         stm.executeUpdate("DELETE FROM bills ORDER BY bill_number DESC LIMIT 1;");
     }
 
-    public boolean deleteBill(int billNumber) throws SQLException {
-        if(deleteSell(billNumber)) {
-            String sql = "DELETE FROM bills WHERE bill_number = ?";
+    public boolean deleteSellEdit(Integer sellId) throws SQLException {
+        String sql = "DELETE FROM sell_edits WHERE sale_id = ?;";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, sellId);
+
+        return preparedStatement.executeUpdate() > 0;
+    }
+
+    public void deleteIllegalUsers(int maximumUserCount) throws SQLException {
+        stm.executeUpdate("DELETE FROM users WHERE user_id NOT IN (" +
+                "    SELECT user_id FROM (" +
+                "             SELECT user_id FROM users ORDER BY user_id LIMIT " + maximumUserCount +
+                "    ) AS banned" + ");");
+    }
+
+
+    // Returns ---------------------------------------------------------------------------------------------------------
+    public boolean setReturnBill(int billNumber) throws SQLException {
+        if(setReturnAllSells(billNumber)) {
+            String sql = "UPDATE bills SET returns = 1 WHERE bill_number = ?;";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, billNumber);
@@ -700,41 +759,20 @@ public class DBConnection {
         return false;
     }
 
-    public boolean deleteSell(int billNumber) throws SQLException {
+    public boolean setReturnAllSells(int billNumber) throws SQLException {
         ArrayList<Sell> sells = getSells(billNumber);
 
         for (Sell s : sells) {
-            deleteSellEdit(s.getSellId());
-            updateStock(s);
+            if(!deleteSellEdit(s.getSellId()) || !updateStock(s, billNumber)) {
+                return false;
+            }
         }
 
-        String sql = "DELETE FROM sells WHERE bill_number = ?";
+        String sql = "UPDATE sells SET returns = 1 WHERE bill_number = ?;";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1, billNumber);
         return preparedStatement.executeUpdate() > 0;
-    }
-
-    public void deleteSellEdit(Integer sellId) throws SQLException {
-        String sql = "DELETE FROM sell_edits WHERE sale_id = ?;";
-
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, sellId);
-    }
-
-    public boolean deleteUser(int userId) throws SQLException {
-        String sql = "DELETE FROM users WHERE user_id = ?";
-
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, userId);
-        return preparedStatement.executeUpdate() > 0;
-    }
-
-    public void deleteIllegalUsers(int maximumUserCount) throws SQLException {
-        stm.executeUpdate("DELETE FROM users WHERE user_id NOT IN (" +
-                "    SELECT user_id FROM (" +
-                "             SELECT user_id FROM users ORDER BY user_id LIMIT " + maximumUserCount +
-                "    ) AS banned" + ");");
     }
 
 

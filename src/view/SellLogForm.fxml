@@ -43,7 +43,7 @@
             <TableColumn fx:id="priceBillTableCol" prefWidth="92.79998779296875" text="Price" />
             <TableColumn fx:id="dateCol" prefWidth="104.0" text="Date" />
             <TableColumn fx:id="timeCol" prefWidth="106.4000244140625" text="Time" />
-            <TableColumn fx:id="deleteBillTableCol" prefWidth="88.0" text="Delete" />
+            <TableColumn fx:id="returnBillTableCol" prefWidth="88.0" text="Return" />
         </columns>
       </TableView>
       <TableView fx:id="sellsTbl" layoutX="40.0" layoutY="501.0" prefHeight="226.0" prefWidth="730.0">
@@ -53,7 +53,7 @@
             <TableColumn fx:id="quantityCol" prefWidth="103.199951171875" text="Quantity" />
             <TableColumn fx:id="discountSellTableCol" prefWidth="116.0" text="Discount" />
             <TableColumn fx:id="priceSellTableCol" prefWidth="112.0" text="Price" />
-            <TableColumn fx:id="deleteSellTableCol" prefWidth="91.2000732421875" text="Delete" />
+            <TableColumn fx:id="returnSellTableCol" prefWidth="91.2000732421875" text="Return" />
         </columns>
       </TableView>
       <Button fx:id="previewBillTableBtn" layoutX="363.0" layoutY="428.0" mnemonicParsing="false" onAction="#previewBillTableOnAction" style="-fx-background-color: #48dbfb;" text="&lt;">

@@ -22,13 +22,14 @@ CREATE TABLE items (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
-CREATE TABLE bill (
+CREATE TABLE bills (
     bill_number INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     discount DECIMAL(10, 2),
     total_price DECIMAL(10, 2),
     order_date DATE,
     order_time TIME,
+    returns BIT,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
@@ -62,6 +63,7 @@ CREATE TABLE sells (
     sale_id INT AUTO_INCREMENT PRIMARY KEY,
     bill_number INT,
     item_id INT,
+    stock_id INT,
     discount DECIMAL(10, 2),
     sale_amount DECIMAL(10, 2),
     quantity INT,

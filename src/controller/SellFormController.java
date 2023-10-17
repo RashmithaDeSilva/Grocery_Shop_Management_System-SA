@@ -475,7 +475,7 @@ public class SellFormController extends Window{
 
                 double totalBillPrice = Double.parseDouble(totalBill.getText().split(" ")[1]);
                 if(dbConnection.addBill(new Bill(0, super.getUserId(),
-                        totalBillPrice, discount, super.getDate(), super.getTime()))) {
+                        totalBillPrice, discount, super.getDate(), super.getTime(), false))) {
 
                     boolean successfulMassage = true;
                     int billNumber = dbConnection.getLastBillNumber();
@@ -483,8 +483,9 @@ public class SellFormController extends Window{
 
                     for (InvoiceItem i : quotationTbl.getItems()) {
 
-                        if(!dbConnection.addSell(new Sell(0, billNumber, i.getItemId(), i.getDiscount(),
-                                (i.getSellingPrice() - i.getPrice()), i.getPrice(), i.getQuantity(), false))) {
+                        if(!dbConnection.addSell(new Sell(0, billNumber, i.getItemId(), i.getStockId(),
+                                i.getDiscount(), (i.getSellingPrice() - i.getPrice()), i.getPrice(),
+                                i.getQuantity(), false, false))) {
 
                             successfulMassage = false;
                             for (InvoiceItem itemRemove : quotationTbl.getItems()) {

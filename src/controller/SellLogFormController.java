@@ -27,14 +27,14 @@ public class SellLogFormController extends Window {
     public TableColumn<Object, String> priceBillTableCol;
     public TableColumn<Object, String> dateCol;
     public TableColumn<Object, String> timeCol;
-    public TableColumn<Object, String> deleteBillTableCol;
+    public TableColumn<Object, String> returnBillTableCol;
     public TableView sellsTbl;
     public TableColumn<Object, String> sellIdCol;
     public TableColumn<Object, String> itemNameCol;
     public TableColumn<Object, String> quantityCol;
     public TableColumn<Object, String> discountSellTableCol;
     public TableColumn<Object, String> priceSellTableCol;
-    public TableColumn<Object, String> deleteSellTableCol;
+    public TableColumn<Object, String> returnSellTableCol;
     public TextField sellIdTxt;
     public TextField discountTxt;
     public TextField quantityTxt;
@@ -59,14 +59,14 @@ public class SellLogFormController extends Window {
         priceBillTableCol.setCellValueFactory(new PropertyValueFactory<>("discount"));
         dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
         timeCol.setCellValueFactory(new PropertyValueFactory<>("time"));
-        deleteBillTableCol.setCellValueFactory(new PropertyValueFactory<>("btn"));
+        returnBillTableCol.setCellValueFactory(new PropertyValueFactory<>("btn"));
 
         sellIdCol.setCellValueFactory(new PropertyValueFactory<>("sellId"));
         itemNameCol.setCellValueFactory(new PropertyValueFactory<>("itemId"));
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         discountSellTableCol.setCellValueFactory(new PropertyValueFactory<>("discount"));
         priceSellTableCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-        deleteSellTableCol.setCellValueFactory(new PropertyValueFactory<>("btn"));
+        returnSellTableCol.setCellValueFactory(new PropertyValueFactory<>("btn"));
 
         searchCbBx.setItems(FXCollections.observableArrayList("All", "Bill Number", "User Name",
                 "Discount", "Price", "Date", "Time"));
@@ -178,50 +178,61 @@ public class SellLogFormController extends Window {
     }
 
     private model.tableRows.sellLogWindow.Bill getBillForTable(Bill b) throws SQLException {
+        Button btn = getReturnButton(b.getBillNumber());
+        if(b.isReturns()){
+            btn.setDisable(true);
+        }
+
         return new model.tableRows.sellLogWindow.Bill(b.getBillNumber(), dbConnection.getUserName(b.getUserId()),
-                b.getDiscount(), b.getPrice(), b.getDate(), b.getTime(), getDeleteButton(b.getBillNumber()));
+                b.getDiscount(), b.getPrice(), b.getDate(), b.getTime(), btn);
     }
 
-    private Button getDeleteButton(int billNumber) {
-        Button btn = new Button("Delete");
+    private Button getReturnButton(int billNumber) {
+        Button btn = new Button("Return");
         btn.setStyle("-fx-background-color:  #ff6b6b;");
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("CONFIRMATION");
-        alert.setHeaderText("Conform Delete");
-        alert.setContentText("Are you sure do you want to Delete this Bill?");
-        alert.getButtonTypes().set(0, ButtonType.YES);
-        alert.getButtonTypes().set(1, ButtonType.NO);
+        btn.setOnAction((e) -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("CONFIRMATION");
+            alert.setHeaderText("Conform Return");
+            alert.setContentText("Are you sure do you want to Delete this Bill?");
+            alert.getButtonTypes().set(0, ButtonType.YES);
+            alert.getButtonTypes().set(1, ButtonType.NO);
 
-        alert.showAndWait().ifPresent(response -> {
-            if(response == ButtonType.YES) {
-                try {
-                    if(dbConnection.deleteBill(billNumber)) {
+            alert.showAndWait().ifPresent(response -> {
+                if(response == ButtonType.YES) {
+                    try {
+                        if(dbConnection.setReturnBill(billNumber)) {
+                            bills.forEach(b -> {
+                                if(b.getBillNumber() == billNumber) {
+                                    try {
+                                        dbConnection.addLog(new Log(super.getUserId(), "Return Bill (Bill number: " +
+                                                billNumber + ", price: " + b.getPrice() + ", discount: " +
+                                                b.getDiscount() + ")", LogTypes.INFORMATION, super.getDate(),
+                                                super.getTime(), (b.getPrice() + b.getDiscount()),
+                                                IncomeOrExpenseLogTypes.RETURNS));
 
-//                        int userId, String logName, int logType, Date date, Time time,
-//                        double amount, int incomeOrExpensesType
-                        bills.forEach(b -> {
-                            if(b.getBillNumber() == billNumber) {
-//                                dbConnection.addLog(new Log(super.getUserId(), "Delete Bill (Bill number: " +
-//                                        billNumber + ", price: " + b.getPrice() + ", discount: " +
-//                                        b.getDiscount() + ")", LogTypes.INFORMATION, super.getDate(),
-//                                        super.getTime(), (b.getPrice() + b.getDiscount()),
-//                                        IncomeOrExpenseLogTypes.RETURNS));
-                            }
-                        });
+                                    } catch (SQLException ex) {
+                                        alert(Alert.AlertType.ERROR, "ERROR",
+                                                "Database Connection Error", ex.getMessage());
+                                    }
+                                }
+                            });
 
-                        alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successful Delete",
-                                "Delete successful bill number: " + billNumber);
+                            alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successful Delete",
+                                    "Delete successful bill number: " + billNumber);
 
-                    } else {
-                        alert(Alert.AlertType.WARNING, "WARNING", "Can't Delete",
-                                "This bill can not delete");
+                        } else {
+                            alert(Alert.AlertType.WARNING, "WARNING", "Can't Delete",
+                                    "This bill can not delete");
+                        }
+
+                    } catch (SQLException ex) {
+                        alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                                ex.getMessage());
                     }
-
-                } catch (SQLException e) {
-                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
                 }
-            }
+            });
         });
 
         return btn;
