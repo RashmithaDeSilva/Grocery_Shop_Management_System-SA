@@ -7,18 +7,20 @@ CREATE TABLE users (
     user_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    title INT #     0) Developer    1) Super admin    2) Admin    3) User   4) Banded
+    title INT, #     0) Developer    1) Super admin    2) Admin    3) User   4) Banded
+    banded BIT
 );
 
-INSERT INTO users (user_name, email, password, title)
-VALUES ('admin', 'admin@gmail.com', '12345', 0);
+INSERT INTO users (user_name, email, password, title, banded)
+VALUES ('admin', 'admin@gmail.com', '12345', 0, false);
 
 CREATE TABLE items (
     item_id INT AUTO_INCREMENT PRIMARY KEY,
-    item_name VARCHAR(255),
     user_id INT,
-    refill_date DATE,
-    refill_time TIME,
+    item_name VARCHAR(255),
+    set_or_reset_date DATE,
+    set_or_reset_time TIME,
+    stop_selling BIT,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 

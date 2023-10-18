@@ -32,7 +32,7 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </TextField>
-      <TextField fx:id="nameTxt" alignment="CENTER" layoutX="798.0" layoutY="329.0" prefHeight="30.0" prefWidth="218.0" promptText="Item Name">
+      <TextField fx:id="nameTxt" alignment="CENTER" layoutX="798.0" layoutY="329.0" onKeyPressed="#onKeyPressed" prefHeight="30.0" prefWidth="218.0" promptText="Item Name">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -89,7 +89,7 @@
             <TableColumn fx:id="userNameCol" prefWidth="112.0" text="User Name" />
             <TableColumn fx:id="dateCol" prefWidth="122.40008544921875" text="Date" />
             <TableColumn fx:id="timeCol" prefWidth="120.79986572265625" text="Time" />
-            <TableColumn fx:id="deleteCol" prefWidth="97.5999755859375" resizable="false" text="Delete" />
+            <TableColumn fx:id="stopSellingCol" prefWidth="97.5999755859375" resizable="false" text="Stop Selling" />
         </columns>
          <cursor>
             <Cursor fx:constant="HAND" />

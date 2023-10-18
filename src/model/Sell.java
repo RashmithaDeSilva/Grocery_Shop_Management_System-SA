@@ -15,15 +15,6 @@ public class Sell {
 
     public Sell() {}
 
-    public Sell(int sellId, int itemId, int stockId, double price, double profit, int quantity, boolean returns) {
-        this.sellId = sellId;
-        this.itemId = itemId;
-        this.price = price;
-        this.profit = profit;
-        this.quantity = quantity;
-        this.returns = returns;
-    }
-
     public Sell(int sellId, int billNumber, int itemId, int stockId, double discount, double price, double profit,
                 int quantity, boolean edited, boolean returns) {
         this.sellId = sellId;

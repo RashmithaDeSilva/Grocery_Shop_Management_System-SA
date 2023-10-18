@@ -5,6 +5,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import model.Item;
 import model.User;
@@ -12,6 +14,7 @@ import model.Window;
 import model.staticType.TableTypes;
 
 import java.io.IOException;
+import java.security.Key;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
@@ -28,7 +31,7 @@ public class ItemFormController extends Window{
     public TableView<model.tableRows.itemWindow.Item> itemTbl;
     public TableColumn<Object, String> idCol;
     public TableColumn<Object, String> nameCol;
-    public TableColumn<Object, String> deleteCol;
+    public TableColumn<Object, String> stopSellingCol;
     public TableColumn<Object, String> userNameCol;
     public TableColumn<Object, String> dateCol;
     public TableColumn<Object, String> timeCol;
@@ -41,6 +44,7 @@ public class ItemFormController extends Window{
     private ArrayList<model.Item> items;
     private int loadedRowCountItems = 0;
     private int itemsTableDataCount;
+    private String search = "";
 
     public void initialize() {
         super.context = contextItemForm;
@@ -50,10 +54,10 @@ public class ItemFormController extends Window{
         userNameCol.setCellValueFactory(new PropertyValueFactory<>("userName"));
         dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
         timeCol.setCellValueFactory(new PropertyValueFactory<>("time"));
-        deleteCol.setCellValueFactory(new PropertyValueFactory<>("deleteBtn"));
+        stopSellingCol.setCellValueFactory(new PropertyValueFactory<>("sellStopBtn"));
 
         searchItemsCbBx.setItems(FXCollections.observableArrayList("All", "Item ID", "Item Name",
-                "User Name", "Set or Reset Date", "Set or Reset Time"));
+                "User Name", "Set or Reset Date", "Set or Reset Time", "Selling", "Selling Stop"));
         searchItemsCbBx.setValue("All");
 
         try{
@@ -72,94 +76,18 @@ public class ItemFormController extends Window{
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
 
-        idTxt.setText(items != null ? String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
+        idTxt.setText((items != null && !items.isEmpty()) ?
+                String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
 
         searchItemsCbBx.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(searchItemsCbBx.getValue() != null) {
-                String search = searchTxt.getText();
-                searchTxt.clear();
                 searchTxt.setText(search);
             }
         });
 
         searchTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue != null && items != null && !items.isEmpty()) {
-                ObservableList<model.tableRows.itemWindow.Item> obList = FXCollections.observableArrayList();
-
-                List<Integer> uniqueUserIds = items.stream().map(Item::getUserId).
-                        distinct().collect(Collectors.toList());
-                ArrayList<User> users = new ArrayList<>();
-                uniqueUserIds.forEach(userId -> users.add(new User(userId)));
-
-
-                for (User u : users) {
-                    try {
-                        u.setUserName(dbConnection.getUserName(u.getUserId()));
-                    } catch (SQLException e) {
-                        alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
-                    }
-                }
-
-                for (Item i : items) {
-                    String userName = null;
-
-                    for (User u : users) {
-                        if(i.getUserId() == u.getUserId()) {
-                            userName = u.getUserName();
-                            break;
-                        }
-                    }
-
-                    switch (searchItemsCbBx.getValue()) {
-                        case "Item ID":
-                            if(Integer.toString(i.getItemId()).contains(newValue)) {
-                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
-                                        userName, i.getDate(), i.getTime(), getDeleteButton(i.getItemId())));
-                            }
-                            break;
-
-                        case "Item Name":
-                            if(i.getItemName().contains(newValue)) {
-                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
-                                        userName, i.getDate(), i.getTime(), getDeleteButton(i.getItemId())));
-                            }
-                            break;
-
-                        case "User Name":
-                            if(Objects.requireNonNull(userName).contains(newValue)) {
-                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
-                                        userName, i.getDate(), i.getTime(), getDeleteButton(i.getItemId())));
-                            }
-                            break;
-
-                        case "Set or Reset Date":
-                            if(String.valueOf(i.getDate()).contains(newValue)) {
-                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
-                                        userName, i.getDate(), i.getTime(), getDeleteButton(i.getItemId())));
-                            }
-                            break;
-
-                        case "Set or Reset Time":
-                            if(String.valueOf(i.getTime()).contains(newValue)) {
-                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
-                                        userName, i.getDate(), i.getTime(), getDeleteButton(i.getItemId())));
-                            }
-                            break;
-
-                        default:
-                            if(Integer.toString(i.getItemId()).contains(newValue) ||
-                                    i.getItemName().contains(newValue) ||
-                                    Objects.requireNonNull(userName).contains(newValue) ||
-                                    String.valueOf(i.getDate()).contains(newValue) ||
-                                    String.valueOf(i.getTime()).contains(newValue)) {
-
-                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
-                                        userName, i.getDate(), i.getTime(), getDeleteButton(i.getItemId())));
-                            }
-                            break;
-                    }
-                }
-                itemTbl.setItems(obList);
+            if(newValue != null) {
+                search = newValue;
             }
         });
 
@@ -173,37 +101,74 @@ public class ItemFormController extends Window{
 
     private void setDataIntoItemTable() {
         try {
-            ObservableList<model.tableRows.itemWindow.Item> obList = FXCollections.observableArrayList();
-            ArrayList<String> userIdAndNames = new ArrayList<>();
-
             if(items != null && !items.isEmpty()) {
-                userIdAndNames.add(items.get(0).getUserId() + "-");
+                ObservableList<model.tableRows.itemWindow.Item> obList = FXCollections.observableArrayList();
 
                 for (Item i : items) {
-                    for (String s : userIdAndNames) {
-                        if(i.getUserId() != Integer.parseInt(s.split("-")[0])){
-                            userIdAndNames.add(i.getUserId() + "-");
+                    String userName = dbConnection.getUserName(i.getUserId());
+
+                    switch (searchItemsCbBx.getValue()) {
+                        case "Item ID":
+                            if(Integer.toString(i.getItemId()).contains(search)) {
+                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
+                                        userName, i.getDate(), i.getTime(), getSellingStopButton(i.getItemId())));
+                            }
                             break;
-                        }
-                    }
-                }
 
-                for (int i=0; i<userIdAndNames.size(); i++) {
-                    userIdAndNames.set(i, userIdAndNames.get(i) +
-                            dbConnection.getUserName(Integer.parseInt(userIdAndNames.get(i).split("-")[0])));
-                }
-
-                for (Item i : items) {
-                    String userName = null;
-                    for (String ss : userIdAndNames) {
-                        if(i.getUserId() == Integer.parseInt(ss.split("-")[0])) {
-                            userName = ss.split("-")[1];
+                        case "Item Name":
+                            if(i.getItemName().contains(search)) {
+                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
+                                        userName, i.getDate(), i.getTime(), getSellingStopButton(i.getItemId())));
+                            }
                             break;
-                        }
-                    }
 
-                    obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(), userName,
-                            i.getDate(), i.getTime(), getDeleteButton(i.getItemId())));
+                        case "User Name":
+                            if(Objects.requireNonNull(userName).contains(search)) {
+                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
+                                        userName, i.getDate(), i.getTime(), getSellingStopButton(i.getItemId())));
+                            }
+                            break;
+
+                        case "Set or Reset Date":
+                            if(String.valueOf(i.getDate()).contains(search)) {
+                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
+                                        userName, i.getDate(), i.getTime(), getSellingStopButton(i.getItemId())));
+                            }
+                            break;
+
+                        case "Set or Reset Time":
+                            if(String.valueOf(i.getTime()).contains(search)) {
+                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
+                                        userName, i.getDate(), i.getTime(), getSellingStopButton(i.getItemId())));
+                            }
+                            break;
+
+                        case "Selling Stop":
+                            if(i.isStopSelling()) {
+                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
+                                        userName, i.getDate(), i.getTime(), getSellingStopButton(i.getItemId())));
+                            }
+                            break;
+
+                        case "Selling":
+                            if(!i.isStopSelling()) {
+                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
+                                        userName, i.getDate(), i.getTime(), getSellingStopButton(i.getItemId())));
+                            }
+                            break;
+
+                        default:
+                            if(Integer.toString(i.getItemId()).contains(search) ||
+                                    i.getItemName().contains(search) ||
+                                    Objects.requireNonNull(userName).contains(search) ||
+                                    String.valueOf(i.getDate()).contains(search) ||
+                                    String.valueOf(i.getTime()).contains(search)) {
+
+                                obList.add(new model.tableRows.itemWindow.Item(i.getItemId(), i.getItemName(),
+                                        userName, i.getDate(), i.getTime(), getSellingStopButton(i.getItemId())));
+                            }
+                            break;
+                    }
                 }
 
                 itemTbl.setItems(obList);
@@ -221,37 +186,75 @@ public class ItemFormController extends Window{
         addOrUpdateBtn.setStyle("-fx-background-color: #feca57;");
     }
 
-    private Button getDeleteButton(int itemId) {
-        Button btn = new Button("Delete");
-        btn.setStyle("-fx-background-color:  #ff6b6b;");
+    private Button getSellingStopButton(int itemId) {
+        boolean isStop = false;
+
+        for (Item i : items) {
+            if(i.getItemId() == itemId) {
+                isStop = i.isStopSelling();
+                break;
+            }
+        }
+
+        Button btn = new Button("Resell");;
+        if(isStop) {
+            btn.setText("Resell");
+            btn.setStyle("-fx-background-color: #1dd1a1;");
+
+        } else {
+            btn.setText("Sell Stop");
+            btn.setStyle("-fx-background-color: #ff6b6b;");
+        }
 
         btn.setOnAction((e) -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("CONFIRMATION");
-            alert.setHeaderText("Conform DELETE");
-            alert.setContentText("Are you sure do you want to DELETE this ITEM?");
+            alert.setHeaderText("Conform Selling STOP");
+            alert.setContentText("Are you sure do you want to STOP Selling this ITEM?");
             alert.getButtonTypes().set(0, ButtonType.YES);
             alert.getButtonTypes().set(1, ButtonType.NO);
 
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.YES) {
                     try {
-                        if(dbConnection.deleteItem(itemId)) {
-                            for (Item i : items) {
-                                if(i.getItemId() == itemId) {
-                                    items.remove(i);
-                                    break;
-                                }
-                            }
-                            setDataIntoItemTable();
+                        Item item = new Item();
 
-                            alert(Alert.AlertType.INFORMATION, "INFORMATION", "Delete Successful",
-                                    "Delete successfully stock id = " + itemId);
+                        for (Item i : items) {
+                            if(i.getItemId() == itemId) {
+                                item = i;
+                                break;
+                            }
+                        }
+
+                        if(!item.isStopSelling()) {
+                            if(dbConnection.updateSellingItemStopOrNot(itemId, true)) {
+                                item.setStopSelling(true);
+                                setDataIntoItemTable();
+
+                                alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                                        "Stop Selling Successful",
+                                        "Stop Selling successfully item id = " + itemId);
+
+                            } else {
+                                alert(Alert.AlertType.WARNING, "WARNING", "Can't Stop",
+                                        "Try again");
+                            }
 
                         } else {
-                            alert(Alert.AlertType.WARNING, "WARNING", "Can't Delete",
-                                    "This item have stocks");
+                            if(dbConnection.updateSellingItemStopOrNot(itemId, false)) {
+                                item.setStopSelling(false);
+                                setDataIntoItemTable();
+
+                                alert(Alert.AlertType.INFORMATION, "INFORMATION",
+                                        "Start Selling Successful",
+                                        "Start Selling successfully item id = " + itemId);
+
+                            } else {
+                                alert(Alert.AlertType.WARNING, "WARNING", "Can't Start",
+                                        "Try again");
+                            }
                         }
+
                     } catch (SQLException ex) {
                         alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
                                 ex.getMessage());
@@ -285,7 +288,8 @@ public class ItemFormController extends Window{
         }
 
         if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
-            idTxt.setText(items != null ? String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
+            idTxt.setText((items != null && !items.isEmpty()) ?
+                    String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
         }
     }
 
@@ -297,12 +301,11 @@ public class ItemFormController extends Window{
                     String name = nameTxt.getText().toLowerCase().trim();
 
                     if (dbConnection.addItem(new Item(0, name, super.getUserId(),
-                            new Date(Calendar.getInstance().getTime().getTime()),
-                            new Time(Calendar.getInstance().getTime().getTime())))) {
+                            super.getDate(), super.getTime(), false))) {
 
-                        resetOnAction(actionEvent);
                         alert(Alert.AlertType.INFORMATION, "Successful", "Successfully Added Item",
                                 "Successfully added item " + name + " With Item ID " + idTxt.getText());
+                        resetOnAction(actionEvent);
 
                     } else {
                         alert(Alert.AlertType.WARNING, "WARNING", "Try again",
@@ -320,7 +323,7 @@ public class ItemFormController extends Window{
                     String name = nameTxt.getText().toLowerCase().trim();
 
                     if (dbConnection.updateItem(new Item(Integer.parseInt(idTxt.getText()), name,
-                            super.getUserId(), super.getDate(), super.getTime()))) {
+                            super.getUserId(), super.getDate(), super.getTime(), false))) {
 
                         resetOnAction(actionEvent);
                         alert(Alert.AlertType.INFORMATION, "Successful", "Successfully Update Item",
@@ -344,7 +347,8 @@ public class ItemFormController extends Window{
 
     public void resetOnAction(ActionEvent actionEvent) {
         refreshOnAction(actionEvent);
-        idTxt.setText(items != null ? String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
+        idTxt.setText((items != null && !items.isEmpty()) ?
+                String.valueOf(items.get(items.size() - 1).getItemId() + 1) : "1");
         nameTxt.clear();
         addOrUpdateBtn.setText("Add");
         addOrUpdateBtn.setStyle("-fx-background-color: #1dd1a1;");
@@ -404,4 +408,9 @@ public class ItemFormController extends Window{
         }
     }
 
+    public void onKeyPressed(KeyEvent keyEvent) {
+        if(keyEvent.getCode() == KeyCode.ENTER) {
+            addOrUpdateOnAction(new ActionEvent());
+        }
+    }
 }

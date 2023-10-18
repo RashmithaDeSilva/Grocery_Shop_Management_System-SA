@@ -58,7 +58,8 @@ public class DBConnection {
 
     // Create ----------------------------------------------------------------------------------------------------------
     public boolean addItem(Item item) throws SQLException {
-        String sql = "INSERT INTO items (item_name, user_id, set_or_reset_date, set_or_reset_time) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO items (item_name, user_id, set_or_reset_date, set_or_reset_time, stop_selling) " +
+                "VALUES (?,?,?,?,?)";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         // Set the values for the placeholders
@@ -66,6 +67,7 @@ public class DBConnection {
         preparedStatement.setInt(2, item.getUserId());
         preparedStatement.setDate(3, item.getDate());
         preparedStatement.setTime(4, item.getTime());
+        preparedStatement.setBoolean(5, item.isStopSelling());
 
         // Execute the query
         return preparedStatement.executeUpdate() > 0;
@@ -181,7 +183,7 @@ public class DBConnection {
     // Update ----------------------------------------------------------------------------------------------------------
     public boolean updateItem(Item item) throws SQLException {
         String sql = "UPDATE items SET item_name = ?, user_id = ?, set_or_reset_date = ?, set_or_reset_time = ? " +
-                "WHERE item_id = ?;";
+                "stop_selling = 0 WHERE item_id = ?;";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         // Set the values for the placeholders
@@ -302,6 +304,15 @@ public class DBConnection {
         return preparedStatement.executeUpdate() > 0;
     }
 
+    public boolean updateSellingItemStopOrNot(int itemId, boolean value) throws SQLException {
+        String sql = "UPDATE items SET stop_selling = ? WHERE item_id = ?;";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setBoolean(1, value);
+        preparedStatement.setInt(2, itemId);
+        return preparedStatement.executeUpdate() > 0;
+    }
+
 
     // Retrieve --------------------------------------------------------------------------------------------------------
     public static DBConnection getInstance() {
@@ -417,7 +428,7 @@ public class DBConnection {
         while(reset.next()) {
             items.add(new Item(reset.getInt("item_id"), reset.getString("item_name"),
                     reset.getInt("user_id"), reset.getDate("set_or_reset_date"),
-                    reset.getTime("set_or_reset_time")));
+                    reset.getTime("set_or_reset_time"), reset.getBoolean("stop_selling")));
         }
 
         return items;
@@ -633,15 +644,16 @@ public class DBConnection {
         return null;
     }
 
-    private ArrayList<Sell> getSells(int billNumber) throws SQLException {
+    public ArrayList<Sell> getSells(int billNumber) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT * FROM sells WHERE bill_number = " + billNumber + ";");
         ArrayList<Sell> sells = new ArrayList<>();
 
         while(reset.next()) {
-            sells.add(new Sell(reset.getInt("sale_id"), reset.getInt("item_id"),
-                    reset.getInt("stock_id"), reset.getDouble("sale_amount"),
-                    reset.getDouble("profit"), reset.getInt("quantity"),
-                    reset.getBoolean("return")));
+            sells.add(new Sell(reset.getInt("sale_id"), billNumber, reset.getInt("item_id"),
+                    reset.getInt("stock_id"), reset.getDouble("discount"),
+                    reset.getDouble("sale_amount"), reset.getDouble("profit"),
+                    reset.getInt("quantity"), reset.getBoolean("edit"),
+                    reset.getBoolean("returns")));
         }
 
         return sells;
@@ -711,14 +723,6 @@ public class DBConnection {
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1, stockId);
-        return preparedStatement.executeUpdate() > 0;
-    }
-
-    public boolean deleteItem(int itemId) throws SQLException {
-        String sql = "DELETE FROM items WHERE item_id = ?";
-
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, itemId);
         return preparedStatement.executeUpdate() > 0;
     }
 
@@ -963,5 +967,4 @@ public class DBConnection {
     public static void setPassword(String password) {
         DBConnection.password = password;
     }
-
 }

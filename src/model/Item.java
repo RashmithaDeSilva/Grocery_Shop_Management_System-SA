@@ -11,7 +11,7 @@ public class Item {
     private Date date;
     private Time time;
     private ArrayList<Stock> stocks;
-
+    private boolean stopSelling;
 
     public Item() {
     }
@@ -20,17 +20,13 @@ public class Item {
         this.itemId = itemId;
     }
 
-    public Item(int itemId, String itemName) {
-        this.itemId = itemId;
-        this.itemName = itemName;
-    }
-
-    public Item(int itemId, String itemName, int userId, Date date, Time time) {
+    public Item(int itemId, String itemName, int userId, Date date, Time time, boolean stopSelling) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.userId = userId;
         this.date = date;
         this.time = time;
+        this.stopSelling = stopSelling;
     }
 
 
@@ -86,5 +82,13 @@ public class Item {
             this.stocks = new ArrayList<>();
             this.stocks.add(stock);
         }
+    }
+
+    public boolean isStopSelling() {
+        return stopSelling;
+    }
+
+    public void setStopSelling(boolean stopSelling) {
+        this.stopSelling = stopSelling;
     }
 }

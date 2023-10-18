@@ -8,6 +8,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import model.Bill;
 import model.Log;
+import model.Sell;
 import model.Window;
 import model.staticType.IncomeOrExpenseLogTypes;
 import model.staticType.LogTypes;
@@ -82,9 +83,9 @@ public class SellLogFormController extends Window {
             }
             bills = dbConnection.getBillTableDesc(loadedRowCountBills);
             previewBillTableBtn.setDisable(true);
-            System.out.println(loadedRowCountBills);
 
             setDataIntoBillTable();
+            setDataIntoSellTable(bills != null && !bills.isEmpty() ? bills.get(0).getBillNumber() : -1);
 
         } catch (SQLException e){
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
@@ -92,6 +93,16 @@ public class SellLogFormController extends Window {
 
 
 
+    }
+
+    private void setDataIntoSellTable(int billNumber) {
+        try {
+            ArrayList<Sell> sells = dbConnection.getSells(billNumber);
+            System.out.println(sells.size());
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
     }
 
     private void setDataIntoBillTable() {

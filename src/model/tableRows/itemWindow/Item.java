@@ -11,7 +11,7 @@ public class Item {
     private String userName;
     private Date date;
     private Time time;
-    private Button deleteBtn;
+    private Button sellStopBtn;
 
 
     public Item() {}
@@ -22,7 +22,7 @@ public class Item {
         this.userName = userName;
         this.date = date;
         this.time = time;
-        this.deleteBtn = deleteBtn;
+        this.sellStopBtn = deleteBtn;
     }
 
 
@@ -42,12 +42,12 @@ public class Item {
         this.name = name;
     }
 
-    public Button getDeleteBtn() {
-        return deleteBtn;
+    public Button getSellStopBtn() {
+        return sellStopBtn;
     }
 
-    public void setDeleteBtn(Button deleteBtn) {
-        this.deleteBtn = deleteBtn;
+    public void setSellStopBtn(Button sellStopBtn) {
+        this.sellStopBtn = sellStopBtn;
     }
 
     public String getUserName() {
