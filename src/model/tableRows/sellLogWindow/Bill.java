@@ -18,7 +18,7 @@ public class Bill {
     public Bill() {
     }
 
-    public Bill(int bill_number, String userName, double discount, double price, Date date, Time time, Button btn) {
+    public Bill(int bill_number, String userName, double price, double discount, Date date, Time time, Button btn) {
         this.billNumber = bill_number;
         this.userName = userName;
         this.price = price;

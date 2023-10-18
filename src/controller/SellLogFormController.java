@@ -247,18 +247,61 @@ public class SellLogFormController extends Window {
     }
 
     public void previewBillTableOnAction(ActionEvent actionEvent) {
+        try {
+            previewBillTableBtn.setDisable(true);
+            if(bills != null && !bills.isEmpty()) {
+                if((loadedRowCountBills - 25) >= 0) {
+                    loadedRowCountBills -= 25;
+                    bills = dbConnection.getBillTable(loadedRowCountBills);
+                    setDataIntoBillTable();
+                    nextBillTableBtn.setDisable(false);
+
+                    if((loadedRowCountBills - 25) >= 0) {
+                        previewBillTableBtn.setDisable(false);
+                    }
+                }
+            }
+            if(!searchTxt.getText().isEmpty()) {
+                String search = searchTxt.getText();
+                searchTxt.clear();
+                searchTxt.setText(search);
+            }
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
     }
 
     public void nextBillTableOnAction(ActionEvent actionEvent) {
+        try {
+            nextBillTableBtn.setDisable(true);
+            if(bills != null && !bills.isEmpty()) {
+                if((loadedRowCountBills + 25) < billTableDataCount) {
+                    loadedRowCountBills += 25;
+                    bills = dbConnection.getBillTable(loadedRowCountBills);
+                    setDataIntoBillTable();
+                    previewBillTableBtn.setDisable(false);
+
+                    if((loadedRowCountBills + 25) < billTableDataCount) {
+                        nextBillTableBtn.setDisable(false);
+                    }
+                }
+            }
+            if(!searchTxt.getText().isEmpty()) {
+                String search = searchTxt.getText();
+                searchTxt.clear();
+                searchTxt.setText(search);
+            }
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
     }
 
     public void resetOnAction(ActionEvent actionEvent) {
     }
 
     public void updateOnAction(ActionEvent actionEvent) {
-    }
-
-    public void editBillOnAction(ActionEvent actionEvent) {
     }
 
     public void refreshOnAction(ActionEvent actionEvent) {

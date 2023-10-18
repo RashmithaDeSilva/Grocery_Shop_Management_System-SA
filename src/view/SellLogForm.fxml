@@ -39,8 +39,8 @@
         <columns>
           <TableColumn fx:id="billNumberCol" prefWidth="88.00000381469727" text="Bill number" />
           <TableColumn fx:id="userNameCol" prefWidth="132.7999725341797" text="User name" />
-            <TableColumn fx:id="discountBillTableCol" prefWidth="93.5999755859375" text="Discount" />
-            <TableColumn fx:id="priceBillTableCol" prefWidth="92.79998779296875" text="Price" />
+            <TableColumn fx:id="priceBillTableCol" prefWidth="93.5999755859375" text="Price" />
+            <TableColumn fx:id="discountBillTableCol" prefWidth="92.79998779296875" text="Discount" />
             <TableColumn fx:id="dateCol" prefWidth="104.0" text="Date" />
             <TableColumn fx:id="timeCol" prefWidth="106.4000244140625" text="Time" />
             <TableColumn fx:id="returnBillTableCol" prefWidth="88.0" text="Return" />
@@ -95,13 +95,6 @@
             <Cursor fx:constant="HAND" />
          </cursor></Button>
       <Button layoutX="685.0" layoutY="827.0" mnemonicParsing="false" onAction="#updateOnAction" style="-fx-background-color: #feca57;" text="Update">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor></Button>
-      <Button layoutX="684.0" layoutY="422.0" mnemonicParsing="false" onAction="#editBillOnAction" style="-fx-background-color: #1dd1a1;" text="Edit Bill">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
