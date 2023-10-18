@@ -78,9 +78,11 @@ public class SellLogFormController extends Window {
             // Set stock table
             if(billTableDataCount < 25 && billTableDataCount > 0) {
                 nextBillTableBtn.setDisable(true);
+
             }
-            bills = dbConnection.getBillTable(loadedRowCountBills);
+            bills = dbConnection.getBillTableDesc(loadedRowCountBills);
             previewBillTableBtn.setDisable(true);
+            System.out.println(loadedRowCountBills);
 
             setDataIntoBillTable();
 
@@ -252,7 +254,7 @@ public class SellLogFormController extends Window {
             if(bills != null && !bills.isEmpty()) {
                 if((loadedRowCountBills - 25) >= 0) {
                     loadedRowCountBills -= 25;
-                    bills = dbConnection.getBillTable(loadedRowCountBills);
+                    bills = dbConnection.getBillTableDesc(loadedRowCountBills);
                     setDataIntoBillTable();
                     nextBillTableBtn.setDisable(false);
 
@@ -278,7 +280,7 @@ public class SellLogFormController extends Window {
             if(bills != null && !bills.isEmpty()) {
                 if((loadedRowCountBills + 25) < billTableDataCount) {
                     loadedRowCountBills += 25;
-                    bills = dbConnection.getBillTable(loadedRowCountBills);
+                    bills = dbConnection.getBillTableDesc(loadedRowCountBills);
                     setDataIntoBillTable();
                     previewBillTableBtn.setDisable(false);
 

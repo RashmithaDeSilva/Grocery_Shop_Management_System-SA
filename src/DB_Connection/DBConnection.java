@@ -464,13 +464,14 @@ public class DBConnection {
         return stocks;
     }
 
-    public ArrayList<Bill> getBillTable(int billCount) throws SQLException {
+    public ArrayList<Bill> getBillTableDesc(int billCount) throws SQLException {
         ResultSet reset;
 
         if(billCount > 0) {
-            reset = stm.executeQuery("SELECT * FROM bills LIMIT 25 OFFSET " + billCount +";");
+            reset = stm.executeQuery("SELECT * FROM bills ORDER BY bill_number DESC LIMIT 25 OFFSET "
+                    + billCount +";");
         } else {
-            reset = stm.executeQuery("SELECT * FROM bills LIMIT 25;");
+            reset = stm.executeQuery("SELECT * FROM bills ORDER BY bill_number DESC LIMIT 25;");
         }
 
         ArrayList<Bill> bills = new ArrayList<>();
