@@ -82,12 +82,14 @@ public class ItemFormController extends Window{
         searchItemsCbBx.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(searchItemsCbBx.getValue() != null) {
                 searchTxt.setText(search);
+                setDataIntoItemTable();
             }
         });
 
         searchTxt.textProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null) {
                 search = newValue;
+                setDataIntoItemTable();
             }
         });
 

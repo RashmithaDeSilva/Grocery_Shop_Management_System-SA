@@ -182,8 +182,8 @@ public class DBConnection {
 
     // Update ----------------------------------------------------------------------------------------------------------
     public boolean updateItem(Item item) throws SQLException {
-        String sql = "UPDATE items SET item_name = ?, user_id = ?, set_or_reset_date = ?, set_or_reset_time = ? " +
-                "stop_selling = 0 WHERE item_id = ?;";
+        String sql = "UPDATE items SET item_name = ?, user_id = ?, set_or_reset_date = ?, set_or_reset_time = ?, " +
+                "stop_selling = ? WHERE item_id = ?;";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         // Set the values for the placeholders
@@ -191,7 +191,8 @@ public class DBConnection {
         preparedStatement.setInt(2, item.getUserId());
         preparedStatement.setDate(3, item.getDate());
         preparedStatement.setTime(4, item.getTime());
-        preparedStatement.setInt(5, item.getItemId());
+        preparedStatement.setBoolean(5, item.isStopSelling());
+        preparedStatement.setInt(6, item.getItemId());
 
         // Execute the query
         return preparedStatement.executeUpdate() > 0;
