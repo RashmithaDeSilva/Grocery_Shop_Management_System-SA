@@ -66,7 +66,7 @@ public class SellFormController extends Window{
         deleteCol.setCellValueFactory(new PropertyValueFactory<>("delete"));
 
         try{
-            itemsTableDataCount = dbConnection.getTableRowCount(TableTypes.STOCK_AVAILABLE_ITEM_TABLE);
+            itemsTableDataCount = dbConnection.getTableRowCount(TableTypes.AVAILABLE_ITEM_TABLE);
 
             // Set item table
             if(itemsTableDataCount < 25 && itemsTableDataCount > 0) {

@@ -42,11 +42,7 @@ public class DBConnection {
 
             //ResultSet reset = stm.executeQuery("SELECT * FROM items;");
 
-//            while(reset.next()) {
-//                System.out.println(reset.getRow());
-//            }
-//            int sellId, int billNumber, int userId, int itemId, Date sellDate, Time sellTime,
-//            double discount, double price, int quantity, boolean edited
+            System.out.println(getInstance().getTableRowCount(TableTypes.AVAILABLE_ITEM_TABLE));
 
             connection.close();
 
@@ -354,9 +350,9 @@ public class DBConnection {
                 reset = stm.executeQuery("SELECT COUNT(*) FROM items;");
                 break;
 
-            case STOCK_AVAILABLE_ITEM_TABLE:
-                reset = stm.executeQuery("SELECT COUNT(DISTINCT item_id) AS unique_item_count FROM stock " +
-                        "WHERE quantity > 0;");
+            case AVAILABLE_ITEM_TABLE:
+                reset = stm.executeQuery("SELECT COUNT(DISTINCT s.item_id) AS item_count FROM stock s " +
+                        "INNER JOIN items i ON s.item_id = i.item_id WHERE s.quantity > 0 AND i.stop_selling = 0;");
                 break;
 
             case USER_TABLE:
@@ -375,10 +371,12 @@ public class DBConnection {
         ResultSet reset;
 
         if(itemCount > 0) {
-            reset = stm.executeQuery("SELECT DISTINCT item_id FROM stock WHERE quantity > 0 LIMIT 25 OFFSET "
+            reset = stm.executeQuery("SELECT DISTINCT s.item_id FROM stock s INNER JOIN items i ON " +
+                    "s.item_id = i.item_id WHERE s.quantity > 0 AND i.stop_selling = 0 LIMIT 25 OFFSET"
                     + itemCount +";");
         } else {
-            reset = stm.executeQuery("SELECT DISTINCT item_id FROM stock WHERE quantity > 0 LIMIT 25;");
+            reset = stm.executeQuery("SELECT DISTINCT s.item_id FROM stock s INNER JOIN items i ON " +
+                    "s.item_id = i.item_id WHERE s.quantity > 0 AND i.stop_selling = 0 LIMIT 25;");
         }
 
         ArrayList<Item> items = new ArrayList<>();
