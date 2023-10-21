@@ -350,9 +350,13 @@ public class DBConnection {
                 reset = stm.executeQuery("SELECT COUNT(*) FROM items;");
                 break;
 
-            case AVAILABLE_ITEM_TABLE:
+            case STOCK_AVAILABLE_ITEM_TABLE:
                 reset = stm.executeQuery("SELECT COUNT(DISTINCT s.item_id) AS item_count FROM stock s " +
                         "INNER JOIN items i ON s.item_id = i.item_id WHERE s.quantity > 0 AND i.stop_selling = 0;");
+                break;
+
+            case AVAILABLE_ITEM_TABLE:
+                reset = stm.executeQuery("SELECT COUNT(*) FROM items WHERE stop_selling <> true;");
                 break;
 
             case USER_TABLE:
@@ -420,6 +424,27 @@ public class DBConnection {
             reset = stm.executeQuery("SELECT * FROM items LIMIT 25 OFFSET " + itemCount +";");
         } else {
             reset = stm.executeQuery("SELECT * FROM items LIMIT 25;");
+        }
+
+        ArrayList<Item> items = new ArrayList<>();
+
+        while(reset.next()) {
+            items.add(new Item(reset.getInt("item_id"), reset.getString("item_name"),
+                    reset.getInt("user_id"), reset.getDate("set_or_reset_date"),
+                    reset.getTime("set_or_reset_time"), reset.getBoolean("stop_selling")));
+        }
+
+        return items;
+    }
+
+    public ArrayList<Item> getAvailableItemTable(int availableItemCount) throws SQLException {
+        ResultSet reset;
+
+        if(availableItemCount > 0) {
+            reset = stm.executeQuery("SELECT * FROM items WHERE stop_selling <> true LIMIT 25 OFFSET " +
+                    availableItemCount +";");
+        } else {
+            reset = stm.executeQuery("SELECT * FROM items WHERE stop_selling <> true LIMIT 25;");
         }
 
         ArrayList<Item> items = new ArrayList<>();

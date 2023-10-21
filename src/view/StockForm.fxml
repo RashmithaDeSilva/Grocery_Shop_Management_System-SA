@@ -197,7 +197,7 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Button layoutX="31.0" layoutY="804.0" mnemonicParsing="false" onAction="#printRefillsCnAction" style="-fx-background-color: #48dbfb;" text="Print Refills">
+      <Button layoutX="31.0" layoutY="804.0" mnemonicParsing="false" onAction="#printRefillsOnAction" style="-fx-background-color: #48dbfb;" text="Print Refills">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>

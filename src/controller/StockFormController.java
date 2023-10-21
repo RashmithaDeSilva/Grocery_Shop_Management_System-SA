@@ -11,7 +11,6 @@ import model.staticType.IncomeOrExpenseLogTypes;
 import model.staticType.LogTypes;
 import model.staticType.RefillTableTypes;
 import model.staticType.TableTypes;
-import model.tableRows.sellWindow.InvoiceItem;
 import model.tableRows.stockWindow.RefillAndItem;
 import model.tableRows.stockWindow.StockRefill;
 
@@ -19,7 +18,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -106,16 +104,12 @@ public class StockFormController extends Window {
             stockRefillTableDataCount = dbConnection.getTableRowCount(TableTypes.STOCK_REFILL_TABLE);
 
             // Set stock table
-            if(stockTableDataCount < 25 && stockTableDataCount > 0) {
-                nextStockTableBtn.setDisable(true);
-            }
+            nextStockTableBtn.setDisable(stockTableDataCount < 25 && stockTableDataCount > 0);
             stocks = dbConnection.getStockTable(loadedRowCountStock);
             previewStockTableBtn.setDisable(true);
 
             // Set refill stock table
-            if(stockRefillTableDataCount < 25 && stockRefillTableDataCount > 0) {
-                nextRefillTableBtn.setDisable(true);
-            }
+            nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount > 0);
             refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
             previewRefillTableBtn.setDisable(true);
 
@@ -387,9 +381,9 @@ public class StockFormController extends Window {
                     loadedRowCountItems = 0;
 
                     // Set item table
-                    itemTableDataCount = dbConnection.getTableRowCount(TableTypes.ITEM_TABLE);
+                    itemTableDataCount = dbConnection.getTableRowCount(TableTypes.AVAILABLE_ITEM_TABLE);
                     nextRefillTableBtn.setDisable(itemTableDataCount < 25 && itemTableDataCount > 0);
-                    items = dbConnection.getItemTable(loadedRowCountItems);
+                    items = dbConnection.getAvailableItemTable(loadedRowCountItems);
                     previewRefillTableBtn.setDisable(true);
                     setDataIntoRefillStockTable(ITEMS);
 
@@ -936,7 +930,7 @@ public class StockFormController extends Window {
                 if(items != null && !items.isEmpty()) {
                     if((loadedRowCountItems - 25) >= 0) {
                         loadedRowCountItems -= 25;
-                        items = dbConnection.getItemTable(loadedRowCountItems);
+                        items = dbConnection.getAvailableItemTable(loadedRowCountItems);
                         setDataIntoRefillStockTable(ITEMS);
                         nextRefillTableBtn.setDisable(false);
 
@@ -974,7 +968,7 @@ public class StockFormController extends Window {
                 if(items != null && !items.isEmpty()) {
                     if((loadedRowCountItems + 25) < itemTableDataCount) {
                         loadedRowCountItems += 25;
-                        items = dbConnection.getItemTable(loadedRowCountItems);
+                        items = dbConnection.getAvailableItemTable(loadedRowCountItems);
                         setDataIntoRefillStockTable(ITEMS);
                         previewRefillTableBtn.setDisable(false);
 
@@ -990,7 +984,7 @@ public class StockFormController extends Window {
         }
     }
 
-    public void printRefillsCnAction(ActionEvent actionEvent) {
+    public void printRefillsOnAction(ActionEvent actionEvent) {
         if(!refillTbl.getItems().isEmpty() && stockId2Col.isVisible()) {
 
             // Get the user's home directory
