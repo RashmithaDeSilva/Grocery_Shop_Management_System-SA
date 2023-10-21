@@ -489,6 +489,7 @@ public class SellFormController extends Window{
                             successfulMassage = false;
                             for (InvoiceItem itemRemove : quotationTbl.getItems()) {
                                 if(itemRemove.getStockId() == i.getStockId()) {
+                                    // add log
                                     break;
                                 } else {
                                     addeditemCount += 1;

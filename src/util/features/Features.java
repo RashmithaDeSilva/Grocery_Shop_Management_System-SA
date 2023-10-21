@@ -1,7 +1,7 @@
 package util.features;
 
 public class Features {
-    private int maximumUserCount = 6;
+    private int maximumUserCount = 7;
     private boolean lockerLogAvailability  = true;
 
 

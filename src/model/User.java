@@ -6,6 +6,7 @@ public class User {
     private String email;
     private String password;
     private int title;
+    private boolean banded;
 
 
     public User() {}
@@ -21,26 +22,29 @@ public class User {
         this.password = password;
     }
 
-    public User(int userId, String userName, String email, int title) {
+    public User(int userId, String userName, String email, int title, boolean banded) {
         this.userId = userId;
         this.userName = userName;
         this.email = email;
         this.title = title;
+        this.banded = banded;
     }
 
-    public User(String userName, String email, String password, int title) {
+    public User(String userName, String email, String password, int title, boolean banded) {
         this.userName = userName;
         this.email = email;
         this.password = password;
         this.title = title;
+        this.banded = banded;
     }
 
-    public User(int userId, String userName, String email, String password, int title) {
+    public User(int userId, String userName, String email, String password, int title, boolean banded) {
         this.userId = userId;
         this.userName = userName;
         this.email = email;
         this.password = password;
         this.title = title;
+        this.banded = banded;
     }
 
 
@@ -82,5 +86,13 @@ public class User {
 
     public void setTitle(int title) {
         this.title = title;
+    }
+
+    public boolean isBanded() {
+        return banded;
+    }
+
+    public void setBanded(boolean banded) {
+        this.banded = banded;
     }
 }

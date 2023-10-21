@@ -42,7 +42,9 @@ public class DBConnection {
 
             //ResultSet reset = stm.executeQuery("SELECT * FROM items;");
 
-            System.out.println(getInstance().getTableRowCount(TableTypes.AVAILABLE_ITEM_TABLE));
+//            int userId, String userName, String email, String password, int title, boolean banded
+//            System.out.println(getInstance().addUser(new User("nipun", "nipun@gmail.com",
+//                    "12345", 2, false)));
 
             connection.close();
 
@@ -162,7 +164,7 @@ public class DBConnection {
     }
 
     public boolean addUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (user_name, email, password, title) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO users (user_name, email, password, title, banded) VALUES (?,?,?,?,?);";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         // Set the values for the placeholders
@@ -170,6 +172,7 @@ public class DBConnection {
         preparedStatement.setString(2, user.getEmail());
         preparedStatement.setString(3, user.getPassword());
         preparedStatement.setInt(4, user.getTitle());
+        preparedStatement.setBoolean(5, user.isBanded());
 
         // Execute the query
         return preparedStatement.executeUpdate() > 0;
@@ -308,6 +311,14 @@ public class DBConnection {
         preparedStatement.setBoolean(1, value);
         preparedStatement.setInt(2, itemId);
         return preparedStatement.executeUpdate() > 0;
+    }
+
+    public boolean bandedUser(int userId) throws SQLException {
+        return stm.executeUpdate("UPDATE users SET banded = true WHERE user_id = " + userId + ";") > 0;
+    }
+
+    public boolean unbrandedUser(int userId) throws SQLException {
+        return stm.executeUpdate("UPDATE users SET banded = false WHERE user_id = " + userId + ";") > 0;
     }
 
 
@@ -471,7 +482,8 @@ public class DBConnection {
 
         while(reset.next()) {
             users.add(new User(reset.getInt("user_id"), reset.getString("user_name"),
-                    reset.getString("email"), reset.getInt("title")));
+                    reset.getString("email"), reset.getInt("title"),
+                    reset.getBoolean("banded")));
         }
 
         return users;
@@ -807,7 +819,7 @@ public class DBConnection {
 
     // Check -----------------------------------------------------------------------------------------------------------
     public boolean checkUserLogin(String userName, String password) throws SQLException {
-        String sql = "SELECT COUNT(*) AS count FROM users WHERE user_name = ? AND password = ?";
+        String sql = "SELECT COUNT(*) AS count FROM users WHERE user_name = ? AND password = ? AND banded <> true";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setString(1, userName);
@@ -899,12 +911,9 @@ public class DBConnection {
         return true;
     }
 
-    public boolean bandUser(int userId) throws SQLException {
-        return stm.executeUpdate("UPDATE users SET title = 4 WHERE user_id = " + userId + ";") > 0;
-    }
-
-    public boolean unbannedUser(int userId) throws SQLException {
-        return stm.executeUpdate("UPDATE users SET title = 3 WHERE user_id = " + userId + ";") > 0;
+    public boolean isBandedUser(int userId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT banded FROM users WHERE user_id = " + userId +";");
+        return reset.next() && reset.getBoolean("banded");
     }
 
     public boolean userIdIsAvailable(int userId) throws SQLException {

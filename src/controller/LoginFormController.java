@@ -29,7 +29,7 @@ public class LoginFormController extends Window{
                 int roll = dbConnection.getUserRoll(userNameTxt.getText().trim().toLowerCase(),
                         passwordTxt.getText().trim());
 
-                if(roll > 0 && roll < 4) {
+                if(roll > 0 && roll < 3) {
                     new Window().setUserName(userNameTxt.getText());
                     new Window().setUserId(dbConnection.getUserId(userNameTxt.getText().trim().toLowerCase()));
                     new Window().setUserRoll(roll);
@@ -49,7 +49,7 @@ public class LoginFormController extends Window{
 
             } else {
                 alert(Alert.AlertType.ERROR, "ERROR", "Can't Logging",
-                        "Wrong User or Password");
+                        "Wrong User or Password or you are Banded from system");
             }
 
         } catch (SQLException e){

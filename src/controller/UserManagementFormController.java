@@ -60,15 +60,13 @@ public class UserManagementFormController extends Window {
         userAccessesCmb.setItems(FXCollections.observableArrayList("User Roll", "Admin", "User"));
         userAccessesCmb.setValue("User Roll");
         searchUserAccessesCmb.setItems(FXCollections.observableArrayList("All", "User ID", "Name",
-                "Email", "Roll"));
+                "Email", "Roll", "Banded", "Not Banded"));
         searchUserAccessesCmb.setValue("All");
 
         try {
             userTableDataCount = dbConnection.getTableRowCount(TableTypes.USER_TABLE);
 
-            if(userTableDataCount < 25 && userTableDataCount > 0) {
-                nextUsersTableBtn.setDisable(true);
-            }
+            nextUsersTableBtn.setDisable(userTableDataCount < 25 && userTableDataCount > 0);
             users = dbConnection.getUsersTable(loadedRowCountUsers);
             previewUsersTableBtn.setDisable(true);
 
@@ -80,16 +78,15 @@ public class UserManagementFormController extends Window {
 
         searchUserAccessesCmb.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
-                    if(searchUserAccessesCmb.getValue() != null) {
-                        String search = searchTxt.getText();
-                        searchTxt.clear();
-                        searchTxt.setText(search);
+                    if(newValue != null) {
+                        searchText = searchTxt.getText();
+                        setDataIntoUsersTable();
                     }
                 });
 
         // Search stock
         searchTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue != null && users != null && !users.isEmpty()) {
+            if(newValue != null && users != null) {
                 searchText = searchTxt.getText();
                 setDataIntoUsersTable();
             }
@@ -124,8 +121,7 @@ public class UserManagementFormController extends Window {
             for (model.User u : users) {
                 if(u.getTitle() != 0) {
 
-                    String title = u.getTitle() == 1 ? "Super Admin" : u.getTitle() == 2 ? "Admin" :
-                            u.getTitle() == 3 ? "User" : "Banned";
+                    String title = u.getTitle() == 1 ? "Super Admin" : u.getTitle() == 2 ? "Admin" : "User";
                     User user = getUserForTable(u);
 
                     switch (searchUserAccessesCmb.getValue()) {
@@ -162,6 +158,30 @@ public class UserManagementFormController extends Window {
                             }
                             break;
 
+                        case "Banded":
+                            if(Integer.toString(u.getUserId()).contains(searchText) ||
+                                    Objects.requireNonNull(u.getUserName().toLowerCase()).
+                                            contains(searchText.toLowerCase()) ||
+                                    Objects.requireNonNull(u.getEmail()).contains(searchText) ||
+                                    title.toLowerCase().contains(searchText.toLowerCase())) {
+                                if(user != null && user.isBanded()) {
+                                    obList.add(user);
+                                }
+                            }
+                            break;
+
+                        case "Not Banded":
+                            if(Integer.toString(u.getUserId()).contains(searchText) ||
+                                    Objects.requireNonNull(u.getUserName().toLowerCase()).
+                                            contains(searchText.toLowerCase()) ||
+                                    Objects.requireNonNull(u.getEmail()).contains(searchText) ||
+                                    title.toLowerCase().contains(searchText.toLowerCase())) {
+                                if(user != null && !user.isBanded()) {
+                                    obList.add(user);
+                                }
+                            }
+                            break;
+
                         default:
                             if(Integer.toString(u.getUserId()).contains(searchText) ||
                                     Objects.requireNonNull(u.getUserName().toLowerCase()).
@@ -184,14 +204,13 @@ public class UserManagementFormController extends Window {
     private User getUserForTable(model.User u) {
         if(super.getUserRoll() == 2 && u.getTitle() >= 2) {
             return new User(u.getUserId(), u.getUserName(), u.getEmail(),
-                    u.getTitle() == 2 ? "Admin" : u.getTitle() == 3 ? "User": "Banned",
+                    u.getTitle() == 2 ? "Admin" : "User", u.isBanded(),
                     getBannedUnbannedButton(u.getUserId()));
 
         } else if (super.getUserRoll() == 1) {
             return new User(u.getUserId(), u.getUserName(), u.getEmail(),
-                    u.getTitle() == 1 ? "Super Admin" : u.getTitle() == 2 ? "Admin" :
-                            u.getTitle() == 3 ? "User": "Banned",
-                    getBannedUnbannedButton(u.getUserId()));
+                    u.getTitle() == 1 ? "Super Admin" : u.getTitle() == 2 ? "Admin" : "User",
+                    u.isBanded(), getBannedUnbannedButton(u.getUserId()));
         }
 
         return null;
@@ -202,10 +221,15 @@ public class UserManagementFormController extends Window {
         Button btn = new Button("");
         boolean isBand = false;
 
-        for (model.User u : users) {
-            if(u.getUserId() == userId) {
-                isBand = u.getTitle() == 4;
+        try {
+            for (model.User u : users) {
+                if(u.getUserId() == userId) {
+                    isBand = dbConnection.isBandedUser(u.getUserId());
+                }
             }
+        } catch (SQLException ex) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                    ex.getMessage());
         }
 
         if(!isBand) {
@@ -223,10 +247,10 @@ public class UserManagementFormController extends Window {
                 alert.showAndWait().ifPresent(response -> {
                     if (response == ButtonType.YES) {
                         try {
-                            if(dbConnection.bandUser(userId)) {
+                            if(dbConnection.bandedUser(userId)) {
                                 for (model.User u : users) {
                                     if(u.getUserId() == userId) {
-                                        u.setTitle(4);
+                                        u.setBanded(true);
                                         break;
                                     }
                                 }
@@ -263,10 +287,10 @@ public class UserManagementFormController extends Window {
                 alert.showAndWait().ifPresent(response -> {
                     if (response == ButtonType.YES) {
                         try {
-                            if(dbConnection.unbannedUser(userId)) {
+                            if(dbConnection.unbrandedUser(userId)) {
                                 for (model.User u : users) {
                                     if(u.getUserId() == userId) {
-                                        u.setTitle(3);
+                                        u.setBanded(false);
                                         break;
                                     }
                                 }
@@ -324,14 +348,13 @@ public class UserManagementFormController extends Window {
                                 addOrUpdateBtn.getText().equalsIgnoreCase("update") &&
                                         password.equals(conformPassword)) {
                             if(!roll.equalsIgnoreCase("User Roll")) {
-                                if(addOrUpdateBtn.getText().equalsIgnoreCase("add")) {
+                                if(addOrUpdateBtn.getText().equalsIgnoreCase("add user")) {
+                                    if(dbConnection.addUser(new model.User(name, email, password,
+                                            rollNumber, false))){
 
-                                    if(dbConnection.addUser(new model.User(name, email, password, rollNumber))){
-
-                                        userTableDataCount +=1;
-                                        if(userTableDataCount < 25 && userTableDataCount > 0) {
-                                            nextUsersTableBtn.setDisable(true);
-                                        }
+                                        userTableDataCount += 1;
+                                        nextUsersTableBtn.setDisable(userTableDataCount < 25 &&
+                                                userTableDataCount > 0);
                                         users = dbConnection.getUsersTable(loadedRowCountUsers);
                                         previewUsersTableBtn.setDisable(true);
 
@@ -351,7 +374,7 @@ public class UserManagementFormController extends Window {
 
                                     if(dbConnection.updateAllUserDetails(new model.User(selectedUserId, name, email,
                                             password.isEmpty() ? dbConnection.getUserPassword(selectedUserId) :
-                                                    password, rollNumber))){
+                                                    password, rollNumber, false))){
 
                                         users.forEach((u) -> {
                                             if(u.getUserId() == selectedUserId) {

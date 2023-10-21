@@ -7,16 +7,18 @@ public class User {
     private String name;
     private String email;
     private String roll;
+    private boolean banded;
     private Button btn;
 
     public User() {
     }
 
-    public User(int userId, String name, String email, String roll, Button btn) {
+    public User(int userId, String name, String email, String roll, boolean banded, Button btn) {
         this.userId = userId;
         this.name = name;
         this.email = email;
         this.roll = roll;
+        this.banded = banded;
         this.btn = btn;
     }
 
@@ -59,5 +61,13 @@ public class User {
 
     public void setBtn(Button btn) {
         this.btn = btn;
+    }
+
+    public boolean isBanded() {
+        return banded;
+    }
+
+    public void setBanded(boolean banded) {
+        this.banded = banded;
     }
 }
