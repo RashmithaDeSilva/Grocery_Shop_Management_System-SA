@@ -104,12 +104,12 @@ public class StockFormController extends Window {
             stockRefillTableDataCount = dbConnection.getTableRowCount(TableTypes.STOCK_REFILL_TABLE);
 
             // Set stock table
-            nextStockTableBtn.setDisable(stockTableDataCount < 25 && stockTableDataCount > 0);
+            nextStockTableBtn.setDisable(stockTableDataCount < 25 && stockTableDataCount >= 0);
             stocks = dbConnection.getStockTable(loadedRowCountStock);
             previewStockTableBtn.setDisable(true);
 
             // Set refill stock table
-            nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount > 0);
+            nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount >= 0);
             refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
             previewRefillTableBtn.setDisable(true);
 
@@ -382,7 +382,7 @@ public class StockFormController extends Window {
 
                     // Set item table
                     itemTableDataCount = dbConnection.getTableRowCount(TableTypes.AVAILABLE_ITEM_TABLE);
-                    nextRefillTableBtn.setDisable(itemTableDataCount < 25 && itemTableDataCount > 0);
+                    nextRefillTableBtn.setDisable(itemTableDataCount < 25 && itemTableDataCount >= 0);
                     items = dbConnection.getAvailableItemTable(loadedRowCountItems);
                     previewRefillTableBtn.setDisable(true);
                     setDataIntoRefillStockTable(ITEMS);
@@ -398,7 +398,7 @@ public class StockFormController extends Window {
                     loadedRowCountStockRefill = 0;
 
                     // Set refill stock table
-                    nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount > 0);
+                    nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount >= 0);
                     refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
                     previewRefillTableBtn.setDisable(true);
                     setDataIntoRefillStockTable(REFILL_STOCK);
@@ -648,7 +648,7 @@ public class StockFormController extends Window {
         try {
             // Set stock table
             stockTableDataCount = dbConnection.getTableRowCount(TableTypes.STOCK_TABLE);
-            nextStockTableBtn.setDisable(stockTableDataCount < 25 && stockTableDataCount > 0);
+            nextStockTableBtn.setDisable(stockTableDataCount < 25 && stockTableDataCount >= 0);
             stocks = dbConnection.getStockTable(loadedRowCountStock);
             previewStockTableBtn.setDisable(true);
             setDataIntoStockTable();
@@ -667,7 +667,7 @@ public class StockFormController extends Window {
                 // Set item table
                 loadedRowCountItems = 0;
                 itemTableDataCount = dbConnection.getTableRowCount(TableTypes.ITEM_TABLE);
-                nextRefillTableBtn.setDisable(itemTableDataCount < 25 && itemTableDataCount > 0);
+                nextRefillTableBtn.setDisable(itemTableDataCount < 25 && itemTableDataCount >= 0);
                 items = dbConnection.getItemTable(loadedRowCountItems);
                 previewRefillTableBtn.setDisable(true);
                 setDataIntoRefillStockTable(ITEMS);
@@ -676,7 +676,7 @@ public class StockFormController extends Window {
                 // Set refill stock table
                 loadedRowCountStockRefill = 0;
                 stockRefillTableDataCount = dbConnection.getTableRowCount(TableTypes.STOCK_REFILL_TABLE);
-                nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount > 0);
+                nextRefillTableBtn.setDisable(stockRefillTableDataCount < 25 && stockRefillTableDataCount >= 0);
                 refillStocks = dbConnection.getRefillStockTable(loadedRowCountStockRefill);
                 previewRefillTableBtn.setDisable(true);
                 setDataIntoRefillStockTable(REFILL_STOCK);

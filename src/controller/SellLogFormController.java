@@ -77,9 +77,10 @@ public class SellLogFormController extends Window {
             billTableDataCount = dbConnection.getTableRowCount(TableTypes.BILL_TABLE);
 
             // Set stock table
-            if(billTableDataCount < 25 && billTableDataCount > 0) {
+            if (billTableDataCount < 25 && billTableDataCount >= 0) {
                 nextBillTableBtn.setDisable(true);
             }
+
             bills = dbConnection.getBillTableDesc(loadedRowCountBills);
             previewBillTableBtn.setDisable(true);
 

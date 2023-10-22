@@ -68,9 +68,7 @@ public class SellFormController extends Window{
             itemsTableDataCount = dbConnection.getTableRowCount(TableTypes.STOCK_AVAILABLE_ITEM_TABLE);
 
             // Set item table
-            if(itemsTableDataCount < 25 && itemsTableDataCount > 0) {
-                nextItemTableBtn.setDisable(true);
-            }
+            nextItemTableBtn.setDisable(itemsTableDataCount < 25 && itemsTableDataCount >= 0);
             items = dbConnection.getItemTableWithStockAvailable(loadedRowCountItems);
             previewItemTableBtn.setDisable(true);
 

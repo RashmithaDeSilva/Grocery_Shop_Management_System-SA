@@ -66,7 +66,7 @@ public class UserManagementFormController extends Window {
         try {
             userTableDataCount = dbConnection.getTableRowCount(TableTypes.USER_TABLE);
 
-            nextUsersTableBtn.setDisable(userTableDataCount < 25 && userTableDataCount > 0);
+            nextUsersTableBtn.setDisable(userTableDataCount < 25 && userTableDataCount >= 0);
             users = dbConnection.getUsersTable(loadedRowCountUsers);
             previewUsersTableBtn.setDisable(true);
 
@@ -354,7 +354,7 @@ public class UserManagementFormController extends Window {
 
                                         userTableDataCount += 1;
                                         nextUsersTableBtn.setDisable(userTableDataCount < 25 &&
-                                                userTableDataCount > 0);
+                                                userTableDataCount >= 0);
                                         users = dbConnection.getUsersTable(loadedRowCountUsers);
                                         previewUsersTableBtn.setDisable(true);
 
@@ -445,9 +445,7 @@ public class UserManagementFormController extends Window {
             userTableDataCount = dbConnection.getTableRowCount(TableTypes.USER_TABLE);
             loadedRowCountUsers = 0;
 
-            if(userTableDataCount < 25 && userTableDataCount > 0) {
-                nextUsersTableBtn.setDisable(true);
-            }
+            nextUsersTableBtn.setDisable(userTableDataCount < 25 && userTableDataCount >= 0);
             users = dbConnection.getUsersTable(loadedRowCountUsers);
             previewUsersTableBtn.setDisable(true);
 

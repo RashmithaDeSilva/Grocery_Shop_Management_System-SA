@@ -379,7 +379,7 @@ public class DBConnection {
                 break;
         }
 
-        return (reset != null && reset.next()) ? reset.getInt(1) : -1;
+        return (reset != null && reset.next()) ? reset.getInt(1) : 0;
     }
 
     public ArrayList<Item> getItemTableWithStockAvailable(int itemCount) throws SQLException {

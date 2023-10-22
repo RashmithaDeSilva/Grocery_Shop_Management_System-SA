@@ -64,9 +64,7 @@ public class ItemFormController extends Window{
             itemsTableDataCount = dbConnection.getTableRowCount(TableTypes.ITEM_TABLE);
 
             // Set item table
-            if(itemsTableDataCount < 25 && itemsTableDataCount > 0) {
-                nextItemTableBtn.setDisable(true);
-            }
+            nextItemTableBtn.setDisable(itemsTableDataCount < 25 && itemsTableDataCount >= 0);
             items = dbConnection.getItemTable(loadedRowCountItems);
             previewItemTableBtn.setDisable(true);
 
@@ -280,7 +278,7 @@ public class ItemFormController extends Window{
         try {
             // Set stock table
             itemsTableDataCount = dbConnection.getTableRowCount(TableTypes.ITEM_TABLE);
-            nextItemTableBtn.setDisable(itemsTableDataCount < 25 && itemsTableDataCount > 0);
+            nextItemTableBtn.setDisable(itemsTableDataCount < 25 && itemsTableDataCount >= 0);
             items = dbConnection.getItemTable(loadedRowCountItems);
             previewItemTableBtn.setDisable(true);
             setDataIntoItemTable();
