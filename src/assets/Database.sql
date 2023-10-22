@@ -42,8 +42,8 @@ CREATE TABLE log (
     log_date DATE,
     log_time TIME,
     amount DECIMAL(10, 2),
-    income_and_expenses_type INT, # 1) sell income   2) add money    3) Returns    4) Buy items    5) Withdraw money
-    # 6) Pay bills    7) Damage
+    income_and_expenses_type INT, # 1) Sell Income   2) Add Money    3) Returns    4) Buy Items    5) Withdraw Money
+    # 6) Pay Bills    7) Damage     8) Errors
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
@@ -68,8 +68,10 @@ CREATE TABLE sells (
     stock_id INT,
     discount DECIMAL(10, 2),
     sale_amount DECIMAL(10, 2),
+    profit DECIMAL(10, 2),
     quantity INT,
     edit BIT,
+    returns BIT,
     FOREIGN KEY (bill_number) REFERENCES bills(bill_number),
     FOREIGN KEY (item_id) REFERENCES items(item_id)
 );

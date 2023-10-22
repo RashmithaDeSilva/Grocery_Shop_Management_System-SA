@@ -70,7 +70,7 @@ public class SellLogFormController extends Window {
         returnSellTableCol.setCellValueFactory(new PropertyValueFactory<>("btn"));
 
         searchCbBx.setItems(FXCollections.observableArrayList("All", "Bill Number", "User Name",
-                "Discount", "Price", "Date", "Time"));
+                "Discount", "Price", "Date", "Time", "Return", "Not Return"));
         searchCbBx.setValue("All");
 
         try {
@@ -91,7 +91,19 @@ public class SellLogFormController extends Window {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
 
+        searchCbBx.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(searchCbBx.getValue() != null) {
+                searchText = newValue;
+                setDataIntoBillTable();
+            }
+        });
 
+        searchTxt.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null) {
+                searchText = newValue;
+                setDataIntoBillTable();
+            }
+        });
 
     }
 
@@ -166,6 +178,32 @@ public class SellLogFormController extends Window {
                     case "Time":
                         if(String.valueOf(b.getTime()).contains(searchText)) {
                             if(bill != null) {
+                                obList.add(bill);
+                            }
+                        }
+                        break;
+
+                    case "Return":
+                        if(Integer.toString(b.getBillNumber()).contains(searchText) ||
+                                Objects.requireNonNull(userName).toLowerCase().contains(searchText.toLowerCase()) ||
+                                Double.toString(b.getDiscount()).contains(searchText) ||
+                                Double.toString(b.getPrice()).contains(searchText) ||
+                                String.valueOf(b.getDate()).contains(searchText) ||
+                                String.valueOf(b.getTime()).contains(searchText)) {
+                            if(bill != null && b.isReturns()) {
+                                obList.add(bill);
+                            }
+                        }
+                        break;
+
+                    case "Not Return":
+                        if(Integer.toString(b.getBillNumber()).contains(searchText) ||
+                                Objects.requireNonNull(userName).toLowerCase().contains(searchText.toLowerCase()) ||
+                                Double.toString(b.getDiscount()).contains(searchText) ||
+                                Double.toString(b.getPrice()).contains(searchText) ||
+                                String.valueOf(b.getDate()).contains(searchText) ||
+                                String.valueOf(b.getTime()).contains(searchText)) {
+                            if(bill != null && !b.isReturns()) {
                                 obList.add(bill);
                             }
                         }

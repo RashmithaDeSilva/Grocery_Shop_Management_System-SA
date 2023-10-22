@@ -148,8 +148,8 @@ public class DBConnection {
     }
 
     public boolean addBill(Bill bill) throws SQLException {
-        String sql = "INSERT INTO bills (user_id, discount, total_price, order_date, order_time) " +
-                "VALUES (?,?,?,?,?)";
+        String sql = "INSERT INTO bills (user_id, discount, total_price, order_date, order_time, returns) " +
+                "VALUES (?,?,?,?,?,?)";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         // Set the values for the placeholders
@@ -158,6 +158,7 @@ public class DBConnection {
         preparedStatement.setDouble(3, bill.getPrice());
         preparedStatement.setDate(4, bill.getDate());
         preparedStatement.setTime(5, bill.getTime());
+        preparedStatement.setBoolean(6, bill.isReturns());
 
         // Execute the query
         return preparedStatement.executeUpdate() > 0;
@@ -982,6 +983,9 @@ public class DBConnection {
 
             case DAMAGE:
                 return 7;
+
+            case ERRORS:
+                return 8;
         }
 
         return -1;

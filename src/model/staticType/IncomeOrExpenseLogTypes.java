@@ -7,5 +7,6 @@ public enum IncomeOrExpenseLogTypes {
     BUY_ITEMS,
     WITHDRAW_MONEY,
     PAY_BILLS,
-    DAMAGE
+    DAMAGE,
+    ERRORS
 }
