@@ -15,7 +15,6 @@ import model.tableRows.sellWindow.SellItem;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.text.SimpleDateFormat;
@@ -471,23 +470,25 @@ public class SellFormController extends Window{
                 for (InvoiceItem i : quotationTbl.getItems()) {
                     discount += i.getDiscount();
                 }
-
+                String billNumber = getNewId(dbConnection.getLastBillNumber());
                 double totalBillPrice = Double.parseDouble(totalBill.getText().split(" ")[1]);
-                if(dbConnection.addBill(new Bill(0, super.getUserId(),
+
+                if(dbConnection.addBill(new Bill(billNumber, super.getUserId(),
                         totalBillPrice, discount, super.getDate(), super.getTime(), false))) {
 
                     boolean successfulMassage = true;
-                    int billNumber = dbConnection.getLastBillNumber();
-//                    int addeditemCount = 0;
+//                    dbConnection.addLog(new Log(super.getUserId(), "New Bill Added with bill number: " +
+//                            billNumber, LogTypes.INFORMATION, super.getDate(), super.getTime(), totalBillPrice,
+//                            IncomeOrExpenseLogTypes.SELL_INCOME));
 
                     for (InvoiceItem i : quotationTbl.getItems()) {
-                        if(!dbConnection.addSell(new Sell(0, billNumber, i.getItemId(), i.getStockId(),
-                                i.getDiscount(), i.getSellingPrice(), (i.getSellingPrice() - i.getPrice()),
-                                i.getQuantity(), false, false))) {
+                        if(!dbConnection.addSell(new Sell(getNewId(dbConnection.getLastSellID()), billNumber,
+                                i.getItemId(), i.getStockId(), i.getDiscount(), i.getSellingPrice(),
+                                (i.getSellingPrice() - i.getPrice()), i.getQuantity(), false, false))) {
 
                             successfulMassage = false;
-                            dbConnection.addLog(new Log(super.getUserId(), "Fail Bill Added bill number : " +
-                                    billNumber, LogTypes.ERROR, super.getDate(), super.getTime(), totalBillPrice,
+                            dbConnection.addLog(new Log(super.getUserId(), "Fail Bill Added with bill number: "
+                                    + billNumber, LogTypes.ERROR, super.getDate(), super.getTime(), totalBillPrice,
                                     IncomeOrExpenseLogTypes.ERRORS));
 
                             alert(Alert.AlertType.WARNING, "WARNING", "Database Connection Error",
@@ -505,25 +506,22 @@ public class SellFormController extends Window{
                                             }
                                         }
 
-                                        dbConnection.addLog(new Log(super.getUserId(), "Sell items: " +
-                                                quotationTbl.getItems().size() + " with BILL NUMBER: " +
-                                                billNumber, LogTypes.INFORMATION, super.getDate(), super.getTime(),
-                                                totalBillPrice, IncomeOrExpenseLogTypes.SELL_INCOME));
+                                        dbConnection.addLog(new Log(super.getUserId(), "Sell item: " +
+                                                i.getItemName() + " with discount: " + i.getDiscount() +
+                                                " and BILL NUMBER: " + billNumber, LogTypes.INFORMATION,
+                                                super.getDate(), super.getTime(), i.getSellingPrice(),
+                                                IncomeOrExpenseLogTypes.SELL_INCOME));
 
                                     } else {
                                         successfulMassage = false;
-                                        for (InvoiceItem itemRemove : quotationTbl.getItems()) {
-                                            if(itemRemove.getStockId() == i.getStockId()) {
-                                                break;
-                                            } else {
-//                                                addeditemCount += 1;
-                                                dbConnection.updateAddStock(itemRemove.getStockId(),
-                                                        itemRemove.getQuantity());
-                                            }
-                                        }
+                                        dbConnection.addLog(new Log(super.getUserId(),
+                                                "Fail Bill Added with bill number: " + billNumber,
+                                                LogTypes.ERROR, super.getDate(), super.getTime(), totalBillPrice,
+                                                IncomeOrExpenseLogTypes.ERRORS));
 
-                                        alert(Alert.AlertType.WARNING, "WARNING", "Stock Didn't Update",
-                                                "Stock are didn't update try again");
+                                        alert(Alert.AlertType.WARNING, "WARNING",
+                                                "Database Connection Error",
+                                                "Items are didn't added RETURN LAST BILL and try again");
                                         break;
                                     }
                                 }
@@ -554,6 +552,28 @@ public class SellFormController extends Window{
 
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
+    }
+
+    private String getNewId(String oldId) {
+        if(oldId.charAt(0) == 'B') {
+            return "B" + generateId(oldId);
+
+        } else if (oldId.charAt(0) == 'S') {
+            return "S" + generateId(oldId);
+        }
+
+        return null;
+    }
+
+    private String generateId(String oldId) {
+        String date = new SimpleDateFormat("yyMMdd").format(new Date());
+
+        if (oldId.length() > 7) {
+            return date + (Integer.parseInt(oldId.substring(7)) + 1);
+
+        } else {
+            return date + 1;
         }
     }
 

@@ -4,7 +4,7 @@ import java.sql.Date;
 import java.sql.Time;
 
 public class Bill {
-    private int billNumber;
+    private String billNumber;
     private int userId;
     private double price;
     private double discount;
@@ -16,7 +16,7 @@ public class Bill {
     public Bill() {
     }
 
-    public Bill(int billNumber, int userId, double price, double discount, Date date, Time time, boolean returns) {
+    public Bill(String billNumber, int userId, double price, double discount, Date date, Time time, boolean returns) {
         this.billNumber = billNumber;
         this.userId = userId;
         this.price = price;
@@ -27,7 +27,7 @@ public class Bill {
     }
 
 
-    public int getBillNumber() {
+    public String getBillNumber() {
         return billNumber;
     }
 

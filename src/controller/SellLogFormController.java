@@ -85,7 +85,7 @@ public class SellLogFormController extends Window {
             previewBillTableBtn.setDisable(true);
 
             setDataIntoBillTable();
-            setDataIntoSellTable(bills != null && !bills.isEmpty() ? bills.get(0).getBillNumber() : -1);
+            setDataIntoSellTable(bills != null && !bills.isEmpty() ? bills.get(0).getBillNumber() : null);
 
         } catch (SQLException e){
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
@@ -107,7 +107,7 @@ public class SellLogFormController extends Window {
 
     }
 
-    private void setDataIntoSellTable(int billNumber) {
+    private void setDataIntoSellTable(String billNumber) {
         try {
             ArrayList<Sell> sells = dbConnection.getSells(billNumber);
             System.out.println(sells.size());
@@ -136,7 +136,7 @@ public class SellLogFormController extends Window {
 
                 switch (searchCbBx.getValue()) {
                     case "Bill Number":
-                        if(Integer.toString(b.getBillNumber()).contains(searchText)) {
+                        if(b.getBillNumber().contains(searchText)) {
                             if(bill != null) {
                                 obList.add(bill);
                             }
@@ -184,7 +184,7 @@ public class SellLogFormController extends Window {
                         break;
 
                     case "Return":
-                        if(Integer.toString(b.getBillNumber()).contains(searchText) ||
+                        if(b.getBillNumber().contains(searchText) ||
                                 Objects.requireNonNull(userName).toLowerCase().contains(searchText.toLowerCase()) ||
                                 Double.toString(b.getDiscount()).contains(searchText) ||
                                 Double.toString(b.getPrice()).contains(searchText) ||
@@ -197,7 +197,7 @@ public class SellLogFormController extends Window {
                         break;
 
                     case "Not Return":
-                        if(Integer.toString(b.getBillNumber()).contains(searchText) ||
+                        if(b.getBillNumber().contains(searchText) ||
                                 Objects.requireNonNull(userName).toLowerCase().contains(searchText.toLowerCase()) ||
                                 Double.toString(b.getDiscount()).contains(searchText) ||
                                 Double.toString(b.getPrice()).contains(searchText) ||
@@ -210,7 +210,7 @@ public class SellLogFormController extends Window {
                         break;
 
                     default:
-                        if(Integer.toString(b.getBillNumber()).contains(searchText) ||
+                        if(b.getBillNumber().contains(searchText) ||
                                 Objects.requireNonNull(userName).toLowerCase().contains(searchText.toLowerCase()) ||
                                 Double.toString(b.getDiscount()).contains(searchText) ||
                                 Double.toString(b.getPrice()).contains(searchText) ||
@@ -238,7 +238,7 @@ public class SellLogFormController extends Window {
                 b.getDiscount(), b.getPrice(), b.getDate(), b.getTime(), btn);
     }
 
-    private Button getReturnButton(int billNumber) {
+    private Button getReturnButton(String billNumber) {
         Button btn = new Button("Return");
         btn.setStyle("-fx-background-color:  #ff6b6b;");
 

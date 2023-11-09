@@ -1,8 +1,8 @@
 package model;
 
 public class Sell {
-    private int sellId;
-    private int billNumber;
+    private String sellId;
+    private String billNumber;
     private int itemId;
     private int stockId;
     private double discount;
@@ -15,7 +15,7 @@ public class Sell {
 
     public Sell() {}
 
-    public Sell(int sellId, int billNumber, int itemId, int stockId, double discount, double price, double profit,
+    public Sell(String sellId, String billNumber, int itemId, int stockId, double discount, double price, double profit,
                 int quantity, boolean edited, boolean returns) {
         this.sellId = sellId;
         this.billNumber = billNumber;
@@ -30,11 +30,11 @@ public class Sell {
     }
 
 
-    public int getSellId() {
+    public String getSellId() {
         return sellId;
     }
 
-    public void setSellId(int sellId) {
+    public void setSellId(String sellId) {
         this.sellId = sellId;
     }
 
@@ -78,11 +78,11 @@ public class Sell {
         this.edited = edited;
     }
 
-    public int getBillNumber() {
+    public String getBillNumber() {
         return billNumber;
     }
 
-    public void setBillNumber(int billNumber) {
+    public void setBillNumber(String billNumber) {
         this.billNumber = billNumber;
     }
 

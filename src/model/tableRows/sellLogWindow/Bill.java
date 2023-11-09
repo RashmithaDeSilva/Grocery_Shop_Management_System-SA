@@ -6,7 +6,7 @@ import java.sql.Date;
 import java.sql.Time;
 
 public class Bill {
-    private int billNumber;
+    private String billNumber;
     private String userName;
     private double discount;
     private double price;
@@ -18,7 +18,7 @@ public class Bill {
     public Bill() {
     }
 
-    public Bill(int bill_number, String userName, double price, double discount, Date date, Time time, Button btn) {
+    public Bill(String bill_number, String userName, double price, double discount, Date date, Time time, Button btn) {
         this.billNumber = bill_number;
         this.userName = userName;
         this.price = price;
@@ -29,11 +29,11 @@ public class Bill {
     }
 
 
-    public int getBillNumber() {
+    public String getBillNumber() {
         return billNumber;
     }
 
-    public void setBillNumber(int billNumber) {
+    public void setBillNumber(String billNumber) {
         this.billNumber = billNumber;
     }
 

@@ -4,20 +4,21 @@ USE upeksha_communication;
 
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_name VARCHAR(255) NOT NULL,
+    user_name VARCHAR(45) NOT NULL,
     email VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    password VARCHAR(45) NOT NULL,
     title INT, #     0) Developer    1) Super admin    2) Admin    3) User   4) Banded
     banded BIT
 );
 
 INSERT INTO users (user_name, email, password, title, banded)
-VALUES ('admin', 'admin@gmail.com', '12345', 0, false);
+VALUES ('developer', 'developer@gmail.com', '12345', 0, false),
+       ('admin', 'admin@gmail.com', '12345', 1, false);
 
 CREATE TABLE items (
     item_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    item_name VARCHAR(255),
+    item_name VARCHAR(100),
     set_or_reset_date DATE,
     set_or_reset_time TIME,
     stop_selling BIT,
@@ -25,7 +26,7 @@ CREATE TABLE items (
 );
 
 CREATE TABLE bills (
-    bill_number INT AUTO_INCREMENT PRIMARY KEY,
+    bill_number VARCHAR(15) PRIMARY KEY,
     user_id INT,
     discount DECIMAL(10, 2),
     total_price DECIMAL(10, 2),
@@ -37,7 +38,7 @@ CREATE TABLE bills (
 
 CREATE TABLE log (
     user_id INT,
-    log_name VARCHAR(255),
+    log_name VARCHAR(100),
     log_type INT, #  1) [ERROR],   2) [WARNING],   3) [INFO]
     log_date DATE,
     log_time TIME,
@@ -62,8 +63,8 @@ CREATE TABLE stock (
 );
 
 CREATE TABLE sells (
-    sale_id INT AUTO_INCREMENT PRIMARY KEY,
-    bill_number INT,
+    sale_id VARCHAR(15) PRIMARY KEY,
+    bill_number VARCHAR(15),
     item_id INT,
     stock_id INT,
     discount DECIMAL(10, 2),
@@ -78,7 +79,7 @@ CREATE TABLE sells (
 
 CREATE TABLE sell_edits (
     user_id INT,
-    sale_id INT,
+    sale_id VARCHAR(15),
     log_date DATE,
     log_time TIME,
     privies_amount DECIMAL(10, 2),

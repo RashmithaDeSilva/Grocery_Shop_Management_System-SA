@@ -10,9 +10,9 @@ import java.util.Calendar;
 
 public class DBConnection {
 
-    private static String url = "jdbc:mysql://localhost/upeksha_communication";
+    private static String url = "jdbc:mysql://localhost:3307/upeksha_communication";
     private static String userName = "root";
-    private static String password = "1234";
+    private static String password = "12345";
     private static DBConnection instance;
     private static Connection connection;
     private static Statement stm;
@@ -129,36 +129,38 @@ public class DBConnection {
     }
 
     public boolean addSell(Sell sell) throws SQLException {
-        String sql = "INSERT INTO sells (bill_number, item_id, stock_id, discount, " +
-                "sale_amount, profit, quantity, edit, returns) VALUES (?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO sells (sale_id, bill_number, item_id, stock_id, discount, " +
+                "sale_amount, profit, quantity, edit, returns) VALUES (?,?,?,?,?,?,?,?,?,?)";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, sell.getBillNumber());
-        preparedStatement.setInt(2, sell.getItemId());
-        preparedStatement.setInt(3, sell.getStockId());
-        preparedStatement.setDouble(4, sell.getDiscount());
-        preparedStatement.setDouble(5, sell.getPrice());
-        preparedStatement.setDouble(6, sell.getProfit());
-        preparedStatement.setInt(7, sell.getQuantity());
-        preparedStatement.setBoolean(8, sell.isEdited());
-        preparedStatement.setBoolean(9, sell.isReturns());
+        preparedStatement.setString(1, sell.getSellId());
+        preparedStatement.setString(2, sell.getBillNumber());
+        preparedStatement.setInt(3, sell.getItemId());
+        preparedStatement.setInt(4, sell.getStockId());
+        preparedStatement.setDouble(5, sell.getDiscount());
+        preparedStatement.setDouble(6, sell.getPrice());
+        preparedStatement.setDouble(7, sell.getProfit());
+        preparedStatement.setInt(8, sell.getQuantity());
+        preparedStatement.setBoolean(9, sell.isEdited());
+        preparedStatement.setBoolean(10, sell.isReturns());
 
         // Execute the query
         return preparedStatement.executeUpdate() > 0;
     }
 
     public boolean addBill(Bill bill) throws SQLException {
-        String sql = "INSERT INTO bills (user_id, discount, total_price, order_date, order_time, returns) " +
-                "VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO bills (bill_number, user_id, discount, total_price, order_date, order_time, returns) " +
+                "VALUES (?,?,?,?,?,?,?)";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         // Set the values for the placeholders
-        preparedStatement.setInt(1, bill.getUserId());
-        preparedStatement.setDouble(2, bill.getDiscount());
-        preparedStatement.setDouble(3, bill.getPrice());
-        preparedStatement.setDate(4, bill.getDate());
-        preparedStatement.setTime(5, bill.getTime());
-        preparedStatement.setBoolean(6, bill.isReturns());
+        preparedStatement.setString(1, bill.getBillNumber());
+        preparedStatement.setInt(2, bill.getUserId());
+        preparedStatement.setDouble(3, bill.getDiscount());
+        preparedStatement.setDouble(4, bill.getPrice());
+        preparedStatement.setDate(5, bill.getDate());
+        preparedStatement.setTime(6, bill.getTime());
+        preparedStatement.setBoolean(7, bill.isReturns());
 
         // Execute the query
         return preparedStatement.executeUpdate() > 0;
@@ -218,7 +220,7 @@ public class DBConnection {
         return preparedStatement.executeUpdate() > 0;
     }
 
-    public boolean updateStock(Sell sell, int bill_number) throws SQLException {
+    public boolean updateStock(Sell sell, String bill_number) throws SQLException {
         String sql = "UPDATE stock SET quantity = quantity + ?, WHERE stock_id = ? " +
                 "AND item_id = ? AND price = ?;";
 
@@ -331,7 +333,7 @@ public class DBConnection {
         return instance;
     }
 
-    private int getBillAddedUserId(int billNumber) throws SQLException {
+    private int getBillAddedUserId(String billNumber) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT user_id FROM bills WHERE bill_number = " + billNumber +";");
 
         if(reset.next()) {
@@ -525,7 +527,7 @@ public class DBConnection {
         ArrayList<Bill> bills = new ArrayList<>();
 
         while(reset.next()) {
-            bills.add(new Bill(reset.getInt("bill_number"), reset.getInt("user_id"),
+            bills.add(new Bill(reset.getString("bill_number"), reset.getInt("user_id"),
                     reset.getDouble("total_price"), reset.getDouble("discount"),
                     reset.getDate("order_date"), reset.getTime("order_time"),
                     reset.getBoolean("returns")));
@@ -636,13 +638,22 @@ public class DBConnection {
         return -1;
     }
 
-    public int getLastBillNumber() throws SQLException {
+    public String getLastBillNumber() throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT bill_number FROM bills ORDER BY bill_number DESC LIMIT 1;");
 
         if(reset.next()) {
-            return reset.getInt("bill_number");
+            return reset.getString("bill_number");
         }
-        return -1;
+        return null;
+    }
+
+    public String getLastSellID() throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT sale_id FROM sells ORDER BY sale_id DESC LIMIT 1;");
+
+        if(reset.next()) {
+            return reset.getString("sale_id");
+        }
+        return null;
     }
 
     public int getLastStockID() throws SQLException {
@@ -681,12 +692,12 @@ public class DBConnection {
         return null;
     }
 
-    public ArrayList<Sell> getSells(int billNumber) throws SQLException {
+    public ArrayList<Sell> getSells(String billNumber) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT * FROM sells WHERE bill_number = " + billNumber + ";");
         ArrayList<Sell> sells = new ArrayList<>();
 
         while(reset.next()) {
-            sells.add(new Sell(reset.getInt("sale_id"), billNumber, reset.getInt("item_id"),
+            sells.add(new Sell(reset.getString("sale_id"), billNumber, reset.getInt("item_id"),
                     reset.getInt("stock_id"), reset.getDouble("discount"),
                     reset.getDouble("sale_amount"), reset.getDouble("profit"),
                     reset.getInt("quantity"), reset.getBoolean("edit"),
@@ -771,11 +782,11 @@ public class DBConnection {
         stm.executeUpdate("DELETE FROM bills ORDER BY bill_number DESC LIMIT 1;");
     }
 
-    public boolean deleteSellEdit(Integer sellId) throws SQLException {
+    public boolean deleteSellEdit(String sellId) throws SQLException {
         String sql = "DELETE FROM sell_edits WHERE sale_id = ?;";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, sellId);
+        preparedStatement.setString(1, sellId);
 
         return preparedStatement.executeUpdate() > 0;
     }
@@ -789,19 +800,19 @@ public class DBConnection {
 
 
     // Returns ---------------------------------------------------------------------------------------------------------
-    public boolean setReturnBill(int billNumber) throws SQLException {
+    public boolean setReturnBill(String billNumber) throws SQLException {
         if(setReturnAllSells(billNumber)) {
             String sql = "UPDATE bills SET returns = 1 WHERE bill_number = ?;";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, billNumber);
+            preparedStatement.setString(1, billNumber);
             return preparedStatement.executeUpdate() > 0;
         }
 
         return false;
     }
 
-    public boolean setReturnAllSells(int billNumber) throws SQLException {
+    public boolean setReturnAllSells(String billNumber) throws SQLException {
         ArrayList<Sell> sells = getSells(billNumber);
 
         for (Sell s : sells) {
@@ -813,7 +824,7 @@ public class DBConnection {
         String sql = "UPDATE sells SET returns = 1 WHERE bill_number = ?;";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, billNumber);
+        preparedStatement.setString(1, billNumber);
         return preparedStatement.executeUpdate() > 0;
     }
 
@@ -1004,4 +1015,5 @@ public class DBConnection {
     public static void setPassword(String password) {
         DBConnection.password = password;
     }
+
 }

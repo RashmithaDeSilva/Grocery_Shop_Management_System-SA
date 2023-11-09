@@ -20,7 +20,7 @@ import java.util.Objects;
 
 public class Window extends Features {
     public AnchorPane context;
-    private static int userId = 1;
+    private static int userId = 2;
     private static String userName = "Admin";
     private static int userRoll = 1;
     public DBConnection dbConnection = DBConnection.getInstance();
