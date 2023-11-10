@@ -462,7 +462,7 @@ public class SellFormController extends Window{
         setUI("DashboardForm");
     }
 
-    public void sellOnAction(ActionEvent actionEvent) throws IOException {
+    public void sellOnAction(ActionEvent actionEvent) throws IOException, SQLException {
         try {
             if(quotationTbl != null && quotationTbl.getItems() != null && !quotationTbl.getItems().isEmpty()) {
 
@@ -484,7 +484,8 @@ public class SellFormController extends Window{
                     for (InvoiceItem i : quotationTbl.getItems()) {
                         if(!dbConnection.addSell(new Sell(getNewId(dbConnection.getLastSellID()), billNumber,
                                 i.getItemId(), i.getStockId(), i.getDiscount(), i.getSellingPrice(),
-                                (i.getSellingPrice() - i.getPrice()), i.getQuantity(), false, false))) {
+                                (i.getSellingPrice() - (i.getPrice() * i.getQuantity())), i.getQuantity(),
+                                false, false))) {
 
                             successfulMassage = false;
                             dbConnection.addLog(new Log(super.getUserId(), "Fail Bill Added with bill number: "
@@ -561,6 +562,7 @@ public class SellFormController extends Window{
 
         } else if (oldId.charAt(0) == 'S') {
             return "S" + generateId(oldId);
+
         }
 
         return null;
@@ -570,10 +572,10 @@ public class SellFormController extends Window{
         String date = new SimpleDateFormat("yyMMdd").format(new Date());
 
         if (oldId.length() > 7) {
-            return date + (Integer.parseInt(oldId.substring(7)) + 1);
+            return date + String.format("%03d", (Integer.parseInt(oldId.substring(7)) + 1));
 
         } else {
-            return date + 1;
+            return date + "001";
         }
     }
 

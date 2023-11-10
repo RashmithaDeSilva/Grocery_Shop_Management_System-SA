@@ -639,21 +639,23 @@ public class DBConnection {
     }
 
     public String getLastBillNumber() throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT bill_number FROM bills ORDER BY bill_number DESC LIMIT 1;");
+        ResultSet reset = stm.executeQuery("SELECT MAX(CAST(SUBSTRING(bill_number, 2) AS UNSIGNED)) " +
+                "AS last_id_number FROM bills WHERE bill_number LIKE 'B%';");
 
         if(reset.next()) {
-            return reset.getString("bill_number");
+            return "B" + reset.getString("last_id_number");
         }
-        return null;
+        return "B";
     }
 
     public String getLastSellID() throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT sale_id FROM sells ORDER BY sale_id DESC LIMIT 1;");
+        ResultSet reset = stm.executeQuery("SELECT MAX(CAST(SUBSTRING(sale_id, 2) AS UNSIGNED)) " +
+                "AS last_id_number FROM sells WHERE sale_id LIKE 'S%';");
 
         if(reset.next()) {
-            return reset.getString("sale_id");
+            return "S" + reset.getString("last_id_number");
         }
-        return null;
+        return "S";
     }
 
     public int getLastStockID() throws SQLException {
