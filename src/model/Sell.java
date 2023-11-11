@@ -15,8 +15,8 @@ public class Sell {
 
     public Sell() {}
 
-    public Sell(String sellId, String billNumber, int itemId, int stockId, double discount, double price, double profit,
-                int quantity, boolean edited, boolean returns) {
+    public Sell(String sellId, String billNumber, int itemId, int stockId, double discount, double price,
+                double profit, int quantity, boolean edited, boolean returns) {
         this.sellId = sellId;
         this.billNumber = billNumber;
         this.itemId = itemId;

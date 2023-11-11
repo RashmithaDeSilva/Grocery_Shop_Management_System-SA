@@ -3,7 +3,7 @@ package model.tableRows.sellLogWindow;
 import javafx.scene.control.Button;
 
 public class Sell {
-    private int sellId;
+    private String sellId;
     private String  itemName;
     private int quantity;
     private double discount;
@@ -14,7 +14,7 @@ public class Sell {
     public Sell() {
     }
 
-    public Sell(int sellId, String itemName, int quantity, double discount, double price, Button btn) {
+    public Sell(String sellId, String itemName, int quantity, double discount, double price, Button btn) {
         this.sellId = sellId;
         this.itemName = itemName;
         this.discount = discount;
@@ -24,11 +24,11 @@ public class Sell {
     }
 
 
-    public int getSellId() {
+    public String getSellId() {
         return sellId;
     }
 
-    public void setSellId(int sellId) {
+    public void setSellId(String sellId) {
         this.sellId = sellId;
     }
 

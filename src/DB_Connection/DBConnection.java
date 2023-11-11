@@ -221,16 +221,18 @@ public class DBConnection {
     }
 
     public boolean updateStock(Sell sell, String bill_number) throws SQLException {
-        String sql = "UPDATE stock SET quantity = quantity + ?, WHERE stock_id = ? " +
-                "AND item_id = ? AND price = ?;";
+        String sql = "UPDATE stock SET quantity = quantity + ? WHERE stock_id = ? " +
+                "AND item_id = ? AND price = ? AND selling_price = ?;";
 
-        double price = (sell.getProfit() - (sell.getPrice() + sell.getDiscount()));
+        double price = (sell.getPrice() + sell.getDiscount()) - (sell.getProfit() + sell.getDiscount());
+        double sellingPrice = sell.getPrice() + sell.getDiscount();
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1, sell.getQuantity());
         preparedStatement.setInt(2, sell.getStockId());
         preparedStatement.setInt(3, sell.getItemId());
         preparedStatement.setDouble(4, price);
+        preparedStatement.setDouble(5, sellingPrice);
 
         if(preparedStatement.executeUpdate() > 0) {
             return true;
@@ -334,7 +336,7 @@ public class DBConnection {
     }
 
     private int getBillAddedUserId(String billNumber) throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT user_id FROM bills WHERE bill_number = " + billNumber +";");
+        ResultSet reset = stm.executeQuery("SELECT user_id FROM bills WHERE bill_number = '" + billNumber +"';");
 
         if(reset.next()) {
             return reset.getInt("user_id");
@@ -518,10 +520,11 @@ public class DBConnection {
         ResultSet reset;
 
         if(billCount > 0) {
-            reset = stm.executeQuery("SELECT * FROM bills ORDER BY bill_number DESC LIMIT 25 OFFSET "
-                    + billCount +";");
+            reset = stm.executeQuery("SELECT * FROM bills ORDER BY order_date DESC, order_time DESC " +
+                    "bill_number DESC LIMIT 25 OFFSET " + billCount +";");
         } else {
-            reset = stm.executeQuery("SELECT * FROM bills ORDER BY bill_number DESC LIMIT 25;");
+            reset = stm.executeQuery("SELECT * FROM bills ORDER BY order_date DESC, order_time DESC, " +
+                    "bill_number DESC LIMIT 25;");
         }
 
         ArrayList<Bill> bills = new ArrayList<>();
@@ -694,8 +697,8 @@ public class DBConnection {
         return null;
     }
 
-    public ArrayList<Sell> getSells(String billNumber) throws SQLException {
-        ResultSet reset = stm.executeQuery("SELECT * FROM sells WHERE bill_number = " + billNumber + ";");
+    public ArrayList<Sell> getSells(String billNumber) throws SQLException {;
+        ResultSet reset = stm.executeQuery("SELECT * FROM sells WHERE bill_number = '" + billNumber + "';");
         ArrayList<Sell> sells = new ArrayList<>();
 
         while(reset.next()) {
@@ -805,7 +808,6 @@ public class DBConnection {
     public boolean setReturnBill(String billNumber) throws SQLException {
         if(setReturnAllSells(billNumber)) {
             String sql = "UPDATE bills SET returns = 1 WHERE bill_number = ?;";
-
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, billNumber);
             return preparedStatement.executeUpdate() > 0;
@@ -818,7 +820,7 @@ public class DBConnection {
         ArrayList<Sell> sells = getSells(billNumber);
 
         for (Sell s : sells) {
-            if(!deleteSellEdit(s.getSellId()) || !updateStock(s, billNumber)) {
+            if(!deleteSellEdit(s.getSellId()) && !updateStock(s, billNumber)) {
                 return false;
             }
         }
@@ -827,6 +829,13 @@ public class DBConnection {
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setString(1, billNumber);
+        return preparedStatement.executeUpdate() > 0;
+    }
+
+    public boolean setReturnSell(String sellId) throws SQLException {
+        String sql = "UPDATE sells SET returns = 1 WHERE sale_id = ?;";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, sellId);
         return preparedStatement.executeUpdate() > 0;
     }
 

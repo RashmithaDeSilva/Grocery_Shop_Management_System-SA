@@ -29,7 +29,7 @@ public class SellLogFormController extends Window {
     public TableColumn<Object, String> dateCol;
     public TableColumn<Object, String> timeCol;
     public TableColumn<Object, String> returnBillTableCol;
-    public TableView sellsTbl;
+    public TableView<model.tableRows.sellLogWindow.Sell> sellsTbl;
     public TableColumn<Object, String> sellIdCol;
     public TableColumn<Object, String> itemNameCol;
     public TableColumn<Object, String> quantityCol;
@@ -85,15 +85,17 @@ public class SellLogFormController extends Window {
             previewBillTableBtn.setDisable(true);
 
             setDataIntoBillTable();
-            setDataIntoSellTable(bills != null && !bills.isEmpty() ? bills.get(0).getBillNumber() : null);
+            if(bills != null && !bills.isEmpty()) {
+                setDataIntoSellTable(bills.get(0).getBillNumber());
+            }
 
         } catch (SQLException e){
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
 
         searchCbBx.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if(searchCbBx.getValue() != null) {
-                searchText = newValue;
+            if(newValue != null) {
+                searchText = searchTxt.getText();
                 setDataIntoBillTable();
             }
         });
@@ -105,12 +107,32 @@ public class SellLogFormController extends Window {
             }
         });
 
+        billTbl.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null) {
+                setDataIntoSellTable(newValue.getBillNumber());
+            }
+        });
+
     }
 
     private void setDataIntoSellTable(String billNumber) {
         try {
             ArrayList<Sell> sells = dbConnection.getSells(billNumber);
-            System.out.println(sells.size());
+            if(sells != null && !sells.isEmpty()) {
+                ObservableList<model.tableRows.sellLogWindow.Sell> obList = FXCollections.observableArrayList();
+
+                for (Sell s : sells) {
+                    Button btn = new Button("Return");
+                    btn.setStyle("-fx-background-color:  #ff6b6b;");
+                    btn.setDisable(true);
+
+                    obList.add(new model.tableRows.sellLogWindow.Sell(s.getSellId(),
+                            dbConnection.getItemName(s.getItemId()), s.getQuantity(), s.getDiscount(),
+                            s.getPrice(), s.isReturns() ? btn : getSellReturnButton(s.getSellId())));
+                }
+                sellsTbl.setItems(obList);
+            }
+
 
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
@@ -136,7 +158,7 @@ public class SellLogFormController extends Window {
 
                 switch (searchCbBx.getValue()) {
                     case "Bill Number":
-                        if(b.getBillNumber().contains(searchText)) {
+                        if(b.getBillNumber().toLowerCase().contains(searchText.toLowerCase())) {
                             if(bill != null) {
                                 obList.add(bill);
                             }
@@ -184,7 +206,7 @@ public class SellLogFormController extends Window {
                         break;
 
                     case "Return":
-                        if(b.getBillNumber().contains(searchText) ||
+                        if(b.getBillNumber().toLowerCase().contains(searchText.toLowerCase()) ||
                                 Objects.requireNonNull(userName).toLowerCase().contains(searchText.toLowerCase()) ||
                                 Double.toString(b.getDiscount()).contains(searchText) ||
                                 Double.toString(b.getPrice()).contains(searchText) ||
@@ -197,7 +219,7 @@ public class SellLogFormController extends Window {
                         break;
 
                     case "Not Return":
-                        if(b.getBillNumber().contains(searchText) ||
+                        if(b.getBillNumber().toLowerCase().contains(searchText.toLowerCase()) ||
                                 Objects.requireNonNull(userName).toLowerCase().contains(searchText.toLowerCase()) ||
                                 Double.toString(b.getDiscount()).contains(searchText) ||
                                 Double.toString(b.getPrice()).contains(searchText) ||
@@ -210,7 +232,7 @@ public class SellLogFormController extends Window {
                         break;
 
                     default:
-                        if(b.getBillNumber().contains(searchText) ||
+                        if(b.getBillNumber().toLowerCase().contains(searchText.toLowerCase()) ||
                                 Objects.requireNonNull(userName).toLowerCase().contains(searchText.toLowerCase()) ||
                                 Double.toString(b.getDiscount()).contains(searchText) ||
                                 Double.toString(b.getPrice()).contains(searchText) ||
@@ -229,7 +251,7 @@ public class SellLogFormController extends Window {
     }
 
     private model.tableRows.sellLogWindow.Bill getBillForTable(Bill b) throws SQLException {
-        Button btn = getReturnButton(b.getBillNumber());
+        Button btn = getBillReturnButton(b.getBillNumber());
         if(b.isReturns()){
             btn.setDisable(true);
         }
@@ -238,7 +260,7 @@ public class SellLogFormController extends Window {
                 b.getDiscount(), b.getPrice(), b.getDate(), b.getTime(), btn);
     }
 
-    private Button getReturnButton(String billNumber) {
+    private Button getBillReturnButton(String billNumber) {
         Button btn = new Button("Return");
         btn.setStyle("-fx-background-color:  #ff6b6b;");
 
@@ -246,7 +268,7 @@ public class SellLogFormController extends Window {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("CONFIRMATION");
             alert.setHeaderText("Conform Return");
-            alert.setContentText("Are you sure do you want to Delete this Bill?");
+            alert.setContentText("Are you sure do you want to Return this Bill?");
             alert.getButtonTypes().set(0, ButtonType.YES);
             alert.getButtonTypes().set(1, ButtonType.NO);
 
@@ -255,13 +277,13 @@ public class SellLogFormController extends Window {
                     try {
                         if(dbConnection.setReturnBill(billNumber)) {
                             bills.forEach(b -> {
-                                if(b.getBillNumber() == billNumber) {
+                                if(b.getBillNumber().equals(billNumber)) {
                                     try {
-                                        dbConnection.addLog(new Log(super.getUserId(), "Return Bill (Bill number: " +
-                                                billNumber + ", price: " + b.getPrice() + ", discount: " +
-                                                b.getDiscount() + ")", LogTypes.INFORMATION, super.getDate(),
-                                                super.getTime(), (b.getPrice() + b.getDiscount()),
-                                                IncomeOrExpenseLogTypes.RETURNS));
+                                        dbConnection.addLog(new Log(super.getUserId(),
+                                                "Return Bill (Bill number: " + billNumber + ", price: "
+                                                        + b.getPrice() + ", discount: " + b.getDiscount() + ")",
+                                                LogTypes.INFORMATION, super.getDate(), super.getTime(),
+                                                b.getPrice(), IncomeOrExpenseLogTypes.RETURNS));
 
                                     } catch (SQLException ex) {
                                         alert(Alert.AlertType.ERROR, "ERROR",
@@ -270,12 +292,71 @@ public class SellLogFormController extends Window {
                                 }
                             });
 
-                            alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successful Delete",
-                                    "Delete successful bill number: " + billNumber);
+                            if(sellsTbl != null) {
+                                for (model.tableRows.sellLogWindow.Sell s : sellsTbl.getItems()) {
+                                    s.getBtn().setDisable(true);
+                                }
+                            }
+
+                            btn.setDisable(true);
+                            alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successful Return",
+                                    "Return successful Bill number: " + billNumber);
 
                         } else {
-                            alert(Alert.AlertType.WARNING, "WARNING", "Can't Delete",
-                                    "This bill can not delete");
+                            alert(Alert.AlertType.WARNING, "WARNING", "Can't Return",
+                                    "This Bill can not Return");
+                        }
+
+                    } catch (SQLException ex) {
+                        alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error",
+                                ex.getMessage());
+                    }
+                }
+            });
+        });
+
+        return btn;
+    }
+
+    private Button getSellReturnButton(String sellId) {
+        Button btn = new Button("Return");
+        btn.setStyle("-fx-background-color:  #ff6b6b;");
+
+        btn.setOnAction((e) -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("CONFIRMATION");
+            alert.setHeaderText("Conform Return");
+            alert.setContentText("Are you sure do you want to Return this Sell?");
+            alert.getButtonTypes().set(0, ButtonType.YES);
+            alert.getButtonTypes().set(1, ButtonType.NO);
+
+            alert.showAndWait().ifPresent(response -> {
+                if(response == ButtonType.YES) {
+                    try {
+                        if(dbConnection.setReturnSell(sellId)) {
+                            sellsTbl.getItems().forEach(s -> {
+                                if(s.getSellId().equals(sellId)) {
+                                    try {
+                                        dbConnection.addLog(new Log(super.getUserId(),
+                                                "Return Sell (Sell ID: " + sellId + ", price: "
+                                                        + s.getPrice() + ", discount: " + s.getDiscount() + ")",
+                                                LogTypes.INFORMATION, super.getDate(), super.getTime(),
+                                                s.getPrice(), IncomeOrExpenseLogTypes.RETURNS));
+
+                                    } catch (SQLException ex) {
+                                        alert(Alert.AlertType.ERROR, "ERROR",
+                                                "Database Connection Error", ex.getMessage());
+                                    }
+                                }
+                            });
+
+                            btn.setDisable(true);
+                            alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successful Return",
+                                    "Return successful Sell ID: " + sellId);
+
+                        } else {
+                            alert(Alert.AlertType.WARNING, "WARNING", "Can't Return",
+                                    "This Sell can not Return");
                         }
 
                     } catch (SQLException ex) {

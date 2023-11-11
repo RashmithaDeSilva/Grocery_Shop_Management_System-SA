@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contextSellLogForm" prefHeight="886.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SellLogFormController">
+<AnchorPane fx:id="contextSellLogForm" prefHeight="886.0" prefWidth="890.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SellLogFormController">
    <children>
       <Label layoutX="40.0" layoutY="35.0" text="Sell Log">
          <font>
@@ -19,7 +19,7 @@
          </font>
       </Label>
       <Separator layoutX="40.0" layoutY="98.0" prefHeight="4.0" prefWidth="709.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" />
-      <Button layoutX="687.0" layoutY="43.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
+      <Button layoutX="768.0" layoutY="42.0" mnemonicParsing="false" onAction="#backOnAction" style="-fx-background-color: #48dbfb;" text="&lt; Back">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -27,7 +27,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button layoutX="601.0" layoutY="43.0" mnemonicParsing="false" onAction="#sellsOnAction" style="-fx-background-color: #48dbfb;" text="Sells">
+      <Button layoutX="682.0" layoutY="42.0" mnemonicParsing="false" onAction="#sellsOnAction" style="-fx-background-color: #48dbfb;" text="Sells">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -35,33 +35,33 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <TableView fx:id="billTbl" layoutX="34.0" layoutY="183.0" prefHeight="226.0" prefWidth="730.0">
+      <TableView fx:id="billTbl" layoutX="34.0" layoutY="183.0" prefHeight="226.0" prefWidth="810.0">
         <columns>
-          <TableColumn fx:id="billNumberCol" prefWidth="88.00000381469727" text="Bill number" />
-          <TableColumn fx:id="userNameCol" prefWidth="132.7999725341797" text="User name" />
-            <TableColumn fx:id="priceBillTableCol" prefWidth="93.5999755859375" text="Price" />
-            <TableColumn fx:id="discountBillTableCol" prefWidth="92.79998779296875" text="Discount" />
-            <TableColumn fx:id="dateCol" prefWidth="104.0" text="Date" />
-            <TableColumn fx:id="timeCol" prefWidth="106.4000244140625" text="Time" />
-            <TableColumn fx:id="returnBillTableCol" prefWidth="88.0" text="Return" />
+          <TableColumn fx:id="billNumberCol" prefWidth="123.19995498657227" text="Bill number" />
+          <TableColumn fx:id="userNameCol" prefWidth="134.3999481201172" text="User name" />
+            <TableColumn fx:id="priceBillTableCol" prefWidth="114.4000244140625" text="Price" />
+            <TableColumn fx:id="discountBillTableCol" prefWidth="114.39996337890625" text="Discount" />
+            <TableColumn fx:id="dateCol" prefWidth="110.4000244140625" text="Date" />
+            <TableColumn fx:id="timeCol" prefWidth="99.2000732421875" text="Time" />
+            <TableColumn fx:id="returnBillTableCol" prefWidth="100.800048828125" text="Return" />
         </columns>
       </TableView>
-      <TableView fx:id="sellsTbl" layoutX="40.0" layoutY="501.0" prefHeight="226.0" prefWidth="730.0">
+      <TableView fx:id="sellsTbl" layoutX="40.0" layoutY="501.0" prefHeight="226.0" prefWidth="810.0">
         <columns>
-          <TableColumn fx:id="sellIdCol" prefWidth="80.80001831054688" text="Sell ID" />
-          <TableColumn fx:id="itemNameCol" prefWidth="200.0000457763672" text="Item name" />
-            <TableColumn fx:id="quantityCol" prefWidth="103.199951171875" text="Quantity" />
-            <TableColumn fx:id="discountSellTableCol" prefWidth="116.0" text="Discount" />
-            <TableColumn fx:id="priceSellTableCol" prefWidth="112.0" text="Price" />
-            <TableColumn fx:id="returnSellTableCol" prefWidth="91.2000732421875" text="Return" />
+          <TableColumn fx:id="sellIdCol" prefWidth="135.19995498657227" text="Sell ID" />
+          <TableColumn fx:id="itemNameCol" prefWidth="210.40000915527344" text="Item name" />
+            <TableColumn fx:id="quantityCol" prefWidth="118.4000244140625" text="Quantity" />
+            <TableColumn fx:id="discountSellTableCol" prefWidth="117.5999755859375" text="Discount" />
+            <TableColumn fx:id="priceSellTableCol" prefWidth="107.2000732421875" text="Price" />
+            <TableColumn fx:id="returnSellTableCol" prefWidth="100.0001220703125" text="Return" />
         </columns>
       </TableView>
-      <Button fx:id="previewBillTableBtn" layoutX="363.0" layoutY="428.0" mnemonicParsing="false" onAction="#previewBillTableOnAction" style="-fx-background-color: #48dbfb;" text="&lt;">
+      <Button fx:id="previewBillTableBtn" layoutX="409.0" layoutY="430.0" mnemonicParsing="false" onAction="#previewBillTableOnAction" style="-fx-background-color: #48dbfb;" text="&lt;">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="nextBillTableBtn" layoutX="410.0" layoutY="428.0" mnemonicParsing="false" onAction="#nextBillTableOnAction" style="-fx-background-color: #48dbfb;" text="&gt;">
+      <Button fx:id="nextBillTableBtn" layoutX="456.0" layoutY="430.0" mnemonicParsing="false" onAction="#nextBillTableOnAction" style="-fx-background-color: #48dbfb;" text="&gt;">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
@@ -75,39 +75,39 @@
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <TextField fx:id="quantityTxt" alignment="CENTER" layoutX="583.0" layoutY="759.0" prefHeight="37.0" prefWidth="186.0" promptText="Quantity">
+      <TextField fx:id="quantityTxt" alignment="CENTER" layoutX="663.0" layoutY="759.0" prefHeight="37.0" prefWidth="186.0" promptText="Quantity">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <TextField fx:id="priceTxt" alignment="CENTER" layoutX="312.0" layoutY="759.0" prefHeight="37.0" prefWidth="186.0" promptText="Price">
+      <TextField fx:id="priceTxt" alignment="CENTER" layoutX="352.0" layoutY="759.0" prefHeight="37.0" prefWidth="186.0" promptText="Price">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <TextField fx:id="ItemNameTxt" alignment="CENTER" editable="false" layoutX="312.0" layoutY="825.0" prefHeight="38.0" prefWidth="186.0" promptText="Item name">
+      <TextField fx:id="ItemNameTxt" alignment="CENTER" editable="false" layoutX="352.0" layoutY="825.0" prefHeight="38.0" prefWidth="186.0" promptText="Item name">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <Button layoutX="583.0" layoutY="827.0" mnemonicParsing="false" onAction="#resetOnAction" style="-fx-background-color: #ff6b6b;" text="Reset">
+      <Button layoutX="663.0" layoutY="827.0" mnemonicParsing="false" onAction="#resetOnAction" style="-fx-background-color: #ff6b6b;" text="Reset">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Button layoutX="685.0" layoutY="827.0" mnemonicParsing="false" onAction="#updateOnAction" style="-fx-background-color: #feca57;" text="Update">
+      <Button layoutX="765.0" layoutY="827.0" mnemonicParsing="false" onAction="#updateOnAction" style="-fx-background-color: #feca57;" text="Update">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <ComboBox fx:id="searchCbBx" layoutX="40.0" layoutY="129.0" prefHeight="38.0" prefWidth="172.0" />
-      <TextField fx:id="searchTxt" layoutX="223.0" layoutY="129.0" prefHeight="38.0" prefWidth="444.0">
+      <ComboBox fx:id="searchCbBx" layoutX="40.0" layoutY="129.0" prefHeight="38.0" prefWidth="200.0" />
+      <TextField fx:id="searchTxt" layoutX="260.0" layoutY="129.0" prefHeight="38.0" prefWidth="463.0">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </TextField>
-      <Button layoutX="681.0" layoutY="126.0" mnemonicParsing="false" onAction="#refreshOnAction" style="-fx-background-color: #48dbfb;" text="Refresh">
+      <Button layoutX="741.0" layoutY="129.0" mnemonicParsing="false" onAction="#refreshOnAction" prefHeight="38.0" prefWidth="102.0" style="-fx-background-color: #48dbfb;" text="Refresh">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
