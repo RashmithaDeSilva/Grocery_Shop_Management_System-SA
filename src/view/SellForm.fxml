@@ -31,23 +31,23 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </TableView>
-      <TextField fx:id="idTxt" alignment="CENTER" editable="false" layoutX="690.0" layoutY="161.0" prefHeight="27.0" prefWidth="113.0" promptText="Item ID" AnchorPane.bottomAnchor="397.4">
+      <TextField fx:id="idTxt" alignment="CENTER" editable="false" layoutX="800.0" layoutY="229.0" prefHeight="27.0" prefWidth="113.0" AnchorPane.bottomAnchor="329.4">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <TextField fx:id="nameTxt" alignment="CENTER" editable="false" layoutX="689.0" layoutY="212.0" prefHeight="27.0" prefWidth="228.0" promptText="Item Name">
+      <TextField fx:id="nameTxt" alignment="CENTER" editable="false" layoutX="686.0" layoutY="184.0" prefHeight="27.0" prefWidth="228.0">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <TextField fx:id="discountTxt" alignment="CENTER" layoutX="801.0" layoutY="365.0" prefHeight="27.0" prefWidth="114.0" promptText="Discount">
+      <TextField fx:id="discountTxt" alignment="CENTER" layoutX="798.0" layoutY="389.0" prefHeight="27.0" prefWidth="114.0" promptText="Discount">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <TextField fx:id="quantityTxt" alignment="CENTER" layoutX="814.0" layoutY="260.0" prefHeight="27.0" prefWidth="102.0" promptText="Quantity ">
+      <TextField fx:id="quantityTxt" alignment="CENTER" layoutX="800.0" layoutY="299.0" prefHeight="30.0" prefWidth="114.0">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <TextField fx:id="priceTxt" alignment="CENTER" editable="false" layoutX="802.0" layoutY="314.0" prefHeight="27.0" prefWidth="114.0" promptText="Price">
+      <TextField fx:id="priceTxt" alignment="CENTER" editable="false" layoutX="800.0" layoutY="344.0" prefHeight="27.0" prefWidth="114.0" promptText="Price">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
@@ -56,7 +56,7 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Button fx:id="addOrUpdateBtn" layoutX="819.0" layoutY="488.0" mnemonicParsing="false" onAction="#addAndUpdateOnAction" prefHeight="38.0" prefWidth="94.0" style="-fx-background-color: #1dd1a1;" text="Add">
+      <Button fx:id="addOrUpdateBtn" layoutX="817.0" layoutY="525.0" mnemonicParsing="false" onAction="#addAndUpdateOnAction" prefHeight="38.0" prefWidth="94.0" style="-fx-background-color: #1dd1a1;" text="Add">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -105,7 +105,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button layoutX="690.0" layoutY="488.0" mnemonicParsing="false" onAction="#resetInputOnAction" style="-fx-background-color: #ff6b6b;" text="Reset Item">
+      <Button layoutX="688.0" layoutY="525.0" mnemonicParsing="false" onAction="#resetInputOnAction" style="-fx-background-color: #ff6b6b;" text="Reset Item">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
@@ -113,7 +113,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <TextField fx:id="availableQuantityTxt" alignment="CENTER" editable="false" layoutX="689.0" layoutY="260.0" prefHeight="27.0" prefWidth="102.0" promptText="Available">
+      <TextField fx:id="availableQuantityTxt" alignment="CENTER" editable="false" layoutX="688.0" layoutY="299.0" prefHeight="27.0" prefWidth="102.0">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
@@ -126,7 +126,7 @@
          </cursor>
       </Button>
       <TextField fx:id="searchTxt" layoutX="934.0" layoutY="115.0" prefHeight="27.0" prefWidth="287.0" promptText="Search" />
-      <TextField fx:id="totalPriceTxt" alignment="CENTER" editable="false" layoutX="801.0" layoutY="416.0" prefHeight="27.0" prefWidth="114.0" promptText="Total Price">
+      <TextField fx:id="totalPriceTxt" alignment="CENTER" editable="false" layoutX="798.0" layoutY="436.0" prefHeight="27.0" prefWidth="114.0" promptText="Total Price">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
@@ -154,5 +154,40 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
+      <Label layoutX="689.0" layoutY="234.0" text="Item ID">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="688.0" layoutY="273.0" prefHeight="20.0" prefWidth="94.0" text="Available Qt">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="799.0" layoutY="273.0" prefHeight="20.0" prefWidth="94.0" text="Quantity ">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="689.0" layoutY="349.0" prefHeight="20.0" prefWidth="94.0" text="Price">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="687.0" layoutY="394.0" prefHeight="20.0" prefWidth="94.0" text="Discount">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="691.0" layoutY="441.0" prefHeight="20.0" prefWidth="94.0" text="Total Price">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="686.0" layoutY="151.0" text="Item Name">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
