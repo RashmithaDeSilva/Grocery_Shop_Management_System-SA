@@ -651,6 +651,15 @@ public class DBConnection {
         return "B";
     }
 
+    public String getBillNumber(String sellId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT bill_number FROM sells WHERE sale_id = '" + sellId +"';");
+
+        if(reset.next()) {
+            return reset.getString("bill_number");
+        }
+        return null;
+    }
+
     public String getLastSellID() throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT MAX(CAST(SUBSTRING(sale_id, 2) AS UNSIGNED)) " +
                 "AS last_id_number FROM sells WHERE sale_id LIKE 'S%';");

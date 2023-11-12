@@ -128,11 +128,11 @@ public class SellLogFormController extends Window {
 
                     obList.add(new model.tableRows.sellLogWindow.Sell(s.getSellId(),
                             dbConnection.getItemName(s.getItemId()), s.getQuantity(), s.getDiscount(),
-                            s.getPrice(), s.isReturns() ? btn : getSellReturnButton(s.getSellId())));
+                            s.getPrice(), s.isReturns() ? btn : sells.size() != 1 ?
+                            getSellReturnButton(s.getSellId()) : getBillReturnButton(billNumber)));
                 }
                 sellsTbl.setItems(obList);
             }
-
 
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
@@ -279,6 +279,15 @@ public class SellLogFormController extends Window {
                             bills.forEach(b -> {
                                 if(b.getBillNumber().equals(billNumber)) {
                                     try {
+                                        setDataIntoSellTable(billNumber);
+
+                                        for (model.tableRows.sellLogWindow.Bill bill: billTbl.getItems()) {
+                                            if(bill.getBillNumber().equals(billNumber)) {
+                                                bill.getBtn().setDisable(true);
+                                                break;
+                                            }
+                                        }
+
                                         dbConnection.addLog(new Log(super.getUserId(),
                                                 "Return Bill (Bill number: " + billNumber + ", price: "
                                                         + b.getPrice() + ", discount: " + b.getDiscount() + ")",
@@ -298,7 +307,6 @@ public class SellLogFormController extends Window {
                                 }
                             }
 
-                            btn.setDisable(true);
                             alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successful Return",
                                     "Return successful Bill number: " + billNumber);
 
@@ -334,9 +342,12 @@ public class SellLogFormController extends Window {
                 if(response == ButtonType.YES) {
                     try {
                         if(dbConnection.setReturnSell(sellId)) {
-                            sellsTbl.getItems().forEach(s -> {
+                            int returnCount = 0;
+
+                            for (model.tableRows.sellLogWindow.Sell s : sellsTbl.getItems()) {
                                 if(s.getSellId().equals(sellId)) {
                                     try {
+                                        btn.setDisable(true);
                                         dbConnection.addLog(new Log(super.getUserId(),
                                                 "Return Sell (Sell ID: " + sellId + ", price: "
                                                         + s.getPrice() + ", discount: " + s.getDiscount() + ")",
@@ -348,9 +359,21 @@ public class SellLogFormController extends Window {
                                                 "Database Connection Error", ex.getMessage());
                                     }
                                 }
-                            });
 
-                            btn.setDisable(true);
+                                if(!s.getBtn().isDisable()) {
+                                    returnCount += 1;
+                                }
+                            }
+
+                            if(returnCount == 1) {
+                                for (model.tableRows.sellLogWindow.Sell s : sellsTbl.getItems()) {
+                                    if(!s.getBtn().isDisable()) {
+                                        s.setBtn(getBillReturnButton(dbConnection.getBillNumber(sellId)));
+                                        break;
+                                    }
+                                }
+                            }
+
                             alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successful Return",
                                     "Return successful Sell ID: " + sellId);
 
