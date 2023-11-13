@@ -120,16 +120,29 @@ public class SellLogFormController extends Window {
             ArrayList<Sell> sells = dbConnection.getSells(billNumber);
             if(sells != null && !sells.isEmpty()) {
                 ObservableList<model.tableRows.sellLogWindow.Sell> obList = FXCollections.observableArrayList();
+                int returnCount = 0;
+
+                for (Sell s : sells) {
+                    if(!s.isReturns()) {
+                        returnCount += 1;
+                    }
+                }
 
                 for (Sell s : sells) {
                     Button btn = new Button("Return");
                     btn.setStyle("-fx-background-color:  #ff6b6b;");
                     btn.setDisable(true);
 
-                    obList.add(new model.tableRows.sellLogWindow.Sell(s.getSellId(),
-                            dbConnection.getItemName(s.getItemId()), s.getQuantity(), s.getDiscount(),
-                            s.getPrice(), s.isReturns() ? btn : sells.size() != 1 ?
-                            getSellReturnButton(s.getSellId()) : getBillReturnButton(billNumber)));
+                    if((returnCount == 1 || sells.size() == 1) && !s.isReturns()) {
+                        obList.add(new model.tableRows.sellLogWindow.Sell(s.getSellId(),
+                                dbConnection.getItemName(s.getItemId()), s.getQuantity(), s.getDiscount(),
+                                s.getPrice(), getBillReturnButton(billNumber)));
+
+                    } else {
+                        obList.add(new model.tableRows.sellLogWindow.Sell(s.getSellId(),
+                                dbConnection.getItemName(s.getItemId()), s.getQuantity(), s.getDiscount(),
+                                s.getPrice(), s.isReturns() ? btn : getSellReturnButton(s.getSellId())));
+                    }
                 }
                 sellsTbl.setItems(obList);
             }
@@ -342,8 +355,6 @@ public class SellLogFormController extends Window {
                 if(response == ButtonType.YES) {
                     try {
                         if(dbConnection.setReturnSell(sellId)) {
-                            int returnCount = 0;
-
                             for (model.tableRows.sellLogWindow.Sell s : sellsTbl.getItems()) {
                                 if(s.getSellId().equals(sellId)) {
                                     try {
@@ -359,21 +370,9 @@ public class SellLogFormController extends Window {
                                                 "Database Connection Error", ex.getMessage());
                                     }
                                 }
-
-                                if(!s.getBtn().isDisable()) {
-                                    returnCount += 1;
-                                }
                             }
 
-                            if(returnCount == 1) {
-                                for (model.tableRows.sellLogWindow.Sell s : sellsTbl.getItems()) {
-                                    if(!s.getBtn().isDisable()) {
-                                        s.setBtn(getBillReturnButton(dbConnection.getBillNumber(sellId)));
-                                        break;
-                                    }
-                                }
-                            }
-
+                            setDataIntoSellTable(dbConnection.getBillNumber(sellId));
                             alert(Alert.AlertType.INFORMATION, "INFORMATION", "Successful Return",
                                     "Return successful Sell ID: " + sellId);
 
