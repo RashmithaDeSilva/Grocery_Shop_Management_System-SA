@@ -40,11 +40,11 @@ public class SellLogFormController extends Window {
     public TextField discountTxt;
     public TextField quantityTxt;
     public TextField priceTxt;
-    public TextField ItemNameTxt;
     public ComboBox<String> searchCbBx;
     public TextField searchTxt;
     public Button previewBillTableBtn;
     public Button nextBillTableBtn;
+    public TextField itemNameTxt;
     private int billTableDataCount;
     private ArrayList<Bill> bills;
     private int loadedRowCountBills = 0;
@@ -113,6 +113,20 @@ public class SellLogFormController extends Window {
             }
         });
 
+        sellsTbl.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null && !newValue.getBtn().isDisable()) {
+                setDataIntoInputs(newValue);
+            }
+        });
+
+    }
+
+    private void setDataIntoInputs(model.tableRows.sellLogWindow.Sell newValue) {
+        discountTxt.setText(String.valueOf(newValue.getDiscount()));
+        priceTxt.setText(String.valueOf(newValue.getPrice()));
+        quantityTxt.setText(String.valueOf(newValue.getQuantity()));
+        sellIdTxt.setText(String.valueOf(newValue.getSellId()));
+        itemNameTxt.setText(newValue.getItemName());
     }
 
     private void setDataIntoSellTable(String billNumber) {
@@ -453,6 +467,7 @@ public class SellLogFormController extends Window {
     }
 
     public void resetOnAction(ActionEvent actionEvent) {
+
     }
 
     public void updateOnAction(ActionEvent actionEvent) {
