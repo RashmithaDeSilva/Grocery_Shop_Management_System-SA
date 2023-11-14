@@ -24,6 +24,13 @@ public class Stock {
         this.price = price;
     }
 
+    public Stock(int stockId, int quantity, double price, double sellingPrice) {
+        this.stockId = stockId;
+        this.quantity = quantity;
+        this.price = price;
+        this.sellingPrice = sellingPrice;
+    }
+
     public Stock(int stockId, int itemId, int quantity, double price, double sellingPrice) {
         this.stockId = stockId;
         this.itemId = itemId;

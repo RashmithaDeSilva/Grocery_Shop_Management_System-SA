@@ -573,6 +573,18 @@ public class DBConnection {
         return stock;
     }
 
+    public Stock getStock(int stockId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT * FROM stock WHERE stock_id = '" + stockId +"';");
+
+        Stock stock = null;
+        if(reset.next()) {
+            stock = new Stock(stockId, reset.getInt("quantity"), reset.getDouble("price"),
+                    reset.getDouble("selling_price"));
+        }
+
+        return stock;
+    }
+
     public String getUserName(int userId) throws SQLException {
         ResultSet reset = stm.executeQuery("SELECT user_name FROM users WHERE user_id = " + userId +";");
 
@@ -704,6 +716,29 @@ public class DBConnection {
             return reset.getString("password");
         }
         return null;
+    }
+
+    public int getStockId(String sellId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT stock_id FROM sells WHERE sale_id = '" + sellId + "';");
+
+        if(reset.next()) {
+            return reset.getInt("stock_id");
+        }
+        return -1;
+    }
+
+    public Sell getSell(String sellId) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT * FROM sells WHERE sale_id = '" + sellId + "';");
+
+        Sell sell = null;
+        if(reset.next()) {
+            sell = new Sell(sellId, reset.getString("bill_number"), reset.getInt("item_id"),
+                    reset.getInt("stock_id"), reset.getDouble("discount"),
+                    reset.getDouble("price"), reset.getDouble("profit"),
+                    reset.getInt("quantity"), reset.getBoolean("edit"),
+                    reset.getBoolean("returns"));
+        }
+        return sell;
     }
 
     public ArrayList<Sell> getSells(String billNumber) throws SQLException {;

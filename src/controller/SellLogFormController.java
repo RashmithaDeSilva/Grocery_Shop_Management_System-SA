@@ -6,10 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import model.Bill;
-import model.Log;
-import model.Sell;
-import model.Window;
+import model.*;
 import model.staticType.IncomeOrExpenseLogTypes;
 import model.staticType.LogTypes;
 import model.staticType.TableTypes;
@@ -49,6 +46,7 @@ public class SellLogFormController extends Window {
     private ArrayList<Bill> bills;
     private int loadedRowCountBills = 0;
     private String searchText = "";
+    private int oldQuantity;
 
 
     public void initialize() {
@@ -98,6 +96,39 @@ public class SellLogFormController extends Window {
         sellsTbl.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null && !newValue.getBtn().isDisable()) {
                 setDataIntoInputs(newValue);
+            }
+        });
+
+        quantityTxt.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null && !newValue.isEmpty() && oldValue != null && !oldValue.isEmpty()) {
+                try {
+                    Stock stock = dbConnection.getStock(dbConnection.getStockId(sellIdTxt.getText()));
+                    Sell sell = dbConnection.getSell(sellIdTxt.getText());
+                    int quantity = Integer.parseInt(newValue);
+
+                    if(stock != null) {
+                        if(sell.getQuantity() <= stock.getQuantity() && quantity <= stock.getQuantity()
+                                && quantity > 0) {
+                            priceTxt.setText(String.valueOf(stock.getSellingPrice() * quantity));
+                            discountTxt.setText("0");
+                        }
+                    } else {
+                        alert(Alert.AlertType.WARNING, "WARNING", "This stock not available",
+                                "This stock is finish you cant ");
+                    }
+
+
+
+
+                    //int avalabelQuantity = dbConnection.getAvailableStockQuantity();
+                    double price = 0;
+
+                } catch (NumberFormatException e) {
+                    alert(Alert.AlertType.WARNING, "WARNING", "Invalid input enter integer value",
+                            e.getMessage());
+                } catch (SQLException e) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                }
             }
         });
 
@@ -466,6 +497,7 @@ public class SellLogFormController extends Window {
     }
 
     public void updateOnAction(ActionEvent actionEvent) {
+
     }
 
     public void refreshOnAction(ActionEvent actionEvent) {
