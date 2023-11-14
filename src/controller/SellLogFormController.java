@@ -73,25 +73,7 @@ public class SellLogFormController extends Window {
                 "Discount", "Price", "Date", "Time", "Return", "Not Return"));
         searchCbBx.setValue("All");
 
-        try {
-            billTableDataCount = dbConnection.getTableRowCount(TableTypes.BILL_TABLE);
-
-            // Set stock table
-            if (billTableDataCount < 25 && billTableDataCount >= 0) {
-                nextBillTableBtn.setDisable(true);
-            }
-
-            bills = dbConnection.getBillTableDesc(loadedRowCountBills);
-            previewBillTableBtn.setDisable(true);
-
-            setDataIntoBillTable();
-            if(bills != null && !bills.isEmpty()) {
-                setDataIntoSellTable(bills.get(0).getBillNumber());
-            }
-
-        } catch (SQLException e){
-            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
-        }
+        refreshOnAction(new ActionEvent());
 
         searchCbBx.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null) {
@@ -474,5 +456,29 @@ public class SellLogFormController extends Window {
     }
 
     public void refreshOnAction(ActionEvent actionEvent) {
+        loadedRowCountBills = 0;
+        searchCbBx.setValue("All");
+        searchText = "";
+        searchTxt.clear();
+
+        try {
+            billTableDataCount = dbConnection.getTableRowCount(TableTypes.BILL_TABLE);
+
+            // Set stock table
+            if (billTableDataCount < 25 && billTableDataCount >= 0) {
+                nextBillTableBtn.setDisable(true);
+            }
+
+            bills = dbConnection.getBillTableDesc(loadedRowCountBills);
+            previewBillTableBtn.setDisable(true);
+
+            setDataIntoBillTable();
+            if(bills != null && !bills.isEmpty()) {
+                setDataIntoSellTable(bills.get(0).getBillNumber());
+            }
+
+        } catch (SQLException e){
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
     }
 }
