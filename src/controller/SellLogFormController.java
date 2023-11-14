@@ -450,6 +450,19 @@ public class SellLogFormController extends Window {
 
     public void resetOnAction(ActionEvent actionEvent) {
 
+        sellsTbl.getItems().removeAll();
+        try {
+            setDataIntoSellTable(dbConnection.getBillNumber(sellIdTxt.getText()));
+
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+        }
+
+        discountTxt.clear();
+        priceTxt.clear();
+        quantityTxt.clear();
+        sellIdTxt.clear();
+        itemNameTxt.clear();
     }
 
     public void updateOnAction(ActionEvent actionEvent) {
