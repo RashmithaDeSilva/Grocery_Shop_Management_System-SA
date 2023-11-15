@@ -556,7 +556,43 @@ public class SellLogFormController extends Window {
     }
 
     public void updateOnAction(ActionEvent actionEvent) {
+        if(sellIdTxt != null && !sellIdTxt.getText().isEmpty()) {
+            try {
+                Stock stock = dbConnection.getStock(dbConnection.getStockId(sellIdTxt.getText()));
+                Sell sell = dbConnection.getSell(sellIdTxt.getText());
+                int quantity = Integer.parseInt(quantityTxt.getText());
+                double discount = Double.parseDouble(new DecimalFormat("#.##").format(discountTxt.getText()));
 
+                if(stock != null) {
+                    if(sell.getQuantity() > quantity) {
+                        if(stock.getItemId() == sell.getItemId() &&
+                                stock.getPrice() == (sell.getProfit() + sell.getDiscount()) &&
+                                stock.getSellingPrice() == (sell.getPrice() + sell.getDiscount())) {
+
+//                            String sellId, String billNumber, int itemId, int stockId, double discount,
+//                            double price, double profit, int quantity, boolean edited, boolean returns
+
+                            dbConnection.updateStock(new Sell(sell.getSellId(), sell.getBillNumber(),
+                                    sell.getItemId(), sell.getStockId(), ), sell.getBillNumber());
+                        }
+
+                    } else if (sell.getQuantity() < quantity) {
+
+                    } else if (sell.getDiscount() != discount) {
+
+                    }
+
+                }
+
+
+            } catch (NumberFormatException e) {
+                alert(Alert.AlertType.WARNING, "WARNING", "Invalid input enter integer value",
+                        e.getMessage());
+
+            } catch (SQLException e) {
+                alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+            }
+        }
     }
 
     public void refreshOnAction(ActionEvent actionEvent) {
