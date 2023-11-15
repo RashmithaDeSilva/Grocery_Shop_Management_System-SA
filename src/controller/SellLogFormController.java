@@ -61,7 +61,7 @@ public class SellLogFormController extends Window {
         returnBillTableCol.setCellValueFactory(new PropertyValueFactory<>("btn"));
 
         sellIdCol.setCellValueFactory(new PropertyValueFactory<>("sellId"));
-        itemNameCol.setCellValueFactory(new PropertyValueFactory<>("itemId"));
+        itemNameCol.setCellValueFactory(new PropertyValueFactory<>("itemName"));
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         discountSellTableCol.setCellValueFactory(new PropertyValueFactory<>("discount"));
         priceSellTableCol.setCellValueFactory(new PropertyValueFactory<>("price"));
@@ -89,6 +89,7 @@ public class SellLogFormController extends Window {
 
         billTbl.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null) {
+                clearAllInputs();
                 setDataIntoSellTable(newValue.getBillNumber());
             }
         });
@@ -113,6 +114,8 @@ public class SellLogFormController extends Window {
                             discountTxt.setText("0");
 
                         } else {
+                            quantityTxt.setText(String.valueOf(sell.getQuantity()));
+                            discountTxt.setText(String.valueOf(sell.getDiscount()));
                             alert(Alert.AlertType.WARNING, "WARNING", "Invalid input",
                                     "This quantity is invalid, Enter valid quantity");
                         }
@@ -123,6 +126,8 @@ public class SellLogFormController extends Window {
                             discountTxt.setText("0");
 
                         } else {
+                            quantityTxt.setText(String.valueOf(sell.getQuantity()));
+                            discountTxt.setText(String.valueOf(sell.getDiscount()));
                             alert(Alert.AlertType.WARNING, "WARNING", "Invalid input",
                                     "This quantity is invalid, Enter valid quantity");
                         }
@@ -131,6 +136,7 @@ public class SellLogFormController extends Window {
                 } catch (NumberFormatException e) {
                     alert(Alert.AlertType.WARNING, "WARNING", "Invalid input enter integer value",
                             e.getMessage());
+
                 } catch (SQLException e) {
                     alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
                 }
@@ -144,7 +150,8 @@ public class SellLogFormController extends Window {
                     Stock stock = dbConnection.getStock(dbConnection.getStockId(sellIdTxt.getText()));
                     Sell sell = dbConnection.getSell(sellIdTxt.getText());
                     int quantity = Integer.parseInt(quantityTxt.getText());
-                    double discount = Double.parseDouble(new DecimalFormat("#.##").format(Double.parseDouble(newValue)));
+                    double discount = Double.parseDouble(new DecimalFormat("#.##").
+                            format(Double.parseDouble(newValue)));
 
                     if(stock != null) {
                         if(discount >= 0 && stock.getSellingPrice() >= discount) {
@@ -152,6 +159,7 @@ public class SellLogFormController extends Window {
                                     (((sell.getPrice() + sell.getDiscount()) * quantity) - discount)));
 
                         } else {
+                            discountTxt.setText("0.0");
                             alert(Alert.AlertType.WARNING, "WARNING", "Invalid input",
                                     "This discount is invalid, Enter valid discount");
                         }
@@ -163,6 +171,7 @@ public class SellLogFormController extends Window {
                                     (((sell.getPrice() + sell.getDiscount()) * quantity) - discount)));
 
                         } else {
+                            discountTxt.setText("0.0");
                             alert(Alert.AlertType.WARNING, "WARNING", "Invalid input",
                                     "This discount is invalid, Enter valid discount");
                         }
@@ -171,6 +180,7 @@ public class SellLogFormController extends Window {
                 } catch (NumberFormatException e) {
                     alert(Alert.AlertType.WARNING, "WARNING", "Invalid input enter integer value",
                             e.getMessage());
+
                 } catch (SQLException e) {
                     alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
                 }
@@ -534,6 +544,10 @@ public class SellLogFormController extends Window {
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
         }
 
+        clearAllInputs();
+    }
+
+    private void clearAllInputs() {
         discountTxt.clear();
         priceTxt.clear();
         quantityTxt.clear();
