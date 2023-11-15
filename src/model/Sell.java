@@ -58,8 +58,8 @@ public class Sell {
         return price;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setPrice(double sellAmount) {
+        this.price = sellAmount;
     }
 
     public int getQuantity() {

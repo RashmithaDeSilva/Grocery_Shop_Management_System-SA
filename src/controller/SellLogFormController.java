@@ -13,6 +13,7 @@ import model.staticType.TableTypes;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -46,7 +47,6 @@ public class SellLogFormController extends Window {
     private ArrayList<Bill> bills;
     private int loadedRowCountBills = 0;
     private String searchText = "";
-    private int oldQuantity;
 
 
     public void initialize() {
@@ -100,28 +100,73 @@ public class SellLogFormController extends Window {
         });
 
         quantityTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue != null && !newValue.isEmpty() && oldValue != null && !oldValue.isEmpty()) {
+            if(newValue != null && !newValue.isEmpty() && sellIdTxt.getText() != null &&
+                    !sellIdTxt.getText().isEmpty()) {
                 try {
                     Stock stock = dbConnection.getStock(dbConnection.getStockId(sellIdTxt.getText()));
                     Sell sell = dbConnection.getSell(sellIdTxt.getText());
                     int quantity = Integer.parseInt(newValue);
 
                     if(stock != null) {
-                        if(sell.getQuantity() <= stock.getQuantity() && quantity <= stock.getQuantity()
-                                && quantity > 0) {
+                        if(quantity <= (stock.getQuantity() + sell.getQuantity()) && quantity > 0) {
                             priceTxt.setText(String.valueOf(stock.getSellingPrice() * quantity));
                             discountTxt.setText("0");
+
+                        } else {
+                            alert(Alert.AlertType.WARNING, "WARNING", "Invalid input",
+                                    "This quantity is invalid, Enter valid quantity");
                         }
+
                     } else {
-                        alert(Alert.AlertType.WARNING, "WARNING", "This stock not available",
-                                "This stock is finish you cant ");
+                        if(quantity <= sell.getQuantity()) {
+                            priceTxt.setText(String.valueOf((sell.getPrice() + sell.getDiscount()) * quantity));
+                            discountTxt.setText("0");
+
+                        } else {
+                            alert(Alert.AlertType.WARNING, "WARNING", "Invalid input",
+                                    "This quantity is invalid, Enter valid quantity");
+                        }
                     }
 
+                } catch (NumberFormatException e) {
+                    alert(Alert.AlertType.WARNING, "WARNING", "Invalid input enter integer value",
+                            e.getMessage());
+                } catch (SQLException e) {
+                    alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+                }
+            }
+        });
 
+        discountTxt.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null && !newValue.isEmpty() && sellIdTxt.getText() != null &&
+                    !sellIdTxt.getText().isEmpty()) {
+                try {
+                    Stock stock = dbConnection.getStock(dbConnection.getStockId(sellIdTxt.getText()));
+                    Sell sell = dbConnection.getSell(sellIdTxt.getText());
+                    int quantity = Integer.parseInt(quantityTxt.getText());
+                    double discount = Double.parseDouble(new DecimalFormat("#.##").format(Double.parseDouble(newValue)));
 
+                    if(stock != null) {
+                        if(discount >= 0 && stock.getSellingPrice() >= discount) {
+                            priceTxt.setText(String.valueOf(new DecimalFormat("#.##").format
+                                    (((sell.getPrice() + sell.getDiscount()) * quantity) - discount)));
 
-                    //int avalabelQuantity = dbConnection.getAvailableStockQuantity();
-                    double price = 0;
+                        } else {
+                            alert(Alert.AlertType.WARNING, "WARNING", "Invalid input",
+                                    "This discount is invalid, Enter valid discount");
+                        }
+
+                    } else {
+
+                        if(discount >= 0 && ((sell.getPrice() + sell.getDiscount()) * quantity) >= discount) {
+                            priceTxt.setText(String.valueOf(new DecimalFormat("#.##").format
+                                    (((sell.getPrice() + sell.getDiscount()) * quantity) - discount)));
+
+                        } else {
+                            alert(Alert.AlertType.WARNING, "WARNING", "Invalid input",
+                                    "This discount is invalid, Enter valid discount");
+                        }
+                    }
 
                 } catch (NumberFormatException e) {
                     alert(Alert.AlertType.WARNING, "WARNING", "Invalid input enter integer value",

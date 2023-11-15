@@ -79,7 +79,7 @@
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>
-      <TextField fx:id="priceTxt" alignment="CENTER" layoutX="352.0" layoutY="776.0" prefHeight="37.0" prefWidth="186.0">
+      <TextField fx:id="priceTxt" alignment="CENTER" editable="false" layoutX="352.0" layoutY="776.0" prefHeight="37.0" prefWidth="186.0">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></TextField>

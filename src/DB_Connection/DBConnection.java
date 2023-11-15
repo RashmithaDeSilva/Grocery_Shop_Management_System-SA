@@ -734,7 +734,7 @@ public class DBConnection {
         if(reset.next()) {
             sell = new Sell(sellId, reset.getString("bill_number"), reset.getInt("item_id"),
                     reset.getInt("stock_id"), reset.getDouble("discount"),
-                    reset.getDouble("price"), reset.getDouble("profit"),
+                    reset.getDouble("sale_amount"), reset.getDouble("profit"),
                     reset.getInt("quantity"), reset.getBoolean("edit"),
                     reset.getBoolean("returns"));
         }
