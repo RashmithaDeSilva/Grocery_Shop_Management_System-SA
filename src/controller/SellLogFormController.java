@@ -561,27 +561,72 @@ public class SellLogFormController extends Window {
                 Stock stock = dbConnection.getStock(dbConnection.getStockId(sellIdTxt.getText()));
                 Sell sell = dbConnection.getSell(sellIdTxt.getText());
                 int quantity = Integer.parseInt(quantityTxt.getText());
+                double price = Double.parseDouble(new DecimalFormat("#.##").format(priceTxt.getText()));
                 double discount = Double.parseDouble(new DecimalFormat("#.##").format(discountTxt.getText()));
+                boolean doTheChangers = false;
 
                 if(stock != null) {
-                    if(sell.getQuantity() > quantity) {
-                        if(stock.getItemId() == sell.getItemId() &&
+                    if(sell.getQuantity() != quantity || sell.getDiscount() != discount) {
+                        if (stock.getItemId() == sell.getItemId() &&
                                 stock.getPrice() == (sell.getProfit() + sell.getDiscount()) &&
                                 stock.getSellingPrice() == (sell.getPrice() + sell.getDiscount())) {
 
-//                            String sellId, String billNumber, int itemId, int stockId, double discount,
-//                            double price, double profit, int quantity, boolean edited, boolean returns
+                            if (sell.getQuantity() < quantity &&
+                                    (sell.getQuantity() + stock.getQuantity()) >= quantity) {
+                                doTheChangers = true;
 
-                            dbConnection.updateStock(new Sell(sell.getSellId(), sell.getBillNumber(),
-                                    sell.getItemId(), sell.getStockId(), ), sell.getBillNumber());
+                            } else if (sell.getQuantity() > quantity) {
+                                doTheChangers = true;
+
+                            } else if (discount <= (quantity * stock.getSellingPrice()) && discount >= 0) {
+                                doTheChangers = true;
+                            }
+
+                            if (doTheChangers) {
+                                dbConnection.updateStock(new Sell(sell.getSellId(), sell.getBillNumber(),
+                                        sell.getItemId(), sell.getStockId(), discount, price,
+                                        ((stock.getSellingPrice() - stock.getPrice()) * quantity) - discount,
+                                        quantity, true, false), sell.getBillNumber());
+
+                                dbConnection.updateSell(new Sell(sell.getSellId(), sell.getBillNumber(),
+                                        sell.getItemId(), sell.getStockId(), discount, price,
+                                        ((stock.getSellingPrice() - stock.getPrice()) * quantity) - discount,
+                                        quantity, true, false));
+
+                                dbConnection.addSellEdits(new SellEdits(super.getUserId(), sell.getSellId(),
+                                        super.getDate(), super.getTime(), sell.getPrice(), price,
+                                        sell.getDiscount(), discount, sell.getQuantity(), quantity));
+                            }
                         }
-
-                    } else if (sell.getQuantity() < quantity) {
-
-                    } else if (sell.getDiscount() != discount) {
-
                     }
 
+                } else {
+                    if(sell.getQuantity() != quantity || sell.getDiscount() != discount) {
+                        if (sell.getQuantity() >= quantity) {
+                            doTheChangers = true;
+
+                        } else if (discount <= (quantity * (sell.getDiscount() + sell.getPrice())) && discount >= 0) {
+                            doTheChangers = true;
+                        }
+
+                        if (doTheChangers) {
+                            dbConnection.updateStock(new Sell(sell.getSellId(), sell.getBillNumber(),
+                                    sell.getItemId(), sell.getStockId(), discount, price,
+                                    ((discount + price) * quantity) - ((((sell.getDiscount() +
+                                            sell.getPrice()) - sell.getProfit()) / sell.getQuantity()) * quantity),
+                                    quantity, true, false), sell.getBillNumber());
+
+                            dbConnection.updateSell(new Sell(sell.getSellId(), sell.getBillNumber(),
+                                    sell.getItemId(), sell.getStockId(), discount, price,
+                                    ((discount + price) * quantity) - ((((sell.getDiscount() +
+                                            sell.getPrice()) - sell.getProfit()) / sell.getQuantity()) * quantity),
+                                    quantity, true, false));
+
+                            dbConnection.addSellEdits(new SellEdits(super.getUserId(), sell.getSellId(),
+                                    super.getDate(), super.getTime(), sell.getPrice(), price,
+                                    sell.getDiscount(), discount, sell.getQuantity(), quantity));
+                        }
+                    }
                 }
 
 
