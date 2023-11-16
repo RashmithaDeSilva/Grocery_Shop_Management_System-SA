@@ -92,7 +92,7 @@ public class DBConnection {
 
     public boolean addReturnStock(Stock stock) throws SQLException {
         String sql = "INSERT INTO stock (stock_id, user_id, item_id, quantity, refill_quantity, " +
-                "price, selling_price, refill_date, refill_time) VALUES (?,?,?,?,?,?,?,?,?,?)";
+                "price, selling_price, refill_date, refill_time) VALUES (?,?,?,?,?,?,?,?,?)";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         // Set the values for the placeholders
@@ -222,7 +222,7 @@ public class DBConnection {
     }
 
     public boolean updateSell(Sell sell) throws SQLException {
-        String sql = "UPDATE sells SET discount = ?, sale_amount = ?, profit = ?, quantity = ?, edit = ?" +
+        String sql = "UPDATE sells SET discount = ?, sale_amount = ?, profit = ?, quantity = ?, edit = ? " +
                 "WHERE sale_id = ?;";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -262,8 +262,7 @@ public class DBConnection {
         String sql = "UPDATE stock SET quantity = quantity + ? WHERE stock_id = ? " +
                 "AND item_id = ? AND price = ? AND selling_price = ?;";
 
-        double price = ((sell.getPrice() + sell.getDiscount()) - (sell.getProfit() + sell.getDiscount()))
-                / sell.getQuantity();
+        double price = Math.abs(sell.getPrice() - sell.getProfit()) / sell.getQuantity();
         double sellingPrice = (sell.getPrice() + sell.getDiscount()) / sell.getQuantity();
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -289,6 +288,43 @@ public class DBConnection {
                 return addStock(new Stock(0, getBillAddedUserId(bill_number), sell.getItemId(),
                         sell.getQuantity(), 0, price, sell.getPrice() +
                         sell.getDiscount(), date, time));
+            }
+        }
+    }
+
+    public boolean updateStock(Sell sell, int updateQuantity) throws SQLException {
+        String sql = "UPDATE stock SET quantity = ? WHERE stock_id = ? " +
+                "AND item_id = ? AND price = ? AND selling_price = ?;";
+
+        double price = Math.abs(sell.getPrice() - sell.getProfit()) / sell.getQuantity();
+        System.out.println(price);
+        double sellingPrice = (sell.getPrice() + sell.getDiscount()) / sell.getQuantity();
+        System.out.println(sellingPrice);
+        System.out.println(sell);
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, updateQuantity);
+        preparedStatement.setInt(2, sell.getStockId());
+        preparedStatement.setInt(3, sell.getItemId());
+        preparedStatement.setDouble(4, price);
+        preparedStatement.setDouble(5, sellingPrice);
+
+        if(preparedStatement.executeUpdate() > 0) {
+            return true;
+
+        } else {
+            Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+            Time time = new Time(Calendar.getInstance().getTime().getTime());
+
+            if(addReturnStock(new Stock(sell.getStockId(), getBillAddedUserId(sell.getBillNumber()),
+                    sell.getItemId(), updateQuantity, 0, price, sell.getPrice() +
+                    sell.getDiscount(), date, time))) {
+                return true;
+
+            } else {
+                return addStock(new Stock(0, getBillAddedUserId(sell.getBillNumber()),
+                        sell.getItemId(), updateQuantity, 0, price,
+                        sell.getPrice() + sell.getDiscount(), date, time));
             }
         }
     }
@@ -617,8 +653,8 @@ public class DBConnection {
 
         Stock stock = null;
         if(reset.next()) {
-            stock = new Stock(stockId, reset.getInt("quantity"), reset.getDouble("price"),
-                    reset.getDouble("selling_price"));
+            stock = new Stock(stockId, reset.getInt("item_id"), reset.getInt("quantity"),
+                    reset.getDouble("price"), reset.getDouble("selling_price"));
         }
 
         return stock;

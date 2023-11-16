@@ -559,40 +559,58 @@ public class SellLogFormController extends Window {
         if(sellIdTxt != null && !sellIdTxt.getText().isEmpty()) {
             try {
                 Stock stock = dbConnection.getStock(dbConnection.getStockId(sellIdTxt.getText()));
+                System.out.println(stock);
                 Sell sell = dbConnection.getSell(sellIdTxt.getText());
+                System.out.println(sell);
                 int quantity = Integer.parseInt(quantityTxt.getText());
-                double price = Double.parseDouble(new DecimalFormat("#.##").format(priceTxt.getText()));
-                double discount = Double.parseDouble(new DecimalFormat("#.##").format(discountTxt.getText()));
+                double price = Double.parseDouble(new DecimalFormat("#.##").format
+                        (Double.parseDouble(priceTxt.getText())));
+                double discount = Double.parseDouble(new DecimalFormat("#.##").format
+                        (Double.parseDouble(discountTxt.getText())));
                 boolean doTheChangers = false;
 
                 if(stock != null) {
                     if(sell.getQuantity() != quantity || sell.getDiscount() != discount) {
+                        System.out.println("ok");
+                        System.out.println(stock.getItemId() == sell.getItemId());
+                        System.out.println((Math.abs(sell.getPrice() - sell.getProfit()) / sell.getQuantity()));
+                        System.out.println(((sell.getPrice() + sell.getDiscount()) / sell.getQuantity()));
                         if (stock.getItemId() == sell.getItemId() &&
-                                stock.getPrice() == (sell.getProfit() + sell.getDiscount()) &&
-                                stock.getSellingPrice() == (sell.getPrice() + sell.getDiscount())) {
+                                stock.getPrice() == (Math.abs(sell.getPrice() - sell.getProfit()) /
+                                        sell.getQuantity()) &&
+                                stock.getSellingPrice() == ((sell.getPrice() + sell.getDiscount()) /
+                                        sell.getQuantity())) {
+                            System.out.println("ok");
 
                             if (sell.getQuantity() < quantity &&
                                     (sell.getQuantity() + stock.getQuantity()) >= quantity) {
+                                System.out.println("1");
                                 doTheChangers = true;
 
                             } else if (sell.getQuantity() > quantity) {
+                                System.out.println("2");
                                 doTheChangers = true;
 
                             } else if (discount <= (quantity * stock.getSellingPrice()) && discount >= 0) {
+                                System.out.println("3");
                                 doTheChangers = true;
                             }
 
                             if (doTheChangers) {
+                                System.out.println("ok");
                                 dbConnection.updateStock(new Sell(sell.getSellId(), sell.getBillNumber(),
                                         sell.getItemId(), sell.getStockId(), discount, price,
                                         ((stock.getSellingPrice() - stock.getPrice()) * quantity) - discount,
-                                        quantity, true, false), sell.getBillNumber());
+                                        quantity, true, false),
+                                        (stock.getQuantity() + sell.getQuantity()) - quantity);
 
+                                System.out.println("ok");
                                 dbConnection.updateSell(new Sell(sell.getSellId(), sell.getBillNumber(),
                                         sell.getItemId(), sell.getStockId(), discount, price,
                                         ((stock.getSellingPrice() - stock.getPrice()) * quantity) - discount,
                                         quantity, true, false));
 
+                                System.out.println("ok");
                                 dbConnection.addSellEdits(new SellEdits(super.getUserId(), sell.getSellId(),
                                         super.getDate(), super.getTime(), sell.getPrice(), price,
                                         sell.getDiscount(), discount, sell.getQuantity(), quantity));
@@ -614,7 +632,7 @@ public class SellLogFormController extends Window {
                                     sell.getItemId(), sell.getStockId(), discount, price,
                                     ((discount + price) * quantity) - ((((sell.getDiscount() +
                                             sell.getPrice()) - sell.getProfit()) / sell.getQuantity()) * quantity),
-                                    quantity, true, false), sell.getBillNumber());
+                                    quantity, true, false), sell.getQuantity() - quantity);
 
                             dbConnection.updateSell(new Sell(sell.getSellId(), sell.getBillNumber(),
                                     sell.getItemId(), sell.getStockId(), discount, price,
@@ -625,6 +643,9 @@ public class SellLogFormController extends Window {
                             dbConnection.addSellEdits(new SellEdits(super.getUserId(), sell.getSellId(),
                                     super.getDate(), super.getTime(), sell.getPrice(), price,
                                     sell.getDiscount(), discount, sell.getQuantity(), quantity));
+
+                            dbConnection.updateBill(new Bill());
+                            dbConnection.addLog(new Log());
                         }
                     }
                 }
@@ -636,6 +657,13 @@ public class SellLogFormController extends Window {
 
             } catch (SQLException e) {
                 alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());
+
+            } catch (Exception e) {
+                alert(Alert.AlertType.ERROR, "ERROR", "Invalid input enter integer value",
+                        e.getMessage());
+
+            } finally {
+                resetOnAction(new ActionEvent());
             }
         }
     }

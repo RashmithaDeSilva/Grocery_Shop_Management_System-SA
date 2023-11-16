@@ -109,4 +109,21 @@ public class Sell {
     public void setStockId(int stockId) {
         this.stockId = stockId;
     }
+
+
+    @Override
+    public String toString() {
+        return "Sell{" +
+                "sellId='" + sellId + '\'' +
+                ", billNumber='" + billNumber + '\'' +
+                ", itemId=" + itemId +
+                ", stockId=" + stockId +
+                ", discount=" + discount +
+                ", price=" + price +
+                ", profit=" + profit +
+                ", quantity=" + quantity +
+                ", edited=" + edited +
+                ", returns=" + returns +
+                '}';
+    }
 }
