@@ -202,7 +202,7 @@ public class SellLogFormController extends Window {
         try {
             clearAllInputs();
             ArrayList<Sell> sells = dbConnection.getSells(billNumber);
-            
+
             if(sells != null && !sells.isEmpty()) {
                 ObservableList<model.tableRows.sellLogWindow.Sell> obList = FXCollections.observableArrayList();
                 int returnCount = 0;
