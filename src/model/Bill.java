@@ -3,6 +3,7 @@ package model;
 import java.sql.Date;
 import java.sql.Time;
 
+
 public class Bill {
     private String billNumber;
     private int userId;
@@ -81,5 +82,19 @@ public class Bill {
 
     public void setReturns(boolean returns) {
         this.returns = returns;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Bill{" +
+                "billNumber='" + billNumber + '\'' +
+                ", userId=" + userId +
+                ", price=" + price +
+                ", discount=" + discount +
+                ", date=" + date +
+                ", time=" + time +
+                ", returns=" + returns +
+                '}';
     }
 }

@@ -122,7 +122,8 @@ public class SellLogFormController extends Window {
 
                     } else {
                         if(quantity <= sell.getQuantity()) {
-                            priceTxt.setText(String.valueOf((sell.getPrice() + sell.getDiscount()) * quantity));
+                            priceTxt.setText(String.valueOf(((sell.getPrice() + sell.getDiscount()) /
+                                    sell.getQuantity()) * quantity));
                             discountTxt.setText("0");
 
                         } else {
@@ -144,19 +145,18 @@ public class SellLogFormController extends Window {
         });
 
         discountTxt.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue != null && !newValue.isEmpty() && sellIdTxt.getText() != null &&
-                    !sellIdTxt.getText().isEmpty()) {
+            if(sellIdTxt.getText() != null && !sellIdTxt.getText().isEmpty()) {
                 try {
                     Stock stock = dbConnection.getStock(dbConnection.getStockId(sellIdTxt.getText()));
                     Sell sell = dbConnection.getSell(sellIdTxt.getText());
                     int quantity = Integer.parseInt(quantityTxt.getText());
                     double discount = Double.parseDouble(new DecimalFormat("#.##").
-                            format(Double.parseDouble(newValue)));
+                            format(Double.parseDouble(newValue != null && !newValue.isEmpty() ? newValue : "0")));
 
                     if(stock != null) {
                         if(discount >= 0 && stock.getSellingPrice() >= discount) {
                             priceTxt.setText(String.valueOf(new DecimalFormat("#.##").format
-                                    (((sell.getPrice() + sell.getDiscount()) * quantity) - discount)));
+                                    ((stock.getSellingPrice() * quantity) - discount)));
 
                         } else {
                             discountTxt.setText("0.0");
@@ -168,7 +168,8 @@ public class SellLogFormController extends Window {
 
                         if(discount >= 0 && ((sell.getPrice() + sell.getDiscount()) * quantity) >= discount) {
                             priceTxt.setText(String.valueOf(new DecimalFormat("#.##").format
-                                    (((sell.getPrice() + sell.getDiscount()) * quantity) - discount)));
+                                    ((((sell.getPrice() + sell.getDiscount()) / sell.getQuantity()) *
+                                            quantity) - discount)));
 
                         } else {
                             discountTxt.setText("0.0");
@@ -199,7 +200,9 @@ public class SellLogFormController extends Window {
 
     private void setDataIntoSellTable(String billNumber) {
         try {
+            clearAllInputs();
             ArrayList<Sell> sells = dbConnection.getSells(billNumber);
+            
             if(sells != null && !sells.isEmpty()) {
                 ObservableList<model.tableRows.sellLogWindow.Sell> obList = FXCollections.observableArrayList();
                 int returnCount = 0;
@@ -342,6 +345,7 @@ public class SellLogFormController extends Window {
             }
 
             billTbl.setItems(obList);
+            setDataIntoSellTable(billTbl.getItems().get(0).getBillNumber());
         }
     }
 
@@ -483,6 +487,8 @@ public class SellLogFormController extends Window {
     }
 
     public void previewBillTableOnAction(ActionEvent actionEvent) {
+        refreshOnAction(new ActionEvent());
+
         try {
             previewBillTableBtn.setDisable(true);
             if(bills != null && !bills.isEmpty()) {
@@ -490,6 +496,7 @@ public class SellLogFormController extends Window {
                     loadedRowCountBills -= 25;
                     bills = dbConnection.getBillTableDesc(loadedRowCountBills);
                     setDataIntoBillTable();
+                    setDataIntoSellTable(bills.get(0).getBillNumber());
                     nextBillTableBtn.setDisable(false);
 
                     if((loadedRowCountBills - 25) >= 0) {
@@ -509,6 +516,8 @@ public class SellLogFormController extends Window {
     }
 
     public void nextBillTableOnAction(ActionEvent actionEvent) {
+        refreshOnAction(new ActionEvent());
+
         try {
             nextBillTableBtn.setDisable(true);
             if(bills != null && !bills.isEmpty()) {
@@ -516,6 +525,7 @@ public class SellLogFormController extends Window {
                     loadedRowCountBills += 25;
                     bills = dbConnection.getBillTableDesc(loadedRowCountBills);
                     setDataIntoBillTable();
+                    setDataIntoSellTable(bills.get(0).getBillNumber());
                     previewBillTableBtn.setDisable(false);
 
                     if((loadedRowCountBills + 25) < billTableDataCount) {
@@ -559,9 +569,9 @@ public class SellLogFormController extends Window {
         if(sellIdTxt != null && !sellIdTxt.getText().isEmpty()) {
             try {
                 Stock stock = dbConnection.getStock(dbConnection.getStockId(sellIdTxt.getText()));
-                System.out.println(stock);
                 Sell sell = dbConnection.getSell(sellIdTxt.getText());
-                System.out.println(sell);
+                Bill oldBill = bills.stream().filter(b -> b.getBillNumber().equals(sell.getBillNumber()))
+                        .findFirst().orElse(dbConnection.getBill(sell.getBillNumber()));
                 int quantity = Integer.parseInt(quantityTxt.getText());
                 double price = Double.parseDouble(new DecimalFormat("#.##").format
                         (Double.parseDouble(priceTxt.getText())));
@@ -571,49 +581,51 @@ public class SellLogFormController extends Window {
 
                 if(stock != null) {
                     if(sell.getQuantity() != quantity || sell.getDiscount() != discount) {
-                        System.out.println("ok");
-                        System.out.println(stock.getItemId() == sell.getItemId());
-                        System.out.println((Math.abs(sell.getPrice() - sell.getProfit()) / sell.getQuantity()));
-                        System.out.println(((sell.getPrice() + sell.getDiscount()) / sell.getQuantity()));
                         if (stock.getItemId() == sell.getItemId() &&
                                 stock.getPrice() == (Math.abs(sell.getPrice() - sell.getProfit()) /
                                         sell.getQuantity()) &&
                                 stock.getSellingPrice() == ((sell.getPrice() + sell.getDiscount()) /
                                         sell.getQuantity())) {
-                            System.out.println("ok");
 
                             if (sell.getQuantity() < quantity &&
                                     (sell.getQuantity() + stock.getQuantity()) >= quantity) {
-                                System.out.println("1");
                                 doTheChangers = true;
 
                             } else if (sell.getQuantity() > quantity) {
-                                System.out.println("2");
                                 doTheChangers = true;
 
                             } else if (discount <= (quantity * stock.getSellingPrice()) && discount >= 0) {
-                                System.out.println("3");
                                 doTheChangers = true;
                             }
 
                             if (doTheChangers) {
-                                System.out.println("ok");
                                 dbConnection.updateStock(new Sell(sell.getSellId(), sell.getBillNumber(),
                                         sell.getItemId(), sell.getStockId(), discount, price,
                                         ((stock.getSellingPrice() - stock.getPrice()) * quantity) - discount,
                                         quantity, true, false),
                                         (stock.getQuantity() + sell.getQuantity()) - quantity);
 
-                                System.out.println("ok");
                                 dbConnection.updateSell(new Sell(sell.getSellId(), sell.getBillNumber(),
                                         sell.getItemId(), sell.getStockId(), discount, price,
                                         ((stock.getSellingPrice() - stock.getPrice()) * quantity) - discount,
                                         quantity, true, false));
 
-                                System.out.println("ok");
                                 dbConnection.addSellEdits(new SellEdits(super.getUserId(), sell.getSellId(),
                                         super.getDate(), super.getTime(), sell.getPrice(), price,
                                         sell.getDiscount(), discount, sell.getQuantity(), quantity));
+
+                                dbConnection.updateBill(new Bill(oldBill.getBillNumber(), oldBill.getUserId(),
+                                        price, discount, oldBill.getDate(), oldBill.getTime(), oldBill.isReturns()));
+
+                                dbConnection.addLog(new Log(super.getUserId(),
+                                        "Change sell and update oldBill (sell id: " + sell.getSellId() +
+                                                " and oldBill number: " + sell.getBillNumber() + ")",
+                                        LogTypes.INFORMATION, super.getDate(), super.getTime(),
+                                        price - oldBill.getPrice(),
+                                        IncomeOrExpenseLogTypes.SELL_INCOME));
+
+                                oldBill.setPrice(price);
+                                oldBill.setDiscount(discount);
                             }
                         }
                     }
@@ -644,8 +656,18 @@ public class SellLogFormController extends Window {
                                     super.getDate(), super.getTime(), sell.getPrice(), price,
                                     sell.getDiscount(), discount, sell.getQuantity(), quantity));
 
-                            dbConnection.updateBill(new Bill());
-                            dbConnection.addLog(new Log());
+                            dbConnection.updateBill(new Bill(oldBill.getBillNumber(), oldBill.getUserId(),
+                                    price, discount, oldBill.getDate(), oldBill.getTime(), oldBill.isReturns()));
+
+                            dbConnection.addLog(new Log(super.getUserId(),
+                                    "Change sell and update oldBill (sell id: " + sell.getSellId() +
+                                            " and oldBill number: " + sell.getBillNumber() + ")",
+                                    LogTypes.INFORMATION, super.getDate(), super.getTime(),
+                                    price - oldBill.getPrice(),
+                                    IncomeOrExpenseLogTypes.SELL_INCOME));
+
+                            oldBill.setPrice(price);
+                            oldBill.setDiscount(discount);
                         }
                     }
                 }
@@ -686,9 +708,6 @@ public class SellLogFormController extends Window {
             previewBillTableBtn.setDisable(true);
 
             setDataIntoBillTable();
-            if(bills != null && !bills.isEmpty()) {
-                setDataIntoSellTable(bills.get(0).getBillNumber());
-            }
 
         } catch (SQLException e){
             alert(Alert.AlertType.ERROR, "ERROR", "Database Connection Error", e.getMessage());

@@ -238,6 +238,19 @@ public class DBConnection {
         return preparedStatement.executeUpdate() > 0;
     }
 
+    public boolean updateBill(Bill bill) throws SQLException {
+        String sql = "UPDATE bills SET discount = ?, total_price = ? WHERE bill_number = ?;";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        // Set the values for the placeholders
+        preparedStatement.setDouble(1, bill.getDiscount());
+        preparedStatement.setDouble(2, bill.getPrice());
+        preparedStatement.setString(3, bill.getBillNumber());
+
+        // Execute the query
+        return preparedStatement.executeUpdate() > 0;
+    }
+
     public boolean updateStock(Stock stock) throws SQLException {
         String sql = "UPDATE stock " +
                 "SET user_id = ?, item_id = ?, quantity = ?, refill_quantity = ?, price = ?, " +
@@ -297,10 +310,7 @@ public class DBConnection {
                 "AND item_id = ? AND price = ? AND selling_price = ?;";
 
         double price = Math.abs(sell.getPrice() - sell.getProfit()) / sell.getQuantity();
-        System.out.println(price);
         double sellingPrice = (sell.getPrice() + sell.getDiscount()) / sell.getQuantity();
-        System.out.println(sellingPrice);
-        System.out.println(sell);
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1, updateQuantity);
@@ -814,6 +824,18 @@ public class DBConnection {
                     reset.getBoolean("returns"));
         }
         return sell;
+    }
+
+    public Bill getBill(String billNumber) throws SQLException {
+        ResultSet reset = stm.executeQuery("SELECT * FROM bills WHERE bill_number = '" + billNumber + "';");
+
+        Bill bill = null;
+        if(reset.next()) {
+            bill = new Bill(billNumber, reset.getInt("user_id"), reset.getDouble("discount"),
+                    reset.getDouble("total_price"), reset.getDate("order_date"),
+                    reset.getTime("order_time"), reset.getBoolean("returns"));
+        }
+        return bill;
     }
 
     public ArrayList<Sell> getSells(String billNumber) throws SQLException {;

@@ -38,7 +38,7 @@ CREATE TABLE bills (
 
 CREATE TABLE log (
     user_id INT,
-    log_name VARCHAR(100),
+    log_name VARCHAR(150),
     log_type INT, #  1) [ERROR],   2) [WARNING],   3) [INFO]
     log_date DATE,
     log_time TIME,
